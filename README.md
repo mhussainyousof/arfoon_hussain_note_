@@ -1,3 +1,49 @@
+
+# Project Sturucure
+
+The `lib` folder contains the main source code for the application, organized into several packages and files. Below is a guide that outlines the structure and purpose of each component within the `lib` folder.
+
+## Overview
+
+The `lib` folder is structured to promote modularity and reusability, following the VEP (View, Example, Page) Development Guide. It is organized into subdirectories and files, each serving a specific role in the application.
+
+### Directory Structure
+
+- **client**: Contains client-side models and data handling logic.
+  - `models`: Defines data structures and handles serialization/deserialization.
+    - `label.dart`: Model for labels.
+    - `note.dart`: Model for notes.
+    - `pagination.dart`: Handles pagination logic.
+
+- **frontend**: Responsible for the user interface and user experience.
+  - `features`: Encapsulates feature-specific views and examples.
+    - `home`: Contains the home view and its example for testing.
+      - `home_view.dart`: Defines the main UI for the home feature.
+      - `home_example.dart`: Provides test scenarios for the home view.
+  - `widgets`: Reusable UI components shared across different views.
+  - `utils`: Utility functions and helpers used by the frontend.
+  - `data`: Contains fake or mock data for testing purposes.
+    - `fake_data.dart`: Provides mock data for testing the UI.
+
+- **server**: Manages server-side logic and interactions with back-end services.
+  - `notes.dart`: Handles server-side operations for notes.
+  - `note_server.dart`: Manages communication with the note server.
+
+### Key Files
+
+- `frontend_app.dart`: Entry point for the frontend application, initializing the UI components.
+- `example_page.dart`: Demonstrates how to use and test various components in isolation.
+
+## Guidelines
+
+1. **Feature Development**: Each feature should have a corresponding view and example for isolated testing.
+2. **Testing**: Utilize mock data for testing views and ensure scenarios like loading, error, and empty states are covered.
+3. **Integration**: Once tested, integrate features into pages that communicate with the backend.
+4. **Documentation**: Maintain clear and concise documentation for each file, explaining its role and usage.
+5. **Code Reviews**: Ensure all code changes undergo thorough reviews to maintain quality and consistency.
+
+By following this guide, developers can navigate the `lib` folder efficiently, contributing to a maintainable and scalable codebase.
+
 # VEP (View, Example, Page) Development Guide
 
 This document outlines the rules and workflow structure for frontend developers working on the Arfoon company projects. By following this VEP guide, we aim to standardize the development process, ensure consistency, and improve code maintainability and functionality.
@@ -92,48 +138,3 @@ Best Practices
  • Work closely with the backend team to resolve API issues or define requirements.
 
  By adhering to this VEP Development Guide, the team can ensure high-quality frontend development that is scalable, maintainable, and user-friendly.
-
-# Project Sturucure
-
-The `lib` folder contains the main source code for the application, organized into several packages and files. Below is a guide that outlines the structure and purpose of each component within the `lib` folder.
-
-## Overview
-
-The `lib` folder is structured to promote modularity and reusability, following the VEP (View, Example, Page) Development Guide. It is organized into subdirectories and files, each serving a specific role in the application.
-
-### Directory Structure
-
-- **client**: Contains client-side models and data handling logic.
-  - `models`: Defines data structures and handles serialization/deserialization.
-    - `label.dart`: Model for labels.
-    - `note.dart`: Model for notes.
-    - `pagination.dart`: Handles pagination logic.
-
-- **frontend**: Responsible for the user interface and user experience.
-  - `features`: Encapsulates feature-specific views and examples.
-    - `home`: Contains the home view and its example for testing.
-      - `home_view.dart`: Defines the main UI for the home feature.
-      - `home_example.dart`: Provides test scenarios for the home view.
-  - `widgets`: Reusable UI components shared across different views.
-  - `utils`: Utility functions and helpers used by the frontend.
-  - `data`: Contains fake or mock data for testing purposes.
-    - `fake_data.dart`: Provides mock data for testing the UI.
-
-- **server**: Manages server-side logic and interactions with back-end services.
-  - `notes.dart`: Handles server-side operations for notes.
-  - `note_server.dart`: Manages communication with the note server.
-
-### Key Files
-
-- `frontend_app.dart`: Entry point for the frontend application, initializing the UI components.
-- `example_page.dart`: Demonstrates how to use and test various components in isolation.
-
-## Guidelines
-
-1. **Feature Development**: Each feature should have a corresponding view and example for isolated testing.
-2. **Testing**: Utilize mock data for testing views and ensure scenarios like loading, error, and empty states are covered.
-3. **Integration**: Once tested, integrate features into pages that communicate with the backend.
-4. **Documentation**: Maintain clear and concise documentation for each file, explaining its role and usage.
-5. **Code Reviews**: Ensure all code changes undergo thorough reviews to maintain quality and consistency.
-
-By following this guide, developers can navigate the `lib` folder efficiently, contributing to a maintainable and scalable codebase.
