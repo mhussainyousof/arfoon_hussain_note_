@@ -6,6 +6,6 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return HomeView();
+    return const HomeView();
   }
 }
