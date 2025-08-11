@@ -6,6 +6,6 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const HomeView();
+    return const HomeView(categories: [], selectedCategoryIndex: 0, notes: [],);
   }
 }

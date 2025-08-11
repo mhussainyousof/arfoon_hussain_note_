@@ -1,5 +1,4 @@
 import 'package:isar/isar.dart';
-
 import 'package:arfoon_note/client/client.dart';
 
 class Notes {
@@ -30,7 +29,7 @@ class Notes {
   }
 
   Future<Note?> updateLabel(Note note) async {
-    var res = await isar.writeTxn(() async {
+    var res = await isar.writeTxn(() async {  
       return await isar.notes.put(note);
     });
     return note.copyWith(id: res);
