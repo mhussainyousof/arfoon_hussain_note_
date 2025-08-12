@@ -1,38 +1,13 @@
-// lib/frontend/features/note_detail/note_detail_view.dart
 import 'package:arfoon_note/frontend/features/home/widgets/home_appbar.dart';
 import 'package:flutter/material.dart';
-import 'package:iconsax/iconsax.dart';
 import '../../../theme/theme.dart';
 
 class AddNoteView extends StatelessWidget {
-  final String updatedAt;
-  final String title;
-  final String description;
-  final List<String> labels;
-  final List<Color> availableColors;
-  final Color selectedColor;
 
-  final VoidCallback onBack;
-  final VoidCallback onMore;
-  final ValueChanged<String> onTitleChanged;
-  final ValueChanged<String> onDescriptionChanged;
-  final ValueChanged<Color> onColorSelected;
-  final ValueChanged<String> onAddLabel;
 
   const AddNoteView({
     super.key,
-    required this.updatedAt,
-    required this.title,
-    required this.description,
-    required this.labels,
-    required this.availableColors,
-    required this.selectedColor,
-    required this.onBack,
-    required this.onMore,
-    required this.onTitleChanged,
-    required this.onDescriptionChanged,
-    required this.onColorSelected,
-    required this.onAddLabel,
+
   });
 
   @override
@@ -60,7 +35,7 @@ class AddNoteView extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Updated at $updatedAt',
+                'Updated at Dec 17',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: Colors.grey,
                     ),
@@ -75,12 +50,11 @@ class AddNoteView extends StatelessWidget {
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
-                controller: TextEditingController(text: title),
-                onChanged: onTitleChanged,
+               
               ),
-              Expanded(
+              const Expanded(
                 child: TextField(
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: 'Description',
                     hintStyle:
                         TextStyle(color: Color(0xFF9B9696), fontSize: 16),
@@ -89,8 +63,7 @@ class AddNoteView extends StatelessWidget {
                   maxLines: null,
                   expands: true,
                   textAlignVertical: TextAlignVertical.top,
-                  controller: TextEditingController(text: description),
-                  onChanged: onDescriptionChanged,
+                
                 ),
               ),
               const SizedBox(height: 12),
@@ -125,7 +98,7 @@ class AddNoteView extends StatelessWidget {
                       ),
                     ),
                     SizedBox(
-                      width: 55,
+                      width: 70,
                       child: Stack(
                         children: [
                           Positioned(
@@ -133,7 +106,7 @@ class AddNoteView extends StatelessWidget {
                             child: _circle(const Color(0XFF00A894)),
                           ),
                           Positioned(
-                            right: 14,
+                            right: 18,
                             child: _circle(const Color(0XFFFF7E56)),
                           ),
                           Positioned(
@@ -157,8 +130,8 @@ class AddNoteView extends StatelessWidget {
 
 Widget _circle(Color color) {
   return Container(
-    width: 28,
-    height: 28,
+    width: 35,
+    height: 35,
     decoration: BoxDecoration(
       color: color,
       shape: BoxShape.circle,
