@@ -1,6 +1,8 @@
 import 'package:arfoon_note/frontend/features/add_note/add_note_example.dart';
 import 'package:arfoon_note/frontend/features/add_note/add_note_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:iconsax/iconsax.dart';
 import '../../../theme/theme.dart';
 import '../../widgets/widget.dart';
 import 'widgets/home_widgets.dart';
@@ -21,9 +23,14 @@ class HomeView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: const PreferredSize(
-        preferredSize: Size.fromHeight(56),
-        child: HomeAppBar(),
+      appBar:  HomeAppBar(
+        leading: const Icon(Icons.menu),
+        title: 'Arfoon Note',
+        textNaighbor: SvgPicture.asset(
+          'assets/images/note_logo.svg',
+          width: 24,
+          height: 24,
+        ),
       ),
       body: Column(
         children: [

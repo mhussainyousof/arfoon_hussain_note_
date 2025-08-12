@@ -1,31 +1,41 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 
-class HomeAppBar extends StatelessWidget {
-  const HomeAppBar({super.key});
+class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
+  final Widget? textNaighbor; 
+  final Widget? trailing;
+  final Widget? leading;
+  final VoidCallback? onMenuPressed;
+  final String title;
+
+  const HomeAppBar({
+    super.key,
+    this.leading,
+    this.textNaighbor,
+    this.trailing,
+    this.onMenuPressed,
+    required this.title,
+  });
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
       backgroundColor: Colors.white,
       surfaceTintColor: Colors.transparent,
-      title:  Row(
+      title: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-         SvgPicture.asset(
-            'assets/images/note_logo.svg',
-            width: 24 ,
-            height: 24,
-          ),
-          const SizedBox(width: 4),
-          const Text("Arfoon Note", style:TextStyle(fontSize: 16,)),
+          if (textNaighbor != null) ...[
+            textNaighbor!,
+            const SizedBox(width: 4),
+          ],
+          Text(title, style: const TextStyle(fontSize: 16)),
         ],
       ),
       centerTitle: true,
-      leading: IconButton(
-        icon: const Icon(Icons.menu),
-        onPressed: () {},
-      ),
+      leading: leading,
+      actions: trailing != null ? [trailing!] : null,
     );
   }
+   @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
