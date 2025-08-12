@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 
 class AddNoteButton extends StatelessWidget {
-  const AddNoteButton({super.key});
+
+  final Widget? child;
+  final VoidCallback? onPressed;
+  const AddNoteButton({super.key,  this.child, this.onPressed});
 
   @override
   Widget build(BuildContext context) {
     return FloatingActionButton(
       elevation: 0,
-      onPressed: () {},
+      onPressed: onPressed,
       backgroundColor: Colors.black,
-      child: const Icon(Icons.add, color: Colors.white),
+      child: child
     );
   }
 }

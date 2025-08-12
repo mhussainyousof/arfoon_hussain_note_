@@ -1,8 +1,9 @@
+import 'package:arfoon_note/frontend/features/add_note/add_note_example.dart';
+import 'package:arfoon_note/frontend/features/add_note/add_note_view.dart';
 import 'package:flutter/material.dart';
 import '../../../theme/theme.dart';
 import '../../widgets/widget.dart';
 import 'widgets/home_widgets.dart';
-
 
 class HomeView extends StatelessWidget {
   final List<String> categories;
@@ -26,7 +27,9 @@ class HomeView extends StatelessWidget {
       ),
       body: Column(
         children: [
-          const SearchNotesBar(hintText: 'Search Notes',),
+          const SearchNotesBar(
+            hintText: 'Search Notes',
+          ),
           CategoryFilterChips(
             categories: categories,
             selectedIndex: selectedCategoryIndex,
@@ -46,7 +49,17 @@ class HomeView extends StatelessWidget {
           ),
         ],
       ),
-      floatingActionButton: const AddNoteButton(),
+      floatingActionButton: AddNoteButton(
+          child: const Icon(Icons.add, color: Colors.white),
+          onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => const AddNoteExample()
+                      )
+                      
+                      )
+                      
+                      ),
     );
   }
 }

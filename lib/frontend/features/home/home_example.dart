@@ -6,8 +6,7 @@ import 'home_view.dart';
 import 'widgets/home_widgets.dart';
 
 class HomeExample extends StatelessWidget {
-  const HomeExample({super.key});
-
+  const HomeExample({super.key}); 
   @override
   Widget build(BuildContext context) {
     return HomeView(
