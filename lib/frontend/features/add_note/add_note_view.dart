@@ -3,13 +3,11 @@ import 'package:flutter/material.dart';
 import '../../../theme/theme.dart';
 
 class AddNoteView extends StatelessWidget {
-
-
   const AddNoteView({
     super.key,
 
   });
-
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(

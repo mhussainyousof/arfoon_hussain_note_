@@ -1,5 +1,6 @@
 import 'package:arfoon_note/frontend/features/add_note/add_note_example.dart';
 import 'package:arfoon_note/frontend/features/add_note/add_note_view.dart';
+import 'package:arfoon_note/frontend/features/drawer/drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:iconsax/iconsax.dart';
@@ -22,9 +23,18 @@ class HomeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: const CustomDrawer(labels: ['Office', 'Home', 'Design', 'Code', 'To learn'],
+    userName: 'Abdurahman Popal',
+    userGreeting: 'Good Morning',),
       backgroundColor: AppColors.background,
       appBar:  HomeAppBar(
-        leading: const Icon(Icons.menu),
+        
+        leading: Builder(
+    builder: (context) => GestureDetector(
+      onTap: () => Scaffold.of(context).openDrawer(),
+      child: const Icon(Icons.menu),
+    ),
+  ),
         title: 'Arfoon Note',
         textNaighbor: SvgPicture.asset(
           'assets/images/note_logo.svg',
