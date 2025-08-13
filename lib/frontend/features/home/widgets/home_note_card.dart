@@ -42,19 +42,21 @@ class NoteCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(data.date,
-                  style: AppTextStyles.subtitle.copyWith(
-                      color: data.isPinned
+                  style: TextStyle(
+                     color: data.isPinned
                           ? Colors.white
-                          : const Color(0XFF919191))),
+                          : const Color(0XFF919191)
+                  )),
               const SizedBox(height: 8),
               Text(data.title,
-                  style: AppTextStyles.title.copyWith(color: textColor)),
+                  style: TextStyle(color: textColor)),
               const SizedBox(height: 6),
               Text(
                 data.description,
-                style: AppTextStyles.subtitle.copyWith(
-                    color:
-                        data.isPinned ? Colors.white : const Color(0XFFA2A2A2)),
+                style: TextStyle(
+                  color:
+                        data.isPinned ? Colors.white : const Color(0XFFA2A2A2)
+                ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),

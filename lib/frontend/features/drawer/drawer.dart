@@ -19,9 +19,11 @@ class CustomDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Drawer(
       backgroundColor: Colors.white,
+      //! SafeArea to avoid system UI overlaps
       child: SafeArea(
         child: Column(
           children: [
+            //! Header section with app logo and name
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: Row(
@@ -51,7 +53,7 @@ class CustomDrawer extends StatelessWidget {
               ),
             ),
 
-            // All Notes item
+            //! Drawer item for navigating to "All Notes"
             ListTile(
               horizontalTitleGap: 6,
               leading: SvgPicture.asset(
@@ -64,9 +66,10 @@ class CustomDrawer extends StatelessWidget {
                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
               ),
               trailing: const Icon(Icons.chevron_right),
-              onTap: () {},
+              onTap: () {},  //! Navigation handler placeholder
             ),
 
+            //! Section title for labels
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Align(
@@ -81,7 +84,7 @@ class CustomDrawer extends StatelessWidget {
               ),
             ),
 
-            // Labels list
+            //! List of user-defined labels with edit and select functionality
             Expanded(
               child: ListView.builder(
                 itemCount: labels.length,
@@ -99,17 +102,20 @@ class CustomDrawer extends StatelessWidget {
                         width: 20,
                         height: 20,
                       ),
-                      onPressed: () {},
+                      onPressed: () {},  //! Edit label handler placeholder
                     ),
-                    onTap: () {},
+                    onTap: () {},  //! Select label handler placeholder
                   );
                 },
               ),
             ),
+
+            //! Bottom section with label adding and settings options
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
               child: Column(
                 children: [
+                  //! Button to add a new label - opens dialog
                   ListTile(
                     horizontalTitleGap: 6,
                     leading: SvgPicture.asset('assets/images/Vector.svg',
@@ -141,11 +147,15 @@ class CustomDrawer extends StatelessWidget {
                                   hintText: 'A creative label name',
                                 ),
                                 const SizedBox(height: 40),
+
+                                //! Buttons for deleting or saving the label
                                 dialogButtons(
+                                  isTextButton: true,
                                   elevatedButtonOnpressed: () {},
                                   textButtonText: 'Delete',
                                   elevatedButtonText: 'Save Label',
                                   textButtonOnpressed: () {
+                                    //! Confirmation dialog for delete
                                     showDialog(
                                       context: context,
                                       builder: (context) =>
@@ -163,7 +173,10 @@ class CustomDrawer extends StatelessWidget {
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.w500)),
                                         const SizedBox(height: 25),
+
+                                        //! Cancel and Delete buttons in confirmation dialog
                                         dialogButtons(
+                                          isTextButton: true,
                                             textButtonElevation: 0,
                                             mainAxisAlignment:
                                                 MainAxisAlignment.end,
@@ -180,6 +193,8 @@ class CustomDrawer extends StatelessWidget {
                           });
                     },
                   ),
+
+                  //! Settings button - opens settings dialog
                   ListTile(
                     horizontalTitleGap: 6,
                     leading: const Icon(
@@ -198,6 +213,8 @@ class CustomDrawer extends StatelessWidget {
                 ],
               ),
             ),
+
+            //! User info footer with initials, name, greeting, and a menu icon
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
               child: Row(
@@ -221,6 +238,8 @@ class CustomDrawer extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 12),
+
+                  //! User name and greeting text
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -236,10 +255,12 @@ class CustomDrawer extends StatelessWidget {
                     ],
                   ),
                   const Spacer(),
+
+                  //! Icon button for expanding additional options (functionality TBD)
                   IconButton(
                     icon: const Icon(Icons.unfold_more),
                     onPressed: () {},
-                  )
+                  ),
                 ],
               ),
             ),
