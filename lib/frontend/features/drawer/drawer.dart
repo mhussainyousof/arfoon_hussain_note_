@@ -1,8 +1,7 @@
-import 'package:arfoon_note/frontend/features/drawer/dialog_buttons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-
 import '../../widgets/widget.dart';
+import '../features.dart';
 
 class CustomDrawer extends StatelessWidget {
   final List<String> labels;
@@ -189,13 +188,16 @@ class CustomDrawer extends StatelessWidget {
                     ),
                     title:
                         const Text('Settings', style: TextStyle(fontSize: 14)),
-                    onTap: () {},
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => const SettingDialog(),
+                      );
+                    },
                   ),
                 ],
               ),
             ),
-
-            // User profile footer
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
               child: Row(
