@@ -5,7 +5,8 @@ class NoteTextField extends StatelessWidget {
   final double? hintSize;
   const NoteTextField({
     super.key,
-    this.hintText, this.hintSize,
+    this.hintText,
+    this.hintSize,
   });
 
   @override
@@ -13,7 +14,7 @@ class NoteTextField extends StatelessWidget {
     return TextField(
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle:  TextStyle(
+        hintStyle: TextStyle(
           fontSize: hintSize ?? 14,
           color: const Color(0XFF71717A),
         ),

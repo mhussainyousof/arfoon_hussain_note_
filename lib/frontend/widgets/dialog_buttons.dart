@@ -10,13 +10,15 @@ class dialogButtons extends StatelessWidget {
   final bool? isTextButton;
   final double? width;
   const dialogButtons({
-    
     super.key,
     this.textButtonElevation,
     this.textButtonOnpressed,
     this.elevatedButtonOnpressed,
     required this.textButtonText,
-    required this.elevatedButtonText,  this.mainAxisAlignment, this.width, this.isTextButton,
+    required this.elevatedButtonText,
+    this.mainAxisAlignment,
+    this.width,
+    this.isTextButton,
   });
 
   @override
@@ -25,27 +27,28 @@ class dialogButtons extends StatelessWidget {
       mainAxisAlignment: mainAxisAlignment ?? MainAxisAlignment.spaceBetween,
       children: [
         isTextButton == true
-        ?
-        Material(
-          color: Colors.white,
-          elevation: textButtonElevation ?? 1,
-          borderRadius: BorderRadius.circular(8),
-          child: TextButton(
-            style: TextButton.styleFrom(
-              backgroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 2,
-              ),
-            ),
-            onPressed: textButtonOnpressed,
-            child: Text(
-              textButtonText,
-              style: const TextStyle(color: Color(0XFF646464), fontSize: 14),
-            ),
-          ),
-        ) : const SizedBox.shrink(),
-        SizedBox(width:width ),
+            ? Material(
+                color: Colors.white,
+                elevation: textButtonElevation ?? 1,
+                borderRadius: BorderRadius.circular(8),
+                child: TextButton(
+                  style: TextButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 2,
+                    ),
+                  ),
+                  onPressed: textButtonOnpressed,
+                  child: Text(
+                    textButtonText,
+                    style:
+                        const TextStyle(color: Color(0XFF646464), fontSize: 14),
+                  ),
+                ),
+              )
+            : const SizedBox.shrink(),
+        SizedBox(width: width),
         ElevatedButton(
             style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(

@@ -1,9 +1,7 @@
-import 'package:arfoon_note/frontend/features/add_note/add_note_example.dart';
 import 'package:arfoon_note/frontend/features/add_note/add_note_view.dart';
 import 'package:arfoon_note/frontend/features/drawer/drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:iconsax/iconsax.dart';
 import '../../../theme/theme.dart';
 import '../../widgets/widget.dart';
 import 'widgets/home_widgets.dart';

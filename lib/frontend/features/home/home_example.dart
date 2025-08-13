@@ -1,8 +1,6 @@
 import 'package:arfoon_note/frontend/frontend.dart';
 import 'package:flutter/widgets.dart';
-
 import 'package:flutter/material.dart';
-import 'home_view.dart';
 import 'widgets/home_widgets.dart';
 
 class HomeExample extends StatelessWidget {
