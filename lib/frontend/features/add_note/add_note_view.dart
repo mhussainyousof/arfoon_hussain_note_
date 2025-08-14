@@ -1,9 +1,33 @@
+import 'package:arfoon_note/client/models/note.dart';
 import 'package:arfoon_note/frontend/features/home/widgets/home_appbar.dart';
 import 'package:flutter/material.dart';
-import '../../../theme/theme.dart';
+import '../../theme/theme.dart';
 
-class AddNoteView extends StatelessWidget {
+class AddNoteView extends StatefulWidget {
   const AddNoteView({super.key});
+
+  @override
+  State<AddNoteView> createState() => _AddNoteViewState();
+}
+
+class _AddNoteViewState extends State<AddNoteView> {
+  final _titleController = TextEditingController();
+  final _descriptionController = TextEditingController();
+
+  Note get currentNote {
+    return Note(
+      title: _titleController.text,
+      details: _descriptionController.text,
+      labelIds: [],
+    );
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +40,9 @@ class AddNoteView extends StatelessWidget {
       appBar: HomeAppBar(
         title: '',
         leading: IconButton(
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            Navigator.pop(context, currentNote);
+          },
           icon: const Icon(
             Icons.arrow_back_ios,
             color: Color(0XFF646464),
@@ -46,6 +72,7 @@ class AddNoteView extends StatelessWidget {
 
               //! Title input field
               TextField(
+                controller: _titleController,
                 decoration: const InputDecoration(
                   hintText: 'Untitled',
                   hintStyle: TextStyle(color: Color(0xFF9B9696), fontSize: 36),
@@ -57,9 +84,10 @@ class AddNoteView extends StatelessWidget {
               ),
 
               //! Expanded description text field
-              const Expanded(
+              Expanded(
                 child: TextField(
-                  decoration: InputDecoration(
+                  controller: _descriptionController,
+                  decoration: const InputDecoration(
                     hintText: 'Description',
                     hintStyle:
                         TextStyle(color: Color(0xFF9B9696), fontSize: 16),

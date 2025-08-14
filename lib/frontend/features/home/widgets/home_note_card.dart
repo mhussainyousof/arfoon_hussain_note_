@@ -1,34 +1,20 @@
+import 'package:arfoon_note/client/models/note.dart';
 import 'package:flutter/material.dart';
-import '../../../../theme/theme.dart';
+import '../../../theme/theme.dart';
 
-class NoteCardData {
-  final String date;
-  final String title;
-  final String description;
-  final List<String> tags;
-  final bool isPinned;
-  final bool isHighlighted;
 
-  NoteCardData({
-    required this.date,
-    required this.title,
-    required this.description,
-    required this.tags,
-    this.isPinned = false,
-    this.isHighlighted = false,
-  });
-}
 
 class NoteCard extends StatelessWidget {
-  final NoteCardData data;
+  final Note data;
 
   const NoteCard({super.key, required this.data});
 
   @override
   Widget build(BuildContext context) {
-    final bgColor =
-        data.isHighlighted ? AppColors.primaryBlue : AppColors.background;
-    final textColor = data.isHighlighted ? Colors.white : Colors.black;
+    // final bgColor =
+    //     data.isHighlighted ? AppColors.primaryBlue : AppColors.background;
+    // final textColor = data.isHighlighted ? Colors.white : Colors.black;
+    Color? bgColor, textColor;
 
     return Stack(
       children: [
@@ -41,29 +27,25 @@ class NoteCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(data.date,
-                  style: TextStyle(
-                     color: data.isPinned
-                          ? Colors.white
-                          : const Color(0XFF919191)
-                  )),
+              // Text(data.cre,
+              //     style: TextStyle(
+              //         color: data.isPinned
+              //             ? Colors.white
+              //             : const Color(0XFF919191))),
               const SizedBox(height: 8),
-              Text(data.title,
-                  style: TextStyle(color: textColor)),
+              Text(data.title ?? '', style: TextStyle(color: textColor, fontSize: 24)),
               const SizedBox(height: 6),
               Text(
-                data.description,
-                style: TextStyle(
-                  color:
-                        data.isPinned ? Colors.white : const Color(0XFFA2A2A2)
-                ),
+                data.details ?? '',
+                style: const TextStyle(
+                    ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(height: 20),
               Wrap(
                 spacing: 6,
-                children: data.tags
+                children: data.labelIds
                     .map((tag) => Chip(
                         backgroundColor:
                             const Color.fromARGB(255, 253, 253, 254),
@@ -73,7 +55,7 @@ class NoteCard extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             vertical: 1, horizontal: 3),
                         label: Text(
-                          tag,
+                          tag.toString(),
                           style: const TextStyle(
                               fontSize: 12,
                               color: Color(0XFFA2A2A2),
@@ -84,27 +66,26 @@ class NoteCard extends StatelessWidget {
             ],
           ),
         ),
-        Positioned(
-            top: 16,
-            right: 20,
-            child: Card(
-              elevation: 0.1,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              color: data.isPinned ? Colors.black : Colors.white,
-              child: Padding(
-                padding: const EdgeInsets.all(13),
-                child: Image.asset(
-                  data.isPinned
-                      ? 'assets/images/card_pin_tag.png'
-                      : 'assets/images/card_pin.png',
-                  width: 14,
-                  height: 14,
-                      
-                ),
-              ),
-            )),
+        // Positioned(
+        //     top: 16,
+        //     right: 20,
+        //     child: Card(
+        //       elevation: 0.1,
+        //       shape: RoundedRectangleBorder(
+        //         borderRadius: BorderRadius.circular(10),
+        //       ),
+        //       color: data.isPinned ? Colors.black : Colors.white,
+        //       child: Padding(
+        //         padding: const EdgeInsets.all(13),
+        //         child: Image.asset(
+        //           data.isPinned
+        //               ? 'assets/images/card_pin_tag.png'
+        //               : 'assets/images/card_pin.png',
+        //           width: 14,
+        //           height: 14,
+        //         ),
+        //       ),
+        //     )),
       ],
     );
   }

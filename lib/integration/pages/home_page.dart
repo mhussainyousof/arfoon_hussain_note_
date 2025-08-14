@@ -1,4 +1,5 @@
 import 'package:arfoon_note/frontend/frontend.dart';
+import 'package:arfoon_note/main.dart';
 import 'package:flutter/widgets.dart';
 
 class HomePage extends StatelessWidget {
@@ -6,6 +7,13 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const HomeView(categories: [], selectedCategoryIndex: 0, notes: [],);
+    return HomeView(
+      categories: const [],
+      selectedCategoryIndex: 0,
+      getNotes: api.notes.list(),
+      onNoteAdded: (note) {
+        api.notes.insert(note); 
+      },
+    );
   }
 }

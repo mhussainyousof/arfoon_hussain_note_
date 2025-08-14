@@ -1,7 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final Widget? textNaighbor; 
+  final Widget? textNaighbor;
   final Widget? trailing;
   final Widget? leading;
   final VoidCallback? onMenuPressed;
@@ -21,21 +22,29 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       backgroundColor: Colors.white,
       surfaceTintColor: Colors.transparent,
-      title: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (textNaighbor != null) ...[
-            textNaighbor!,
-            const SizedBox(width: 4),
+      title: InkWell(
+        onTap: () {
+          if (kDebugMode) {
+            Navigator.maybePop(context);
+          }
+        },
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (textNaighbor != null) ...[
+              textNaighbor!,
+              const SizedBox(width: 4),
+            ],
+            Text(title, style: const TextStyle(fontSize: 16)),
           ],
-          Text(title, style: const TextStyle(fontSize: 16)),
-        ],
+        ),
       ),
       centerTitle: true,
       leading: leading,
       actions: trailing != null ? [trailing!] : null,
     );
   }
-   @override
+
+  @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }

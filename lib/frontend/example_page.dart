@@ -1,3 +1,5 @@
+import 'package:arfoon_note/frontend/features/home/home_example.dart';
+import 'package:arfoon_note/integration/main_app.dart';
 import 'package:flutter/material.dart';
 
 class ExamplePage extends StatefulWidget {
@@ -8,40 +10,52 @@ class ExamplePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<ExamplePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text('Examples'),
+        title: const Text('Examples')),
+      body: const Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          ExampleButton(
+            text: 'Home Example',
+            route: HomeExample(),
+          ),
+          ExampleButton(
+            text: 'Main App',
+            route: MainApp(),
+          ),
+        ],
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
+    );
+  }
+}
+
+class ExampleButton extends StatelessWidget {
+  final String text;
+  final Widget route;
+
+  const ExampleButton({
+    super.key,
+    required this.text,
+    required this.route,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16.0),
+      child: ElevatedButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => route),
+          );
+        },
+        child: Text(text),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
