@@ -1,4 +1,6 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:isar/isar.dart';
+
 part 'note.g.dart';
 
 @collection
@@ -8,6 +10,8 @@ class Note {
   String? details;
   int? colorId;
   List<int> labelIds;
+  DateTime createdAt;
+  DateTime? updatedAt;
 
   Note({
     this.id,
@@ -15,6 +19,8 @@ class Note {
     this.details,
     this.colorId,
     required this.labelIds,
+    required this.createdAt,
+    this.updatedAt,
   });
 
   Note copyWith({
@@ -23,6 +29,9 @@ class Note {
     String? details,
     int? colorId,
     List<int>? labelIds,
+    DateTime? createdAt,
+  DateTime? updatedAt
+    
   }) {
     return Note(
       id: id ?? this.id,
@@ -30,6 +39,8 @@ class Note {
       details: details ?? this.details,
       colorId: colorId ?? this.colorId,
       labelIds: labelIds ?? this.labelIds,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt
     );
   }
 }

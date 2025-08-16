@@ -40,4 +40,10 @@ class Notes {
       return await isar.notes.delete(id);
     });
   }
-}
+
+  Future<bool> deleteNote(int id)async{
+    return await isar.writeTxn(()async{
+      return await isar.notes.delete(id);
+    });
+  }
+ }

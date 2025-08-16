@@ -1,5 +1,8 @@
 import 'package:arfoon_note/client/models/note.dart';
+import 'package:arfoon_note/integration/blocs/note_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 
 
 
@@ -10,59 +13,59 @@ class NoteCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final bgColor =
-    //     data.isHighlighted ? AppColors.primaryBlue : AppColors.background;
-    // final textColor = data.isHighlighted ? Colors.white : Colors.black;
     Color? bgColor, textColor;
 
     return Stack(
       children: [
-        Container(
-          decoration: BoxDecoration(
-            color: bgColor,
-            borderRadius: BorderRadius.circular(30),
-          ),
-          padding: const EdgeInsets.all(25),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Text(data.cre,
-              //     style: TextStyle(
-              //         color: data.isPinned
-              //             ? Colors.white
-              //             : const Color(0XFF919191))),
-              const SizedBox(height: 8),
-              Text(data.title ?? '', style: TextStyle(color: textColor, fontSize: 24)),
-              const SizedBox(height: 6),
-              Text(
-                data.details ?? '',
-                style: const TextStyle(
-                    ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 20),
-              Wrap(
-                spacing: 6,
-                children: data.labelIds
-                    .map((tag) => Chip(
-                        backgroundColor:
-                            const Color.fromARGB(255, 253, 253, 254),
-                        side: const BorderSide(color: Color(0xFFE4E4E7)),
-                        visualDensity:
-                            const VisualDensity(horizontal: 0, vertical: -4),
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 1, horizontal: 3),
-                        label: Text(
-                          tag.toString(),
-                          style: const TextStyle(
-                              fontSize: 12,
-                              color: Color(0XFFA2A2A2),
-                              fontWeight: FontWeight.w500),
-                        )))
-                    .toList(),
-              ),
-            ],
+        InkWell(
+          onLongPress: (){
+            context.read<NotesBloc>().add(DeleteNote(data.id!));
+          },
+          child: Container(
+            
+            decoration: BoxDecoration(
+              color: bgColor,
+              borderRadius: BorderRadius.circular(30),
+            ),
+            padding: const EdgeInsets.all(25),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(DateFormat('dd MMM').format(data.createdAt),
+                   ),
+                const SizedBox(height: 8),
+                Text(data.title ?? '', style: TextStyle(color: textColor, fontSize: 24)),
+                const SizedBox(height: 6),
+                Text(
+                  data.details ?? '',
+                  style: const TextStyle(
+                      ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 20),
+                Wrap(
+                  spacing: 6,
+                  children: data.labelIds
+                      .map((tag) => Chip(
+                          backgroundColor:
+                              const Color.fromARGB(255, 253, 253, 254),
+                          side: const BorderSide(color: Color(0xFFE4E4E7)),
+                          visualDensity:
+                              const VisualDensity(horizontal: 0, vertical: -4),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 1, horizontal: 3),
+                          label: Text(
+                            tag.toString(),
+                            style: const TextStyle(
+                                fontSize: 12,
+                                color: Color(0XFFA2A2A2),
+                                fontWeight: FontWeight.w500),
+                          )))
+                      .toList(),
+                ),
+              ],
+            ),
           ),
         ),
         // Positioned(

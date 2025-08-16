@@ -16,6 +16,7 @@ class _AddNoteViewState extends State<AddNoteView> {
 
   Note get currentNote {
     return Note(
+      createdAt: DateTime.now(),
       title: _titleController.text,
       details: _descriptionController.text,
       labelIds: [],

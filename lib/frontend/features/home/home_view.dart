@@ -10,17 +10,8 @@ import '../../widgets/widget.dart';
 import 'widgets/home_widgets.dart';
 
 class HomeView extends StatefulWidget {
-  // final List<String> categories;
-  // final int selectedCategoryIndex;
-  // final Future<List<Note>> getNotes;
-  // final Function(Note)? onNoteAdded;
-
   const HomeView({
     super.key,
-    // required this.categories,
-    // required this.selectedCategoryIndex,
-    // required this.getNotes,
-    // this.onNoteAdded,
   });
 
   @override
@@ -31,28 +22,6 @@ class _HomeViewState extends State<HomeView> {
   List<Note> notes = [];
   bool loading = false;
   String? error;
-
-  // Future<void> _loadNotes() async {
-  //   setState(() {
-  //     loading = true;
-  //     error = null;
-  //   });
-  //   try {
-  //     notes = await widget.getNotes;
-  //   } catch (e) {
-  //     error = e.toString();
-  //   } finally {
-  //     setState(() {
-  //       loading = false;
-  //     });
-  //   }
-  // }
-
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   _loadNotes();
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -96,33 +65,31 @@ class _HomeViewState extends State<HomeView> {
 
           Expanded(
             child: BlocBuilder<NotesBloc, NotesState>(
-
               builder: (context, state) {
-                if(state is NotesLoading){
+                if (state is NotesLoading) {
                   return const Center(child: CircularProgressIndicator());
-
                 }
 
-                if(state is NotesError){
+                if (state is NotesError) {
                   return Center(child: Text('Error: ${state.message}'));
                 }
 
-                if (state is NotesLoaded){
-                  if(state.notes.isEmpty){
+                if (state is NotesLoaded) {
+                  if (state.notes.isEmpty) {
                     return const Center(child: Text('No text found'));
                   }
-                return ListView.builder(
-                  reverse: true,
-                  padding: const EdgeInsets.all(16),
-                  itemCount: state.notes.length,
-                  itemBuilder: (context, index) {
-                    final note = state.notes[index];
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: NoteCard(data: note),
-                    );
-                  },
-                );
+                  return ListView.builder(
+                    reverse: true,
+                    padding: const EdgeInsets.all(16),
+                    itemCount: state.notes.length,
+                    itemBuilder: (context, index) {
+                      final note = state.notes[index];
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: NoteCard(data: note),
+                      );
+                    },
+                  );
                 }
                 return const SizedBox.shrink();
               },
@@ -142,7 +109,7 @@ class _HomeViewState extends State<HomeView> {
             if (result != null &&
                 ((result.title ?? '').isNotEmpty ||
                     (result.details ?? '').isNotEmpty)) {
-                      context.read<NotesBloc>().add(AddNoteEvent(result));
+              context.read<NotesBloc>().add(AddNoteEvent(result));
               // setState(() {
               //   notes.insert(0, result);
               // });

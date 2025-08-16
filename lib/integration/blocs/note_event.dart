@@ -21,6 +21,12 @@ class AddNoteEvent extends NotesEvent {
 }
 
 
+class DeleteNote extends NotesEvent{
+  final int id;
+  DeleteNote( this.id);
+} 
+
+
 
 
 
