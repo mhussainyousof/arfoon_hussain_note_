@@ -1,6 +1,5 @@
 import 'package:arfoon_note/client/models/note.dart';
 import 'package:flutter/material.dart';
-import '../../../theme/theme.dart';
 
 
 
