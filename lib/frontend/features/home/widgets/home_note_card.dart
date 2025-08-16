@@ -26,21 +26,23 @@ class NoteCard extends StatelessWidget {
                     title: 'Delete!',
                     details: 'Are you sure you want to delete it?',
                     children: [
-                    dialogButtons(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      width: 20,
-                      textButtonElevation: 1,
-                      textButtonText: 'stop',
-                      elevatedButtonText: 'do it.',
-                      isTextButton: true,
-                      elevatedButtonOnpressed: (){
-                        Navigator.pop(context, true);
-                      },
-                      textButtonOnpressed: (){
-                        Navigator.pop(context, false);
-                      },
-                    )
-                  ]);
+                      const SizedBox(height: 20),
+                      dialogButtons(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        width: 20,
+                        textButtonElevation: 1,
+                        textButtonText: 'Stop',
+                        elevatedButtonText: 'Do it',
+                        isTextButton: true,
+                        elevatedButtonOnpressed: () {
+                          Navigator.pop(context, true);
+                        },
+                        textButtonOnpressed: () {
+                          Navigator.pop(context, false);
+                        },
+                      )
+                    ],
+                  );
                 });
 
             if (confirm == true) {

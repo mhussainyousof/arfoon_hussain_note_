@@ -36,7 +36,7 @@ class dialogButtons extends StatelessWidget {
                   onTap: textButtonOnpressed,
                   child: Padding(
                     padding:
-                        const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                     child: Text(
                       textButtonText,
                       style: const TextStyle(

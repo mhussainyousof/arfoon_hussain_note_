@@ -1,4 +1,3 @@
-import 'package:arfoon_note/client/models/note.dart';
 import 'package:arfoon_note/frontend/frontend.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart'; 
