@@ -127,69 +127,50 @@ class CustomDrawer extends StatelessWidget {
                           context: context,
                           builder: (context) {
                             return NoteDialog(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'New Label',
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                const SizedBox(height: 16),
-                                const Text(
-                                  'Label Name',
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500),
-                                ),
-                                const SizedBox(height: 8),
-                                const NoteTextField(
-                                  hintText: 'A creative label name',
-                                ),
-                                const SizedBox(height: 40),
+                        title: 'New Label',
+                        fontWeight: FontWeight.bold,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        details: 'Label Name',
+                        children: [
 
-                                //! Buttons for deleting or saving the label
-                                dialogButtons(
-                                  isTextButton: true,
-                                  elevatedButtonOnpressed: () {},
-                                  textButtonText: 'Delete',
-                                  elevatedButtonText: 'Save Label',
-                                  textButtonOnpressed: () {
-                                    //! Confirmation dialog for delete
-                                    showDialog(
-                                      context: context,
-                                      builder: (context) =>
-                                          NoteDialog(children: [
-                                        const Text(
-                                          'Are you sure want to Delete?',
-                                          style: TextStyle(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                        const SizedBox(height: 15),
-                                        const Text(
-                                            'Once Deleted a label cannot be undo, are you sure want to Delete?',
-                                            style: TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w500)),
-                                        const SizedBox(height: 25),
+                          const SizedBox(height: 8),
+                          const NoteTextField(
+                            hintText: 'A creative label name',
+                          ),
+                          const SizedBox(height: 40),
 
-                                        //! Cancel and Delete buttons in confirmation dialog
-                                        dialogButtons(
-                                          isTextButton: true,
-                                            textButtonElevation: 0,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.end,
-                                            width: 15,
-                                            elevatedButtonOnpressed: () {},
-                                            textButtonText: 'Cancel',
-                                            elevatedButtonText: 'Delete It.')
-                                      ]),
-                                    );
-                                  },
-                                )
-                              ],
-                            );
+                          //! Buttons for deleting or saving the label
+                          dialogButtons(
+                            isTextButton: true,
+                            elevatedButtonOnpressed: () {},
+                            textButtonText: 'Delete',
+                            elevatedButtonText: 'Save Label',
+                            textButtonOnpressed: () {
+                              //! Confirmation dialog for delete
+                              showDialog(
+                                context: context,
+                                builder: (context) => NoteDialog(
+                                  title: 'Are you sure want to Delete?',
+                                  details: 'Once Deleted a label cannot be undo, are you sure want to Delete?',
+                                  children: [
+                                    
+                                  const SizedBox(height: 15),
+                                  //! Cancel and Delete buttons in confirmation dialog
+                                  dialogButtons(
+                                      isTextButton: true,
+                                      textButtonElevation: 0,
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      width: 15,
+                                      elevatedButtonOnpressed: () {},
+                                      
+                                      textButtonText: 'Cancel',
+                                      elevatedButtonText: 'Delete It.')
+                                ]),
+                              );
+                            },
+                          )
+                        ],
+                      );
                           });
                     },
                   ),

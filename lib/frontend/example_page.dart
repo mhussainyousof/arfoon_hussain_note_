@@ -73,11 +73,6 @@ class _MyHomePageState extends State<ExamplePage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         details: 'Label Name',
                         children: [
-                          // const Text(
-                          //   'Label Name',
-                          //   style: TextStyle(
-                          //       fontSize: 14, fontWeight: FontWeight.w500),
-                          // ),
 
                           const SizedBox(height: 8),
                           const NoteTextField(
@@ -96,23 +91,11 @@ class _MyHomePageState extends State<ExamplePage> {
                               showDialog(
                                 context: context,
                                 builder: (context) => NoteDialog(
-                                  
+                                  title: 'Are you sure want to Delete?',
+                                  details: 'Once Deleted a label cannot be undo, are you sure want to Delete?',
                                   children: [
                                     
-                                  const Text(
-                                    'Are you sure want to Delete?',
-                                    style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold),
-                                  ),
                                   const SizedBox(height: 15),
-                                  const Text(
-                                      'Once Deleted a label cannot be undo, are you sure want to Delete?',
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500)),
-                                  const SizedBox(height: 25),
-
                                   //! Cancel and Delete buttons in confirmation dialog
                                   dialogButtons(
                                       isTextButton: true,
