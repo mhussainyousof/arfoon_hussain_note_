@@ -31,19 +31,19 @@ class dialogButtons extends StatelessWidget {
                 color: Colors.white,
                 elevation: textButtonElevation ?? 1,
                 borderRadius: BorderRadius.circular(8),
-                child: TextButton(
-                  style: TextButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 2,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(8),
+                  onTap: textButtonOnpressed,
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    child: Text(
+                      textButtonText,
+                      style: const TextStyle(
+                        color: Color(0XFF646464),
+                        fontSize: 14,
+                      ),
                     ),
-                  ),
-                  onPressed: textButtonOnpressed,
-                  child: Text(
-                    textButtonText,
-                    style:
-                        const TextStyle(color: Color(0XFF646464), fontSize: 14),
                   ),
                 ),
               )

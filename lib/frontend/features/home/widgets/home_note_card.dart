@@ -1,10 +1,9 @@
 import 'package:arfoon_note/client/models/note.dart';
+import 'package:arfoon_note/frontend/widgets/widget.dart';
 import 'package:arfoon_note/integration/blocs/note_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-
-
 
 class NoteCard extends StatelessWidget {
   final Note data;
@@ -18,11 +17,37 @@ class NoteCard extends StatelessWidget {
     return Stack(
       children: [
         InkWell(
-          onLongPress: (){
-            context.read<NotesBloc>().add(DeleteNote(data.id!));
+          onLongPress: () async {
+            final confirm = await showDialog(
+                context: context,
+                builder: (context) {
+                  return  NoteDialog(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    title: 'Delete!',
+                    details: 'Are you sure you want to delete it?',
+                    children: [
+                    dialogButtons(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      width: 20,
+                      textButtonElevation: 1,
+                      textButtonText: 'stop',
+                      elevatedButtonText: 'do it.',
+                      isTextButton: true,
+                      elevatedButtonOnpressed: (){
+                        Navigator.pop(context, true);
+                      },
+                      textButtonOnpressed: (){
+                        Navigator.pop(context, false);
+                      },
+                    )
+                  ]);
+                });
+
+            if (confirm == true) {
+              context.read<NotesBloc>().add(DeleteNote(data.id!));
+            }
           },
           child: Container(
-            
             decoration: BoxDecoration(
               color: bgColor,
               borderRadius: BorderRadius.circular(30),
@@ -31,15 +56,16 @@ class NoteCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(DateFormat('dd MMM').format(data.createdAt),
-                   ),
+                Text(
+                  DateFormat('dd MMM').format(data.createdAt),
+                ),
                 const SizedBox(height: 8),
-                Text(data.title ?? '', style: TextStyle(color: textColor, fontSize: 24)),
+                Text(data.title ?? '',
+                    style: TextStyle(color: textColor, fontSize: 24)),
                 const SizedBox(height: 6),
                 Text(
                   data.details ?? '',
-                  style: const TextStyle(
-                      ),
+                  style: const TextStyle(),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
