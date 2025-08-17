@@ -1,25 +1,41 @@
 import 'package:arfoon_note/client/models/note.dart';
 import 'package:arfoon_note/frontend/features/home/widgets/home_appbar.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../../theme/theme.dart';
 
 class AddNoteView extends StatefulWidget {
-  const AddNoteView({super.key});
+  final Note? note;
+  const AddNoteView({super.key, this.note});
 
   @override
   State<AddNoteView> createState() => _AddNoteViewState();
 }
 
 class _AddNoteViewState extends State<AddNoteView> {
-  final _titleController = TextEditingController();
-  final _descriptionController = TextEditingController();
+  late TextEditingController _titleController;
+  late TextEditingController _descriptionController;
+
+  // final _titleController = TextEditingController();
+  // final _descriptionController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _titleController = TextEditingController(text: widget.note?.title ?? '');
+    _descriptionController =
+        TextEditingController(text: widget.note?.details ?? '');
+  }
 
   Note get currentNote {
     return Note(
-      createdAt: DateTime.now(),
+      id: widget.note?.id,
+      createdAt: widget.note?.createdAt ?? DateTime.now(),
+      updatedAt: widget.note != null ? DateTime.now() : null,
+      // createdAt: DateTime.now(),
       title: _titleController.text,
       details: _descriptionController.text,
-      labelIds: [],
+      labelIds: widget.note?.labelIds ?? [],
     );
   }
 
@@ -58,17 +74,20 @@ class _AddNoteViewState extends State<AddNoteView> {
       //! Main body content
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(13),
+          padding:  const EdgeInsets.all(13),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               //! Displays the last updated date of the note
-              Text(
-                'Updated at Dec 17',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            if(widget.note != null)
+            Text(
+              widget.note?.updatedAt != null
+              ? 'Updated at ${DateFormat('dd MMM').format(widget.note!.updatedAt!)}'
+              : 'Created at ${DateFormat('dd MMM').format(widget.note?.createdAt ?? DateTime.now())}',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: Colors.grey,
                     ),
-              ),
+            ),
               const SizedBox(height: 8),
 
               //! Title input field

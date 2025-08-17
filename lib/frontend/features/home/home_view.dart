@@ -86,7 +86,7 @@ class _HomeViewState extends State<HomeView> {
                       final note = state.notes[index];
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 12),
-                        child: NoteCard(data: note),
+                        child: NoteCard(note: note),
                       );
                     },
                   );

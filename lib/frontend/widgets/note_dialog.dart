@@ -7,6 +7,7 @@ class NoteDialog extends StatelessWidget {
   final String? details;
   final FontWeight? fontWeight;
   final double? detailsHeight;
+  final double? titleSize;
 
  
   const NoteDialog(
@@ -15,6 +16,7 @@ class NoteDialog extends StatelessWidget {
       required this.children,
       this.title,
       this.fontWeight,
+      this.titleSize,
       this.detailsHeight,
       this.details});
 
@@ -34,7 +36,7 @@ class NoteDialog extends StatelessWidget {
                 Text(
                   title!,
                   style:  TextStyle(
-                    fontSize: 20,
+                    fontSize: titleSize ?? 20,
                     fontWeight: fontWeight ?? FontWeight.w600,
                   ),
                 ),

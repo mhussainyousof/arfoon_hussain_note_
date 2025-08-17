@@ -146,6 +146,8 @@ class CustomDrawer extends StatelessWidget {
                             textButtonText: 'Delete',
                             elevatedButtonText: 'Save Label',
                             textButtonOnpressed: () {
+
+
                               //! Confirmation dialog for delete
                               showDialog(
                                 context: context,
@@ -153,7 +155,6 @@ class CustomDrawer extends StatelessWidget {
                                   title: 'Are you sure want to Delete?',
                                   details: 'Once Deleted a label cannot be undo, are you sure want to Delete?',
                                   children: [
-                                    
                                   const SizedBox(height: 15),
                                   //! Cancel and Delete buttons in confirmation dialog
                                   dialogButtons(

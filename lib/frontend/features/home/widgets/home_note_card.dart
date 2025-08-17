@@ -1,4 +1,5 @@
 import 'package:arfoon_note/client/models/note.dart';
+import 'package:arfoon_note/frontend/features/add_note/add_note_view.dart';
 import 'package:arfoon_note/frontend/widgets/widget.dart';
 import 'package:arfoon_note/integration/blocs/note_bloc.dart';
 import 'package:flutter/material.dart';
@@ -6,9 +7,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
 class NoteCard extends StatelessWidget {
-  final Note data;
+  final Note note;
 
-  const NoteCard({super.key, required this.data});
+  const NoteCard({super.key, required this.note});
 
   @override
   Widget build(BuildContext context) {
@@ -17,6 +18,12 @@ class NoteCard extends StatelessWidget {
     return Stack(
       children: [
         InkWell(
+          onTap: ()async{
+            final updateNote = await Navigator.push(context, MaterialPageRoute(builder: (_)=> AddNoteView(note: note,)));
+          if( updateNote != null){
+            context.read<NotesBloc>().add(UpdatedNoteEvent(updateNote));
+          }
+          },
           onLongPress: () async {
             final confirm = await showDialog(
                 context: context,
@@ -46,7 +53,7 @@ class NoteCard extends StatelessWidget {
                 });
 
             if (confirm == true) {
-              context.read<NotesBloc>().add(DeleteNote(data.id!));
+              context.read<NotesBloc>().add(DeleteNoteEvent(note.id!));
             }
           },
           child: Container(
@@ -59,14 +66,16 @@ class NoteCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  DateFormat('dd MMM').format(data.createdAt),
+                  note.updatedAt != null
+                  ? DateFormat('dd MMM').format(note.updatedAt!)
+                  : DateFormat('dd MMM').format(note.createdAt),
                 ),
                 const SizedBox(height: 8),
-                Text(data.title ?? '',
+                Text(note.title ?? '',
                     style: TextStyle(color: textColor, fontSize: 24)),
                 const SizedBox(height: 6),
                 Text(
-                  data.details ?? '',
+                  note.details ?? '',
                   style: const TextStyle(),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -74,7 +83,7 @@ class NoteCard extends StatelessWidget {
                 const SizedBox(height: 20),
                 Wrap(
                   spacing: 6,
-                  children: data.labelIds
+                  children: note.labelIds
                       .map((tag) => Chip(
                           backgroundColor:
                               const Color.fromARGB(255, 253, 253, 254),

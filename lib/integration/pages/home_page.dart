@@ -11,7 +11,7 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
 
-      create: (context) => NotesBloc(api)..add(LoadNotes()),
+      create: (context) => NotesBloc(api)..add(LoadNotesEvent()),
       child: const HomeView(
 
       ),

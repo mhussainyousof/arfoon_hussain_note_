@@ -12,12 +12,13 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
   final NoteServer api;
 
   NotesBloc(this.api) : super(NotesInitial()) {
-    on<LoadNotes>(_onLoadNotes);
+    on<LoadNotesEvent>(_onLoadNotes);
     on<AddNoteEvent>(_onAddNote);
-    on<DeleteNote>(_onDeleteNote);
+    on<DeleteNoteEvent>(_onDeleteNote);
+    on<UpdatedNoteEvent>(_onUpdateNote);
   }
 
-  Future<void> _onLoadNotes(LoadNotes event, Emitter<NotesState> emit) async {
+  Future<void> _onLoadNotes(LoadNotesEvent event, Emitter<NotesState> emit) async {
     emit(NotesLoading());
     try {
       final notes = await api.notes.list();
@@ -40,12 +41,23 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
     }
   }
 
-  Future<void> _onDeleteNote(DeleteNote event, Emitter<NotesState> emit)async {
+  Future<void> _onDeleteNote(DeleteNoteEvent event, Emitter<NotesState> emit)async {
     try{
       await api.notes.deleteNote(event.id);
       final notes = await api.notes.list();
       emit(NotesLoaded(notes));
     }catch(e){
+      emit(NotesError(e.toString()));
+    }
+  }
+
+
+  Future<void> _onUpdateNote(UpdatedNoteEvent event, Emitter<NotesState> emit) async {
+     try {
+      await api.notes.updateLabel(event.note);
+      final notes = await api.notes.list();
+      emit(NotesLoaded(notes));
+    } catch (e) {
       emit(NotesError(e.toString()));
     }
   }
