@@ -15,9 +15,9 @@ class AddNoteView extends StatefulWidget {
 class _AddNoteViewState extends State<AddNoteView> {
   late TextEditingController _titleController;
   late TextEditingController _descriptionController;
-
   // final _titleController = TextEditingController();
   // final _descriptionController = TextEditingController();
+
 
   @override
   void initState() {
@@ -74,20 +74,20 @@ class _AddNoteViewState extends State<AddNoteView> {
       //! Main body content
       body: SafeArea(
         child: Padding(
-          padding:  const EdgeInsets.all(13),
+          padding: const EdgeInsets.all(13),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               //! Displays the last updated date of the note
-            if(widget.note != null)
-            Text(
-              widget.note?.updatedAt != null
-              ? 'Updated at ${DateFormat('dd MMM').format(widget.note!.updatedAt!)}'
-              : 'Created at ${DateFormat('dd MMM').format(widget.note?.createdAt ?? DateTime.now())}',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Colors.grey,
-                    ),
-            ),
+              if (widget.note != null)
+                Text(
+                  widget.note?.updatedAt != null
+                      ? 'Updated at ${DateFormat('dd MMM').format(widget.note!.updatedAt!)}'
+                      : 'Created at ${DateFormat('dd MMM').format(widget.note?.createdAt ?? DateTime.now())}',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Colors.grey,
+                      ),
+                ),
               const SizedBox(height: 8),
 
               //! Title input field

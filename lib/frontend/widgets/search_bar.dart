@@ -2,14 +2,17 @@ import 'package:flutter/material.dart';
 
 class SearchNotesBar extends StatelessWidget {
   final String hintText;
-  const SearchNotesBar({super.key, required this.hintText});
+  final ValueChanged<String> onChanged;
+  const SearchNotesBar({
+    required this.onChanged,
+    super.key, required this.hintText});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: TextField(
-        
+        onChanged: onChanged,
         decoration: InputDecoration(
           prefixIcon: const Padding(
             padding: EdgeInsets.only(left: 8,),

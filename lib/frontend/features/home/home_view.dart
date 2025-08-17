@@ -19,9 +19,7 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  List<Note> notes = [];
-  bool loading = false;
-  String? error;
+  String searchQuery = ''; // 👈 اضافه شد
 
   @override
   Widget build(BuildContext context) {
@@ -48,21 +46,18 @@ class _HomeViewState extends State<HomeView> {
       ),
       body: Column(
         children: [
-          const SearchNotesBar(
+          SearchNotesBar(
+            onChanged: (value) {
+              setState(() {
+                searchQuery = value;
+              });
+            },
             hintText: 'Search Notes',
           ),
           const CategoryFilterChips(
             categories: [],
             selectedIndex: 0,
           ),
-          // if (loading)
-          //   const Center(child: CircularProgressIndicator())
-          // else if (error != null)
-          //   Center(child: Text('Error: $error'))
-          // else if (notes.isEmpty)
-          //   const Center(child: Text('No notes found.'))
-          // else
-
           Expanded(
             child: BlocBuilder<NotesBloc, NotesState>(
               builder: (context, state) {
@@ -75,15 +70,32 @@ class _HomeViewState extends State<HomeView> {
                 }
 
                 if (state is NotesLoaded) {
-                  if (state.notes.isEmpty) {
-                    return const Center(child: Text('No text found'));
+                  final allNotes = state.notes;
+
+                  final filteredNotes = searchQuery.isEmpty
+                      ? allNotes
+                      : allNotes.where((note) {
+                          final title = note.title?.toLowerCase() ?? '';
+                          final details = note.details?.toLowerCase() ?? '';
+                          final query = searchQuery.toLowerCase();
+                          return title.contains(query) ||
+                              details.contains(query);
+                        }).toList();
+
+                  if (filteredNotes.isEmpty) {
+                    return const Center(child: Text('No notes found'));
                   }
+
+                  if (state.notes.isEmpty) {
+                    return const Center(child: Text('No notes found'));
+                  }
+
                   return ListView.builder(
                     reverse: true,
                     padding: const EdgeInsets.all(16),
-                    itemCount: state.notes.length,
+                    itemCount: filteredNotes.length,
                     itemBuilder: (context, index) {
-                      final note = state.notes[index];
+                      final note = filteredNotes[index];
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 12),
                         child: NoteCard(note: note),
@@ -110,12 +122,6 @@ class _HomeViewState extends State<HomeView> {
                 ((result.title ?? '').isNotEmpty ||
                     (result.details ?? '').isNotEmpty)) {
               context.read<NotesBloc>().add(AddNoteEvent(result));
-              // setState(() {
-              //   notes.insert(0, result);
-              // });
-
-              // widget.onNoteAdded?.call(result);
-              // await _loadNotes();
             }
           }),
     );
