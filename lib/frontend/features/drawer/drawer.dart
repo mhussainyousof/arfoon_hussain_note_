@@ -1,4 +1,5 @@
 import 'package:arfoon_note/client/models/label.dart';
+import 'package:arfoon_note/frontend/features/all_notes/all_notes_view.dart';
 import 'package:arfoon_note/integration/blocs/label/label_bloc.dart';
 import 'package:arfoon_note/integration/blocs/label/label_state.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +9,6 @@ import '../../widgets/widget.dart';
 import '../features.dart';
 
 class CustomDrawer extends StatelessWidget {
-
   final String userName;
   final String userGreeting;
 
@@ -69,7 +69,13 @@ class CustomDrawer extends StatelessWidget {
                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
               ),
               trailing: const Icon(Icons.chevron_right),
-              onTap: () {}, //! Navigation handler placeholder
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AllNotesView()),
+                );
+              }, //! Navigation handler placeholder
             ),
 
             //! Section title for labels
@@ -91,18 +97,20 @@ class CustomDrawer extends StatelessWidget {
             Expanded(
               child: BlocBuilder<LabelsBloc, LabelsState>(
                 builder: (context, state) {
-
-                  if (state is LabelsLoading){
-                    return const Center(child: CircularProgressIndicator(),);
+                  if (state is LabelsLoading) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
                   }
                   if (state is LabelsError) {
                     return Text('Error: ${state.message}');
                   }
 
-
                   if (state is LabelsLoaded) {
-                    if(state.labels.isEmpty){
-                      return const Center(child: Text('There is no label.'),);
+                    if (state.labels.isEmpty) {
+                      return const Center(
+                        child: Text('There is no label.'),
+                      );
                     }
                     return ListView.builder(
                       itemCount: state.labels.length,

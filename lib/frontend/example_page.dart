@@ -13,7 +13,12 @@ class _MyHomePageState extends State<ExamplePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Examples')),
+      appBar: AppBar(
+          backgroundColor: Colors.black,
+          title: const Text(
+            'Examples',
+            style: TextStyle(color: Colors.white),
+          )),
       body: const Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
@@ -25,8 +30,6 @@ class _MyHomePageState extends State<ExamplePage> {
             text: 'Main App',
             route: MainApp(),
           ),
-          
-          
         ],
       ),
     );

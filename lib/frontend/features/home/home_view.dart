@@ -1,6 +1,4 @@
 import 'package:arfoon_note/client/models/note.dart';
-import 'package:arfoon_note/frontend/features/add_note/add_note_view.dart';
-import 'package:arfoon_note/frontend/features/drawer/drawer.dart';
 import 'package:arfoon_note/integration/blocs/label/label_bloc.dart';
 import 'package:arfoon_note/integration/blocs/label/label_state.dart';
 import 'package:arfoon_note/integration/blocs/note/note_bloc.dart';
@@ -9,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../theme/theme.dart';
 import '../../widgets/widget.dart';
+import '../features.dart';
 import 'widgets/home_widgets.dart';
 
 class HomeView extends StatefulWidget {
@@ -33,7 +32,6 @@ class _HomeViewState extends State<HomeView> {
           }
           if (state is LabelsLoaded) {
             return  const CustomDrawer(
-              // labels: state.labels,
               userName: 'Abdurahman Popal',
               userGreeting: 'Good Morning',
             );
@@ -103,7 +101,6 @@ class _HomeViewState extends State<HomeView> {
                   }
 
                   return ListView.builder(
-                    reverse: true,
                     padding: const EdgeInsets.all(16),
                     itemCount: filteredNotes.length,
                     itemBuilder: (context, index) {

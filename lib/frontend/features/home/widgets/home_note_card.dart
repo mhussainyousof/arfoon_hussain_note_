@@ -1,8 +1,6 @@
 import 'package:arfoon_note/client/models/note.dart';
 import 'package:arfoon_note/frontend/features/add_note/add_note_view.dart';
 import 'package:arfoon_note/frontend/widgets/widget.dart';
-import 'package:arfoon_note/integration/blocs/label/label_bloc.dart';
-import 'package:arfoon_note/integration/blocs/label/label_state.dart';
 import 'package:arfoon_note/integration/blocs/note/note_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
