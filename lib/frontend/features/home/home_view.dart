@@ -1,7 +1,9 @@
 import 'package:arfoon_note/client/models/note.dart';
 import 'package:arfoon_note/frontend/features/add_note/add_note_view.dart';
 import 'package:arfoon_note/frontend/features/drawer/drawer.dart';
-import 'package:arfoon_note/integration/blocs/note_bloc.dart';
+import 'package:arfoon_note/integration/blocs/label/label_bloc.dart';
+import 'package:arfoon_note/integration/blocs/label/label_state.dart';
+import 'package:arfoon_note/integration/blocs/note/note_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -19,15 +21,25 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  String searchQuery = ''; // 👈 اضافه شد
+  String searchQuery = '';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: const CustomDrawer(
-        labels: ['Office', 'Home', 'Design', 'Code', 'To learn'],
-        userName: 'Abdurahman Popal',
-        userGreeting: 'Good Morning',
+      drawer: BlocBuilder<LabelsBloc, LabelsState>(
+        builder: (context, state) {
+          if (state is LabelsError) {
+            return Text("message: ${state.message}");
+          }
+          if (state is LabelsLoaded) {
+            return  const CustomDrawer(
+              // labels: state.labels,
+              userName: 'Abdurahman Popal',
+              userGreeting: 'Good Morning',
+            );
+          }
+          return const CircularProgressIndicator();
+        },
       ),
       backgroundColor: AppColors.background,
       appBar: HomeAppBar(
@@ -112,16 +124,16 @@ class _HomeViewState extends State<HomeView> {
       floatingActionButton: AddNoteButton(
           child: const Icon(Icons.add, color: Colors.white),
           onPressed: () async {
+            final notesBloc = context.read<NotesBloc>();
             final result = await Navigator.push<Note>(
               context,
-              MaterialPageRoute(builder: (_) => const AddNoteView()),
+              MaterialPageRoute(builder: (context) => const AddNoteView()),
             );
-            if (!mounted) return;
 
             if (result != null &&
                 ((result.title ?? '').isNotEmpty ||
                     (result.details ?? '').isNotEmpty)) {
-              context.read<NotesBloc>().add(AddNoteEvent(result));
+              notesBloc.add(AddNoteEvent(result));
             }
           }),
     );

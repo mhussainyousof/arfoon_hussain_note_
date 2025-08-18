@@ -1,7 +1,7 @@
-import 'package:arfoon_note/client/models/note.dart';
 import 'package:arfoon_note/frontend/features/home/widgets/home_appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../../../client/client.dart';
 import '../../theme/theme.dart';
 
 class AddNoteView extends StatefulWidget {
@@ -11,20 +11,18 @@ class AddNoteView extends StatefulWidget {
   @override
   State<AddNoteView> createState() => _AddNoteViewState();
 }
-
 class _AddNoteViewState extends State<AddNoteView> {
   late TextEditingController _titleController;
   late TextEditingController _descriptionController;
-  // final _titleController = TextEditingController();
-  // final _descriptionController = TextEditingController();
+  late TextEditingController _labelController;
 
 
   @override
   void initState() {
     super.initState();
     _titleController = TextEditingController(text: widget.note?.title ?? '');
-    _descriptionController =
-        TextEditingController(text: widget.note?.details ?? '');
+    _descriptionController = TextEditingController(text: widget.note?.details ?? '');
+    _labelController = TextEditingController();
   }
 
   Note get currentNote {
@@ -32,10 +30,9 @@ class _AddNoteViewState extends State<AddNoteView> {
       id: widget.note?.id,
       createdAt: widget.note?.createdAt ?? DateTime.now(),
       updatedAt: widget.note != null ? DateTime.now() : null,
-      // createdAt: DateTime.now(),
       title: _titleController.text,
       details: _descriptionController.text,
-      labelIds: widget.note?.labelIds ?? [],
+      labelIds: [],
     );
   }
 
@@ -43,6 +40,7 @@ class _AddNoteViewState extends State<AddNoteView> {
   void dispose() {
     _titleController.dispose();
     _descriptionController.dispose();
+    _labelController.dispose();
     super.dispose();
   }
 
@@ -57,7 +55,7 @@ class _AddNoteViewState extends State<AddNoteView> {
       appBar: HomeAppBar(
         title: '',
         leading: IconButton(
-          onPressed: () {
+          onPressed: () async {
             Navigator.pop(context, currentNote);
           },
           icon: const Icon(
@@ -127,27 +125,10 @@ class _AddNoteViewState extends State<AddNoteView> {
                   padding: const EdgeInsets.all(8),
                   child: Row(
                     children: [
-                      //! Predefined tag label
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: const Color(0XFFF4F4F5),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: const Text(
-                          'Office',
-                          style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.black,
-                              fontWeight: FontWeight.w500),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-
                       //! Field for adding a new tag
                       const Expanded(
                         child: TextField(
+                          // controller: _labelController,
                           decoration: InputDecoration(
                             hintText: 'Add Label',
                             hintStyle: TextStyle(fontSize: 14),
@@ -199,3 +180,24 @@ Widget _circle(Color color) {
     ),
   );
 }
+
+
+
+
+  // //! Predefined tag label
+  //                     Container(
+  //                       padding: const EdgeInsets.symmetric(
+  //                           horizontal: 8, vertical: 6),
+  //                       decoration: BoxDecoration(
+  //                         color: const Color(0XFFF4F4F5),
+  //                         borderRadius: BorderRadius.circular(20),
+  //                       ),
+  //                       child: const Text(
+  //                         'Office',
+  //                         style: TextStyle(
+  //                             fontSize: 14,
+  //                             color: Colors.black,
+  //                             fontWeight: FontWeight.w500),
+  //                       ),
+  //                     ),
+  //                     const SizedBox(width: 8),

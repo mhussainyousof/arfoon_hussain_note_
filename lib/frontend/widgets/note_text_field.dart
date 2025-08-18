@@ -3,15 +3,18 @@ import 'package:flutter/material.dart';
 class NoteTextField extends StatelessWidget {
   final String? hintText;
   final double? hintSize;
+  final TextEditingController? controller; 
   const NoteTextField({
     super.key,
     this.hintText,
     this.hintSize,
+    this.controller,
   });
 
   @override
   Widget build(BuildContext context) {
     return TextField(
+      controller: controller,
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: TextStyle(

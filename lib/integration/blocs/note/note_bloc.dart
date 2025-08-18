@@ -28,9 +28,6 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
     }
   }
 
-  
-
-
   Future<void> _onAddNote(AddNoteEvent event, Emitter<NotesState> emit) async {
     try {
       await api.notes.insert(event.note);
@@ -51,10 +48,9 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
     }
   }
 
-
   Future<void> _onUpdateNote(UpdatedNoteEvent event, Emitter<NotesState> emit) async {
      try {
-      await api.notes.updateLabel(event.note);
+      await api.notes.updateNote(event.note);
       final notes = await api.notes.list();
       emit(NotesLoaded(notes));
     } catch (e) {

@@ -1,7 +1,9 @@
 import 'package:arfoon_note/client/models/note.dart';
 import 'package:arfoon_note/frontend/features/add_note/add_note_view.dart';
 import 'package:arfoon_note/frontend/widgets/widget.dart';
-import 'package:arfoon_note/integration/blocs/note_bloc.dart';
+import 'package:arfoon_note/integration/blocs/label/label_bloc.dart';
+import 'package:arfoon_note/integration/blocs/label/label_state.dart';
+import 'package:arfoon_note/integration/blocs/note/note_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -18,17 +20,22 @@ class NoteCard extends StatelessWidget {
     return Stack(
       children: [
         InkWell(
-          onTap: ()async{
-            final updateNote = await Navigator.push(context, MaterialPageRoute(builder: (_)=> AddNoteView(note: note,)));
-          if( updateNote != null){
-            context.read<NotesBloc>().add(UpdatedNoteEvent(updateNote));
-          }
+          onTap: () async {
+            final updateNote = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => AddNoteView(
+                          note: note,
+                        )));
+            if (updateNote != null) {
+              context.read<NotesBloc>().add(UpdatedNoteEvent(updateNote));
+            }
           },
           onLongPress: () async {
             final confirm = await showDialog(
                 context: context,
                 builder: (context) {
-                  return  NoteDialog(
+                  return NoteDialog(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     title: 'Delete!',
                     details: 'Are you sure you want to delete it?',
@@ -67,8 +74,8 @@ class NoteCard extends StatelessWidget {
               children: [
                 Text(
                   note.updatedAt != null
-                  ? DateFormat('dd MMM').format(note.updatedAt!)
-                  : DateFormat('dd MMM').format(note.createdAt),
+                      ? DateFormat('dd MMM').format(note.updatedAt!)
+                      : DateFormat('dd MMM').format(note.createdAt),
                 ),
                 const SizedBox(height: 8),
                 Text(note.title ?? '',
@@ -81,26 +88,32 @@ class NoteCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 20),
-                Wrap(
-                  spacing: 6,
-                  children: note.labelIds
-                      .map((tag) => Chip(
-                          backgroundColor:
-                              const Color.fromARGB(255, 253, 253, 254),
-                          side: const BorderSide(color: Color(0xFFE4E4E7)),
-                          visualDensity:
-                              const VisualDensity(horizontal: 0, vertical: -4),
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 1, horizontal: 3),
-                          label: Text(
-                            tag.toString(),
-                            style: const TextStyle(
-                                fontSize: 12,
-                                color: Color(0XFFA2A2A2),
-                                fontWeight: FontWeight.w500),
-                          )))
-                      .toList(),
-                ),
+                
+
+
+            
+                const SizedBox(height: 20),
+
+                // Wrap(
+                //   spacing: 6,
+                //   children: note.labelIds
+                //       .map((tag) => Chip(
+                //           backgroundColor:
+                //               const Color.fromARGB(255, 253, 253, 254),
+                //           side: const BorderSide(color: Color(0xFFE4E4E7)),
+                //           visualDensity:
+                //               const VisualDensity(horizontal: 0, vertical: -4),
+                //           padding: const EdgeInsets.symmetric(
+                //               vertical: 1, horizontal: 3),
+                //           label: Text(
+                //             tag.toString(),
+                //             style: const TextStyle(
+                //                 fontSize: 12,
+                //                 color: Color(0XFFA2A2A2),
+                //                 fontWeight: FontWeight.w500),
+                //           )))
+                //       .toList(),
+                // ),
               ],
             ),
           ),
