@@ -2,6 +2,7 @@ import 'package:arfoon_note/client/models/note.dart';
 import 'package:arfoon_note/frontend/features/add_note/add_note_view.dart';
 import 'package:arfoon_note/frontend/widgets/widget.dart';
 import 'package:arfoon_note/integration/blocs/note/note_bloc.dart';
+import 'package:arfoon_note/integration/pages/add_note_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -22,9 +23,9 @@ class NoteCard extends StatelessWidget {
             final updateNote = await Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (_) => AddNoteView(
-                          note: note,
-                        )));
+                    builder: (_) => const AddNotePage()
+                        )
+                        );
             if (updateNote != null) {
               context.read<NotesBloc>().add(UpdatedNoteEvent(updateNote));
             }

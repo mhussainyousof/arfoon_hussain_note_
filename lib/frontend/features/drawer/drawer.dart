@@ -1,5 +1,4 @@
 import 'package:arfoon_note/client/models/label.dart';
-import 'package:arfoon_note/frontend/features/all_notes/all_notes_view.dart';
 import 'package:arfoon_note/integration/blocs/label/label_bloc.dart';
 import 'package:arfoon_note/integration/blocs/label/label_state.dart';
 import 'package:flutter/material.dart';

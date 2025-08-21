@@ -1,3 +1,4 @@
+import 'package:arfoon_note/frontend/features/features.dart';
 import 'package:arfoon_note/frontend/features/home/home_example.dart';
 import 'package:arfoon_note/integration/main_app.dart';
 import 'package:flutter/material.dart';
@@ -29,6 +30,10 @@ class _MyHomePageState extends State<ExamplePage> {
           ExampleButton(
             text: 'Main App',
             route: MainApp(),
+          ),
+          ExampleButton(
+            text: 'add App',
+            route: AddNoteExample(),
           ),
         ],
       ),

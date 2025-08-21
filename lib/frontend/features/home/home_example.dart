@@ -1,12 +1,20 @@
 import 'package:arfoon_note/frontend/frontend.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter/material.dart'; 
+import 'package:flutter/material.dart';
 
 class HomeExample extends StatelessWidget {
   const HomeExample({super.key});
   @override
   Widget build(BuildContext context) {
-    return const HomeView(
+    return HomeView(
+      addNote: (n) async {
+        await Future.delayed(const Duration(seconds: 1));
+        return n.copyWith(id: 11);
+      },
+      getNotes: (f) async {
+        await Future.delayed(const Duration(seconds: 1));
+        return [];
+      },
       // categories: const ["All Notes", "Home", "Office", "Note", "Design"],
       // selectedCategoryIndex: 0,
       // getNotes: Future.value([
