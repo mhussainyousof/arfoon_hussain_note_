@@ -21,6 +21,10 @@ class Notes {
       .detailsContains(s, caseSensitive: false)
       ).findAll();
     }
+
+    if(filter?.label != null){
+      return await isar.notes.filter().labelIdsElementEqualTo (filter!.label!.id!).findAll();
+    }
     
     if (filter?.pagination != null) {
       return await isar.notes

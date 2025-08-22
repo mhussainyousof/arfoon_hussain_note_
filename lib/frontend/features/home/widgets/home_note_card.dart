@@ -47,7 +47,7 @@ class NoteCard extends StatelessWidget {
                         textButtonText: 'Stop',
                         elevatedButtonText: 'Do it',
                         isTextButton: true,
-                        elevatedButtonOnpressed: () {
+                        elevatedButtonOnpressed: ()async {
                           Navigator.pop(context, true);
                         },
                         textButtonOnpressed: () {

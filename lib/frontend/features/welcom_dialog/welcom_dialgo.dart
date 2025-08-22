@@ -40,7 +40,7 @@ class WelcomDialgo extends StatelessWidget {
         //! Dialog action buttons centered horizontally
         dialogButtons(
           mainAxisAlignment: MainAxisAlignment.center,
-          elevatedButtonOnpressed: () {},  
+          elevatedButtonOnpressed: ()async {},  
           isTextButton: false,              
           textButtonText: 'textButtonText', 
           elevatedButtonText: 'Continue',

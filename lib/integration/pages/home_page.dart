@@ -12,6 +12,7 @@ class HomePage extends StatelessWidget {
     return HomeView(
       addNote: api.notes.insert,
       getNotes: api.notes.list,
+      getLabels: api.labels.list,
     );
   }
 }

@@ -33,7 +33,7 @@ class _MyHomePageState extends State<ExamplePage> {
           ),
           ExampleButton(
             text: 'add App',
-            route: AddNoteExample(),
+            route: CustomDrawer(userName: 'sdf', userGreeting: 'asdf',),
           ),
         ],
       ),

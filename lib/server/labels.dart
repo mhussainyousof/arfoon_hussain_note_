@@ -1,5 +1,4 @@
 import 'package:isar/isar.dart';
-
 import 'package:arfoon_note/client/client.dart';
 
 class Labels {
@@ -15,12 +14,13 @@ class Labels {
     return label.copyWith(id: res);
   }
 
-  Future<List<Label>> list({Pagination? pagination}) async {
-    if (pagination != null) {
+  Future<List<Label>> list([Filter? filter]) async {
+    if (filter?.pagination != null) {
       return await isar.labels
           .where()
-          .offset(pagination.offset)
-          .limit(pagination.limit)
+
+          .offset(filter!.pagination!.offset)
+          .limit(filter.pagination!.limit)
           .findAll();
     }
 

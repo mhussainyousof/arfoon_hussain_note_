@@ -1,13 +1,12 @@
 import 'package:arfoon_note/client/models/label.dart';
-import 'package:arfoon_note/integration/blocs/label/label_bloc.dart';
-import 'package:arfoon_note/integration/blocs/label/label_state.dart';
+import 'package:arfoon_note/integration/blocs/note/note_bloc.dart';
+import 'package:arfoon_note/main.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import '../../widgets/widget.dart';
 import '../features.dart';
 
-class CustomDrawer extends StatelessWidget {
+class CustomDrawer extends StatefulWidget {
   final String userName;
   final String userGreeting;
 
@@ -16,6 +15,20 @@ class CustomDrawer extends StatelessWidget {
     required this.userName,
     required this.userGreeting,
   });
+
+  @override
+  State<CustomDrawer> createState() => _CustomDrawerState();
+}
+
+class _CustomDrawerState extends State<CustomDrawer> {
+  late final AwaitCubit<List<Label>> awaitCubit;
+
+  @override
+  void initState() {
+    super.initState();
+    awaitCubit = AwaitCubit<List<Label>>();
+    awaitCubit.load(api.labels.list, null);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -94,133 +107,128 @@ class CustomDrawer extends StatelessWidget {
 
             //! List of user-defined labels with edit and select functionality
             Expanded(
-              child: BlocBuilder<LabelsBloc, LabelsState>(
+              child: AwaitBuilder<List<Label>>(
+                cubit: awaitCubit,
+                getData: (filter) async {
+                  return await api.labels.list(filter);
+                },
                 builder: (context, state) {
-                  if (state is LabelsLoading) {
+                  if (state.status == AwaitStatus.loading) {
                     return const Center(
                       child: CircularProgressIndicator(),
                     );
                   }
-                  if (state is LabelsError) {
-                    return Text('Error: ${state.message}');
+                  if (state.status == AwaitStatus.error) {
+                    return Text('Error: ${state.error}');
                   }
 
-                  if (state is LabelsLoaded) {
-                    if (state.labels.isEmpty) {
-                      return const Center(
-                        child: Text('There is no label.'),
-                      );
-                    }
-                    return ListView.builder(
-                      itemCount: state.labels.length,
-                      itemBuilder: (context, index) {
-                        final label = state.labels[index];
-                        return ListTile(
-                          onLongPress: () {
-                            context
-                                .read<LabelsBloc>()
-                                .add(DeleteLabelEvent(label.id!));
-                          },
-                          horizontalTitleGap: 6,
-                          leading: SvgPicture.asset('assets/images/label.svg',
-                              width: 24, height: 24),
-                          title: Text(label.name,
-                              style: const TextStyle(
-                                  fontSize: 14, color: Color(0XFF73737E))),
-                          trailing: IconButton(
-                            icon: SvgPicture.asset(
-                              'assets/images/edit.svg',
-                              width: 20,
-                              height: 20,
-                            ),
-                            onPressed: () {
-                              final TextEditingController controller =
-                                  TextEditingController(text: label.name);
-
-                              showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return NoteDialog(
-                                    title: 'Edit Label',
-                                    fontWeight: FontWeight.bold,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    details: 'Label Name',
-                                    children: [
-                                      const SizedBox(height: 8),
-                                      NoteTextField(
-                                        controller: controller,
-                                        hintText: 'Enter label name',
-                                      ),
-                                      const SizedBox(height: 40),
-                                      dialogButtons(
-                                        isTextButton: true,
-                                        textButtonText: 'Delete',
-                                        elevatedButtonText: 'Update',
-                                        textButtonOnpressed: () {
-                                          showDialog(
-                                            context: context,
-                                            builder: (context) => NoteDialog(
-                                                title:
-                                                    'Are you sure want to Delete?',
-                                                details:
-                                                    'Once Deleted a label cannot be undo, are you sure want to Delete?',
-                                                children: [
-                                                  const SizedBox(height: 15),
-                                                  //! Cancel and Delete buttons in confirmation dialog
-                                                  dialogButtons(
-                                                      isTextButton: true,
-                                                      textButtonElevation: 0,
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment.end,
-                                                      width: 15,
-                                                      elevatedButtonOnpressed:
-                                                          () {
-                                                        context
-                                                            .read<LabelsBloc>()
-                                                            .add(
-                                                                DeleteLabelEvent(
-                                                                    label.id!));
-                                                        Navigator.pop(context);
-                                                        Navigator.pop(context);
-                                                      },
-                                                      textButtonOnpressed: () {
-                                                        Navigator.pop(context);
-                                                      },
-                                                      textButtonText: 'Cancel',
-                                                      elevatedButtonText:
-                                                          'Delete It.')
-                                                ]),
-                                          );
-                                        },
-                                        elevatedButtonOnpressed: () {
-                                          final newName =
-                                              controller.text.trim();
-                                          if (newName.isNotEmpty) {
-                                            final updatedLabel =
-                                                label.copyWith(name: newName);
-
-                                            context.read<LabelsBloc>().add(
-                                                  UpdateLabelEvent(
-                                                      updatedLabel),
-                                                );
-                                            Navigator.pop(context);
-                                          }
-                                        },
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-                            },
-                          ),
-
-                          onTap: () {}, //! Select label handler placeholder
-                        );
-                      },
+                  final labels = state.data ?? [];
+                  if (labels.isEmpty) {
+                    return const Center(
+                      child: Text('There is no label.'),
                     );
                   }
-                  return const SizedBox.shrink();
+                  return ListView.builder(
+                    itemCount: labels.length,
+                    itemBuilder: (context, index) {
+                      final label = labels[index];
+                      return ListTile(
+                        onLongPress: () {
+                          api.labels.deleteLabel(label.id!);
+                        },
+                        horizontalTitleGap: 6,
+                        leading: SvgPicture.asset('assets/images/label.svg',
+                            width: 24, height: 24),
+                        title: Text(label.name,
+                            style: const TextStyle(
+                                fontSize: 14, color: Color(0XFF73737E))),
+                        trailing: IconButton(
+                          icon: SvgPicture.asset(
+                            'assets/images/edit.svg',
+                            width: 20,
+                            height: 20,
+                          ),
+                          onPressed: () {
+                            final TextEditingController controller =
+                                TextEditingController(text: label.name);
+
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                return NoteDialog(
+                                  title: 'Edit Label',
+                                  fontWeight: FontWeight.bold,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  details: 'Label Name',
+                                  children: [
+                                    const SizedBox(height: 8),
+                                    NoteTextField(
+                                      controller: controller,
+                                      hintText: 'Enter label name',
+                                    ),
+                                    const SizedBox(height: 40),
+                                    dialogButtons(
+                                      isTextButton: true,
+                                      textButtonText: 'Delete',
+                                      elevatedButtonText: 'Update',
+                                      textButtonOnpressed: () {
+                                        showDialog(
+                                          context: context,
+                                          builder: (context) => NoteDialog(
+                                              title:
+                                                  'Are you sure want to Delete?',
+                                              details:
+                                                  'Once Deleted a label cannot be undo, are you sure want to Delete?',
+                                              children: [
+                                                const SizedBox(height: 15),
+                                                //! Cancel and Delete buttons in confirmation dialog
+                                                dialogButtons(
+                                                    isTextButton: true,
+                                                    textButtonElevation: 0,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.end,
+                                                    width: 15,
+                                                    elevatedButtonOnpressed:
+                                                        () async {
+                                                      await api.labels
+                                                          .deleteLabel(
+                                                              label.id!);
+
+                                                      awaitCubit.refresh();
+                                                      Navigator.pop(context);
+                                                      Navigator.pop(context);
+                                                    },
+                                                    textButtonOnpressed: () {
+                                                      Navigator.pop(context);
+                                                    },
+                                                    textButtonText: 'Cancel',
+                                                    elevatedButtonText:
+                                                        'Delete It.')
+                                              ]),
+                                        );
+                                      },
+                                      elevatedButtonOnpressed: () async{
+                                        final newName = controller.text.trim();
+                                        if (newName.isNotEmpty) {
+                                          final updatedLabel =
+                                              label.copyWith(name: newName);
+                                       await  api.labels.updateLabel(updatedLabel);
+                                         awaitCubit.refresh();
+                                          Navigator.pop(context);
+                                        }
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                        ),
+
+                        onTap: () {}, //! Select label handler placeholder
+                      );
+                    },
+                  );
                 },
               ),
             ),
@@ -259,15 +267,19 @@ class CustomDrawer extends StatelessWidget {
                                 //! Buttons for deleting or saving the label
                                 dialogButtons(
                                   isTextButton: true,
-                                  elevatedButtonOnpressed: () {
+                                  elevatedButtonOnpressed: ()async {
                                     final labeleName =
                                         labelController.text.trim();
                                     if (labeleName.isNotEmpty) {
-                                      context.read<LabelsBloc>().add(
-                                          AddLabelEvent(
-                                              Label(name: labeleName)));
+                                      
+                                      await awaitCubit.load((filter) async{
+                                       await api.labels.insert(Label(name: labeleName));
+                                            return await api.labels.list(filter);
 
-                                      Navigator.pop(context);
+                                      }, null);
+                                     if(Navigator.canPop(context)){
+                                       Navigator.pop(context);
+                                     }
                                     }
                                   },
                                   textButtonText: 'Cancel',
@@ -275,6 +287,7 @@ class CustomDrawer extends StatelessWidget {
                                   textButtonOnpressed: () {
                                     Navigator.pop(context);
                                   },
+                                  
                                 )
                               ],
                             );
@@ -313,8 +326,8 @@ class CustomDrawer extends StatelessWidget {
                         color: Colors.black,
                         borderRadius: BorderRadius.circular(10)),
                     child: Text(
-                      userName.trim().isNotEmpty
-                          ? userName
+                      widget.userName.trim().isNotEmpty
+                          ? widget.userName
                               .trim()
                               .split(' ')
                               .where((part) => part.isNotEmpty)
@@ -332,11 +345,11 @@ class CustomDrawer extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        userName,
+                        widget.userName,
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       Text(
-                        userGreeting,
+                        widget.userGreeting,
                         style:
                             const TextStyle(color: Colors.grey, fontSize: 12),
                       ),
