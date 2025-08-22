@@ -1,5 +1,4 @@
 import 'package:arfoon_note/client/models/note.dart';
-import 'package:arfoon_note/frontend/features/add_note/add_note_view.dart';
 import 'package:arfoon_note/frontend/widgets/widget.dart';
 import 'package:arfoon_note/integration/blocs/note/note_bloc.dart';
 import 'package:arfoon_note/integration/pages/add_note_page.dart';
