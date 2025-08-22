@@ -1,5 +1,4 @@
 import 'package:arfoon_note/frontend/features/home/widgets/home_appbar.dart';
-import 'package:arfoon_note/integration/blocs/note/note_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../client/client.dart';

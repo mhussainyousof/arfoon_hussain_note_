@@ -1,13 +1,7 @@
-import 'package:arfoon_note/client/models/filter.dart';
-import 'package:arfoon_note/client/models/note.dart';
-import 'package:arfoon_note/integration/blocs/label/label_bloc.dart';
-import 'package:arfoon_note/integration/blocs/label/label_state.dart';
+
 import 'package:arfoon_note/integration/blocs/note/note_bloc.dart';
 import 'package:arfoon_note/integration/integration.dart';
-import 'package:arfoon_note/main.dart';
-import 'package:arfoon_note/server/server.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../../client/models/models.dart';
 import '../../theme/theme.dart';
