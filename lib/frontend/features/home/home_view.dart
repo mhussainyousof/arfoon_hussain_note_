@@ -42,9 +42,6 @@ class _HomeViewState extends State<HomeView> {
               userName: 'Abdurahman Popal',
               userGreeting: 'Good Morning',
             ),
-
-    
-
       backgroundColor: AppColors.background,
       appBar: HomeAppBar(
         leading: Builder(
@@ -91,7 +88,6 @@ class _HomeViewState extends State<HomeView> {
                     child: Text('No Data found'),
                   );
                 }
-
                 return ListView.builder(
                   padding: const EdgeInsets.all(16),
                   itemCount: state.data!.length,

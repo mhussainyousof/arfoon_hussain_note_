@@ -1,4 +1,5 @@
 import 'package:arfoon_note/frontend/features/home/widgets/home_appbar.dart';
+import 'package:arfoon_note/main.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../client/client.dart';
@@ -19,7 +20,7 @@ class _AddNoteViewState extends State<AddNoteView> {
   late TextEditingController _descriptionController;
   late TextEditingController _labelController;
   bool _isLoading = false;
-
+  List<int> _selectedLabelIds = [];
 
   @override
   void initState() {
@@ -28,6 +29,7 @@ class _AddNoteViewState extends State<AddNoteView> {
     _descriptionController =
         TextEditingController(text: widget.note?.details ?? '');
     _labelController = TextEditingController();
+    _selectedLabelIds = List<int>.from(widget.note?.labelIds ?? <int>[]);
   }
 
   Note get currentNote {
@@ -37,17 +39,19 @@ class _AddNoteViewState extends State<AddNoteView> {
       updatedAt: widget.note != null ? DateTime.now() : null,
       title: _titleController.text,
       details: _descriptionController.text,
-      labelIds: [],
+      labelIds: _selectedLabelIds,
     );
   }
 
   Future<void> _onSave() async {
+    if (_isLoading) return;
     setState(() {
       _isLoading = true;
     });
 
     try {
-      await widget.onSave(currentNote);
+      final saveNote = await widget.onSave(currentNote);
+      Navigator.pop(context, saveNote);
     } catch (e) {
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text('Some thing went wrong')));
@@ -59,6 +63,8 @@ class _AddNoteViewState extends State<AddNoteView> {
       }
     }
   }
+
+  
 
   @override
   void dispose() {
@@ -92,9 +98,7 @@ class _AddNoteViewState extends State<AddNoteView> {
       ),
 
       //! Main body content
-      body:
-      
-       SafeArea(
+      body: SafeArea(
         child: Stack(
           children: [
             Padding(
@@ -113,20 +117,21 @@ class _AddNoteViewState extends State<AddNoteView> {
                           ),
                     ),
                   const SizedBox(height: 8),
-            
+
                   //! Title input field
                   TextField(
                     controller: _titleController,
                     decoration: const InputDecoration(
                       hintText: 'Untitled',
-                      hintStyle: TextStyle(color: Color(0xFF9B9696), fontSize: 36),
+                      hintStyle:
+                          TextStyle(color: Color(0xFF9B9696), fontSize: 36),
                       border: InputBorder.none,
                     ),
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
                   ),
-            
+
                   //! Expanded description text field
                   Expanded(
                     child: TextField(
@@ -142,58 +147,76 @@ class _AddNoteViewState extends State<AddNoteView> {
                       textAlignVertical: TextAlignVertical.top,
                     ),
                   ),
-            
+
                   const SizedBox(height: 12),
-            
-                  //! Tag and color selection section
-                  SingleChildScrollView(
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      child: Row(
-                        children: [
-                          //! Field for adding a new tag
-                          const Expanded(
-                            child: TextField(
-                              // controller: _labelController,
-                              decoration: InputDecoration(
-                                hintText: 'Add Label',
-                                hintStyle: TextStyle(fontSize: 14),
+                  Wrap(
+                    spacing: 6,
+                    children: [
+                      ..._selectedLabelIds.map((id) => FutureBuilder<Label?>(
+                            future: api.labels.get(id),
+                            builder: (context, snapshot) {
+                              if (!snapshot.hasData) return const SizedBox();
+                              return Chip(
+                                label: Text(snapshot.data!.name),
+                                deleteIcon: const Icon(
+                                  Icons.close,
+                                  size: 18,
+                                ),
+                                onDeleted: () {
+                                  setState(() {
+                                    _selectedLabelIds.remove(id);
+                                  });
+                                },
+                              );
+                            },
+                          )),
+                      SizedBox(
+                        width: 150,
+                        child: Autocomplete<Label>(
+                          optionsViewOpenDirection: OptionsViewOpenDirection.up,
+                          optionsBuilder: (TextEditingValue value) async {
+                            if (value.text.isEmpty) {
+                              return const Iterable<Label>.empty();
+                            }
+
+                            final labels = await api.labels.list(null);
+                            final query = value.text.toLowerCase();
+
+                            return labels.where(
+                              (label) =>
+                                  label.name.toLowerCase().contains(query),
+                            );
+                          },
+                          displayStringForOption: (Label option) => option.name,
+                          onSelected: (Label selected) {
+                            setState(() {
+                              if (!_selectedLabelIds.contains(selected.id)) {
+                                _selectedLabelIds.add(selected.id!);
+                              }
+                            });
+                          },
+                          fieldViewBuilder: (context, textEditingController,
+                              focusNode, onFieldSubmitted) {
+                            return TextField(
+                              controller: textEditingController,
+                              focusNode: focusNode,
+                              decoration: const InputDecoration(
+                                hintText: 'Search or add label',
                                 border: InputBorder.none,
                               ),
-                            ),
-                          ),
-            
-                          //! Color selection palette
-                          SizedBox(
-                            width: 70,
-                            child: Stack(
-                              children: [
-                                Positioned(
-                                  right: 0,
-                                  child: _circle(const Color(0XFF00A894)),
-                                ),
-                                Positioned(
-                                  right: 18,
-                                  child: _circle(const Color(0XFFFF7E56)),
-                                ),
-                                Positioned(
-                                  child: _circle(const Color(0XFF0081C8)),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                            );
+                          },
+                        ),
                       ),
-                    ),
-                  ),
+                    ],
+                  )
                 ],
               ),
             ),
-                  if (_isLoading)
-                    const Center(
-                     
-                      child: CircularProgressIndicator(),
-                    ),  
+            if (_isLoading)
+              const Center(
+                child: CircularProgressIndicator(),
+              ),
           ],
         ),
       ),
@@ -201,20 +224,37 @@ class _AddNoteViewState extends State<AddNoteView> {
   }
 }
 
-//! Helper function to draw a color circle option
-Widget _circle(Color color) {
-  return Container(
-    width: 35,
-    height: 35,
-    decoration: BoxDecoration(
-      color: color,
-      shape: BoxShape.circle,
-      border: Border.all(color: Colors.white, width: 2),
-    ),
-  );
-}
+// //! Helper function to draw a color circle option
+// Widget _circle(Color color) {
+//   return Container(
+//     width: 35,
+//     height: 35,
+//     decoration: BoxDecoration(
+//       color: color,
+//       shape: BoxShape.circle,
+//       border: Border.all(color: Colors.white, width: 2),
+//     ),
+//   );
+// }
 
-
+//  SizedBox(
+//                             width: 70,
+//                             child: Stack(
+//                               children: [
+//                                 Positioned(
+//                                   right: 0,
+//                                   child: _circle(const Color(0XFF00A894)),
+//                                 ),
+//                                 Positioned(
+//                                   right: 18,
+//                                   child: _circle(const Color(0XFFFF7E56)),
+//                                 ),
+//                                 Positioned(
+//                                   child: _circle(const Color(0XFF0081C8)),
+//                                 ),
+//                               ],
+//                             ),
+//                           ),
 
 
   // //! Predefined tag label

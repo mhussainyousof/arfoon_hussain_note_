@@ -2,9 +2,12 @@ import 'package:arfoon_note/client/models/note.dart';
 import 'package:arfoon_note/frontend/widgets/widget.dart';
 import 'package:arfoon_note/integration/blocs/note/note_bloc.dart';
 import 'package:arfoon_note/integration/pages/add_note_page.dart';
+import 'package:arfoon_note/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+
+import '../../../../client/models/models.dart';
 
 class NoteCard extends StatelessWidget {
   final Note note;
@@ -22,11 +25,14 @@ class NoteCard extends StatelessWidget {
             final updateNote = await Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (_) => const AddNotePage()
-                        )
-                        );
+                    builder: (_) => AddNotePage(
+                          note: note,
+                        )));
             if (updateNote != null) {
-              context.read<NotesBloc>().add(UpdatedNoteEvent(updateNote));
+              api.notes.updateNote(updateNote);
+              context
+                  .read<AwaitCubit<List<Note>>>()
+                  .refresh();
             }
           },
           onLongPress: () async {
@@ -46,7 +52,9 @@ class NoteCard extends StatelessWidget {
                         textButtonText: 'Stop',
                         elevatedButtonText: 'Do it',
                         isTextButton: true,
-                        elevatedButtonOnpressed: ()async {
+                        elevatedButtonOnpressed: () async {
+                          await api.notes.deleteNote(note.id!);
+
                           Navigator.pop(context, true);
                         },
                         textButtonOnpressed: () {
@@ -58,7 +66,7 @@ class NoteCard extends StatelessWidget {
                 });
 
             if (confirm == true) {
-              context.read<NotesBloc>().add(DeleteNoteEvent(note.id!));
+              context.read<AwaitCubit<List<Note>>>().refresh();
             }
           },
           child: Container(
@@ -86,10 +94,21 @@ class NoteCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 20),
-                
-
-
-            
+                    Wrap(
+      spacing: 6,
+      children: note.labelIds.map((id) {
+        return FutureBuilder<Label?>(
+          future: api.labels.get(id),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) return const SizedBox();
+            return Chip(
+              label: Text(snapshot.data!.name),
+              backgroundColor: Colors.grey.shade200,
+            );
+          },
+        );
+      }).toList(),
+    ),
                 const SizedBox(height: 20),
 
                 // Wrap(

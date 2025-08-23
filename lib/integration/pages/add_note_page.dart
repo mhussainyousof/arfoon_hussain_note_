@@ -14,7 +14,7 @@ class AddNotePage extends StatelessWidget {
       note: note,
       onSave: (newNote) async {
         final saved = await api.notes.insert(newNote!);
-        Navigator.pop(context, saved);
+        
         return saved;
       },
     );

@@ -36,7 +36,8 @@ class AllNotesView extends StatelessWidget {
                 final note = notes[index];
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 12),
-                  child: NoteCard(note: note),
+                  child: NoteCard(note: note
+                  ),
                 );
               },
             );
