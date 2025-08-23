@@ -1,4 +1,5 @@
 import 'package:arfoon_note/frontend/features/home/widgets/home_appbar.dart';
+import 'package:arfoon_note/frontend/widgets/widget.dart';
 import 'package:arfoon_note/main.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -63,8 +64,6 @@ class _AddNoteViewState extends State<AddNoteView> {
       }
     }
   }
-
-  
 
   @override
   void dispose() {
@@ -150,30 +149,59 @@ class _AddNoteViewState extends State<AddNoteView> {
 
                   const SizedBox(height: 12),
                   Wrap(
-                    spacing: 6,
-                    children: [
-                      ..._selectedLabelIds.map((id) => FutureBuilder<Label?>(
-                            future: api.labels.get(id),
-                            builder: (context, snapshot) {
-                              if (!snapshot.hasData) return const SizedBox();
-                              return Chip(
-                                label: Text(snapshot.data!.name),
-                                deleteIcon: const Icon(
-                                  Icons.close,
-                                  size: 18,
-                                ),
-                                onDeleted: () {
-                                  setState(() {
-                                    _selectedLabelIds.remove(id);
-                                  });
+                      spacing: 6,
+                      children: _selectedLabelIds
+                          .map((id) => FutureBuilder<Label?>(
+                                future: api.labels.get(id),
+                                builder: (context, snapshot) {
+                                  if (!snapshot.hasData)
+                                    return const SizedBox();
+                                  return Chip(
+                                    label: Text(snapshot.data!.name),
+                                    deleteIcon: const Icon(
+                                      Icons.close,
+                                      size: 18,
+                                    ),
+                                    onDeleted: () {
+                                      setState(() {
+                                        _selectedLabelIds.remove(id);
+                                      });
+                                    },
+                                  );
                                 },
-                              );
-                            },
-                          )),
-                      SizedBox(
-                        width: 150,
+                              ))
+                          .toList()),
+
+                          const Divider(),
+                  Row(
+                    children: [
+                      Expanded(
                         child: Autocomplete<Label>(
                           optionsViewOpenDirection: OptionsViewOpenDirection.up,
+                          optionsViewBuilder: (context, onSelected, options) {
+                            return ConstrainedBox(
+                              constraints: const BoxConstraints(
+                                maxHeight: 100,
+                              ),
+                              child: Material(
+                                borderRadius: BorderRadius.circular(12),
+                                elevation: 4,
+                                color: Colors.white,
+                                child: ListView.builder(
+                                    itemCount: options.length,
+                                    itemBuilder: (context, index) {
+                                      final Label option =
+                                          options.elementAt(index);
+                                      return ListTile(
+                                        title: Text(option.name),
+                                        onTap: () {
+                                          onSelected(option);
+                                        },
+                                      );
+                                    }),
+                              ),
+                            );
+                          },
                           optionsBuilder: (TextEditingValue value) async {
                             if (value.text.isEmpty) {
                               return const Iterable<Label>.empty();
@@ -197,19 +225,36 @@ class _AddNoteViewState extends State<AddNoteView> {
                           },
                           fieldViewBuilder: (context, textEditingController,
                               focusNode, onFieldSubmitted) {
-                            return TextField(
+                            return NoteTextField(
+                              borderWidth: 0,
+                              borderColor: Colors.transparent,
                               controller: textEditingController,
                               focusNode: focusNode,
-                              decoration: const InputDecoration(
-                                hintText: 'Search or add label',
-                                border: InputBorder.none,
-                              ),
+                              hintText: 'Type to add label',
                             );
                           },
                         ),
                       ),
+                      SizedBox(
+                        width: 70,
+                        child: Stack(
+                          children: [
+                            Positioned(
+                              right: 0,
+                              child: _circle(const Color(0XFF00A894)),
+                            ),
+                            Positioned(
+                              right: 18,
+                              child: _circle(const Color(0XFFFF7E56)),
+                            ),
+                            Positioned(
+                              child: _circle(const Color(0XFF0081C8)),
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
-                  )
+                  ),
                 ],
               ),
             ),
@@ -225,37 +270,19 @@ class _AddNoteViewState extends State<AddNoteView> {
 }
 
 // //! Helper function to draw a color circle option
-// Widget _circle(Color color) {
-//   return Container(
-//     width: 35,
-//     height: 35,
-//     decoration: BoxDecoration(
-//       color: color,
-//       shape: BoxShape.circle,
-//       border: Border.all(color: Colors.white, width: 2),
-//     ),
-//   );
-// }
+Widget _circle(Color color) {
+  return Container(
+    width: 35,
+    height: 35,
+    decoration: BoxDecoration(
+      color: color,
+      shape: BoxShape.circle,
+      border: Border.all(color: Colors.white, width: 2),
+    ),
+  );
+}
 
-//  SizedBox(
-//                             width: 70,
-//                             child: Stack(
-//                               children: [
-//                                 Positioned(
-//                                   right: 0,
-//                                   child: _circle(const Color(0XFF00A894)),
-//                                 ),
-//                                 Positioned(
-//                                   right: 18,
-//                                   child: _circle(const Color(0XFFFF7E56)),
-//                                 ),
-//                                 Positioned(
-//                                   child: _circle(const Color(0XFF0081C8)),
-//                                 ),
-//                               ],
-//                             ),
-//                           ),
-
+ 
 
   // //! Predefined tag label
   //                     Container(
