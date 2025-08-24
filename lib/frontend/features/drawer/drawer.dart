@@ -1,5 +1,4 @@
 import 'package:arfoon_note/frontend/theme/context_ext.dart';
-import 'package:arfoon_note/integration/await_cubit/await_cubit.dart';
 import 'package:arfoon_note/integration/integration.dart';
 import 'package:arfoon_note/main.dart';
 import 'package:flutter/material.dart';
