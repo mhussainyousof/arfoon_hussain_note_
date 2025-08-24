@@ -1,4 +1,4 @@
-import 'package:arfoon_note/integration/blocs/note/note_bloc.dart';
+import 'package:arfoon_note/integration/await_cubit/await_cubit.dart';
 import 'package:arfoon_note/integration/integration.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -101,10 +101,12 @@ class _HomeViewState extends State<HomeView> {
       floatingActionButton: AddNoteButton(
           child: const Icon(Icons.add, color: Colors.white),
           onPressed: () async {
-            Navigator.push<Note>(
+            await Navigator.push<Note>(
                 context,
                 MaterialPageRoute(
                     builder: (context) => AddNoteView(onSave: widget.addNote)));
+
+            notesCubit.refresh();
           }),
     );
   }

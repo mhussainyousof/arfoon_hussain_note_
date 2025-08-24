@@ -23,6 +23,7 @@ class _AddNoteViewState extends State<AddNoteView> {
   bool _isLoading = false;
   List<int> _selectedLabelIds = [];
 
+
   @override
   void initState() {
     super.initState();
@@ -52,11 +53,13 @@ class _AddNoteViewState extends State<AddNoteView> {
 
     try {
       final saveNote = await widget.onSave(currentNote);
+      
       Navigator.pop(context, saveNote);
+
     } catch (e) {
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text('Some thing went wrong')));
-    } finally {
+    } finally { 
       if (mounted) {
         setState(() {
           _isLoading = false;
@@ -85,6 +88,7 @@ class _AddNoteViewState extends State<AddNoteView> {
         title: '',
         leading: IconButton(
           onPressed: _onSave,
+
           icon: const Icon(
             Icons.arrow_back_ios,
             color: Color(0XFF646464),

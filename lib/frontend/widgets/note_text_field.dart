@@ -43,7 +43,7 @@ class NoteTextField extends StatelessWidget {
       child: TextField(
         controller: controller,
         focusNode: focusNode,
-        maxLines: isMultiline ? maxLines ?? null : 1,
+        maxLines: isMultiline ? maxLines : 1,
         decoration: InputDecoration(
           hintText: hintText,
           hintStyle: TextStyle(fontSize: hintSize ?? 14, color: const Color(0xFF71717A)),

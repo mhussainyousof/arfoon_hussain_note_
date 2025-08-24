@@ -1,5 +1,6 @@
 import 'package:arfoon_note/frontend/theme/context_ext.dart';
-import 'package:arfoon_note/integration/blocs/note/note_bloc.dart';
+import 'package:arfoon_note/integration/await_cubit/await_cubit.dart';
+import 'package:arfoon_note/integration/integration.dart';
 import 'package:arfoon_note/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -91,12 +92,8 @@ class _CustomDrawerState extends State<CustomDrawer> {
               ),
               trailing: const Icon(Icons.chevron_right),
               onTap: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const AllNotesView()),
-                );
-              }, //! Navigation handler placeholder
+        
+              }, 
             ),
 
             //! Section title for labels
