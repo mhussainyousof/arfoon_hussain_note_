@@ -1,4 +1,3 @@
-import 'package:arfoon_note/integration/await_cubit/await_cubit.dart';
 import 'package:arfoon_note/integration/integration.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -12,8 +11,8 @@ class HomeView extends StatefulWidget {
   const HomeView({
     super.key,
     required this.getNotes,
-    required this.addNote, required this.getLabels,
-
+    required this.addNote,
+    required this.getLabels,
   });
   final Future<List<Note>> Function(Filter?) getNotes;
   final Future<List<Label>> Function(Filter?) getLabels;
@@ -27,6 +26,19 @@ class HomeView extends StatefulWidget {
 class _HomeViewState extends State<HomeView> {
   final searchController = TextEditingController();
   final notesCubit = AwaitCubit<List<Note>>();
+  int selectedChipIndex = 0;
+  List<Label> allLabels = [];
+  Label? selectedLabel;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.getLabels(null).then((labels) {
+      setState(() => allLabels = labels);
+    });
+
+    notesCubit.load(widget.getNotes, null, inital: true);
+  }
 
   @override
   void dispose() {
@@ -37,7 +49,29 @@ class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: const DrawerPage(),
+      drawer: DrawerPage(
+        onLabelSelected: (label) {
+          if (label.id == null) {
+            notesCubit.filter(Filter());
+          } else {
+            notesCubit.filter(Filter(label: label));
+          }
+        },
+        onLabelAdded: (newlable)async{
+          final labels = await widget.getLabels(null);
+          setState(()=> allLabels = labels);
+        },
+        onLabelDelete: (id) async{
+          final labels = await widget.getLabels(null);
+          setState(()=> allLabels = labels);
+        },
+        onLabelUpdate: (udatedLabel) async{
+          final labels = await widget.getLabels(null);
+          setState(()=> allLabels = labels);
+        },
+
+
+      ),
       backgroundColor: AppColors.background,
       appBar: HomeAppBar(
         leading: Builder(
@@ -60,11 +94,25 @@ class _HomeViewState extends State<HomeView> {
             hintText: 'Search Notes',
             onChanged: (s) {
               notesCubit.filter(Filter(search: s));
+            
             },
           ),
-          const CategoryFilterChips(
-            categories: [],
-            selectedIndex: 0,
+          CategoryFilterChips(
+
+            onSelectLabel: (label, index) {
+              setState((){selectedChipIndex = index;
+              selectedLabel = label;
+              });
+
+              if(label.id == null){
+                notesCubit.filter(Filter());
+              }else{
+              notesCubit.filter(Filter(label: label));
+
+              }
+            },
+            labels: allLabels,
+            selectedIndex: selectedChipIndex,
           ),
           Expanded(
             child: AwaitBuilder<List<Note>>(
@@ -106,7 +154,10 @@ class _HomeViewState extends State<HomeView> {
             await Navigator.push<Note>(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => AddNoteView(onSave: widget.addNote, getLabels: widget.getLabels,)));
+                    builder: (context) => AddNoteView(
+                          onSave: widget.addNote,
+                          getLabels: widget.getLabels,
+                        )));
 
             notesCubit.refresh();
           }),

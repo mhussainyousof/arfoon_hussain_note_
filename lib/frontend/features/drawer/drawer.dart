@@ -6,7 +6,6 @@ import 'package:arfoon_note/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-
 class CustomDrawer extends StatefulWidget {
   final String userName;
   final String userGreeting;
@@ -14,16 +13,23 @@ class CustomDrawer extends StatefulWidget {
   final Future<Label?> Function(Label) updateLabel;
   final Future<void> Function(int) deleteLabel;
   final Future<Label> Function(Label) addLabel;
+  final void Function(Label label) onLabelSelected;
+  final void Function(Label label)? onLabelAdded;
+  final void Function(Label label)? onLabelUpdated;
+  final void Function(int id)? onLabelDeleted;
 
-  const CustomDrawer({
-    super.key,
-    required this.userName,
-    required this.userGreeting,
-    required this.deleteLabel,
-    required this.updateLabel,
-    required this.getLabels,
-    required this.addLabel
-  });
+  const CustomDrawer(
+      {super.key,
+      required this.userName,
+      required this.userGreeting,
+      required this.deleteLabel,
+      required this.updateLabel,
+      required this.getLabels,
+      required this.addLabel,
+      required this.onLabelSelected,
+      this.onLabelAdded,
+      this.onLabelUpdated,
+      this.onLabelDeleted});
 
   @override
   State<CustomDrawer> createState() => _CustomDrawerState();
@@ -91,8 +97,9 @@ class _CustomDrawerState extends State<CustomDrawer> {
               ),
               trailing: const Icon(Icons.chevron_right),
               onTap: () {
-        
-              }, 
+                widget.onLabelSelected(Label(name: '', id: null));
+                Navigator.pop(context);
+              },
             ),
 
             //! Section title for labels
@@ -136,9 +143,8 @@ class _CustomDrawerState extends State<CustomDrawer> {
                     itemBuilder: (context, index) {
                       final label = labels[index];
                       return ListTile(
-                        onLongPress: () {
-                          api.labels.deleteLabel(label.id!);
-                        },
+                       
+
                         horizontalTitleGap: 6,
                         leading: SvgPicture.asset('assets/images/label.svg',
                             width: 24, height: 24),
@@ -197,6 +203,13 @@ class _CustomDrawerState extends State<CustomDrawer> {
                                                         .deleteLabel(label.id!);
 
                                                     awaitCubit.refresh();
+
+                                                    //! Notifiy Home view
+                                                    if (widget.onLabelDeleted !=
+                                                        null) {
+                                                      widget.onLabelDeleted!(
+                                                          label.id!);
+                                                    }
                                                     Navigator.pop(context);
                                                     Navigator.pop(context);
                                                   },
@@ -211,14 +224,20 @@ class _CustomDrawerState extends State<CustomDrawer> {
                                         );
                                       },
 
-                                      // Update Label Button 
+                                      // Update Label Button
                                       elevatedButtonOnpressed: () async {
                                         final newName = controller.text.trim();
                                         if (newName.isNotEmpty) {
                                           final updatedLabel =
                                               label.copyWith(name: newName);
-                                              await widget.updateLabel(updatedLabel);
+                                          await widget
+                                              .updateLabel(updatedLabel);
                                           awaitCubit.refresh();
+
+                                          if (widget.onLabelUpdated != null) {
+                                            widget
+                                                .onLabelUpdated!(updatedLabel);
+                                          }
                                           Navigator.pop(context);
                                         }
                                       },
@@ -230,7 +249,10 @@ class _CustomDrawerState extends State<CustomDrawer> {
                           },
                         ),
 
-                        onTap: () {}, //! Select label handler placeholder
+                        onTap: () {
+                          widget.onLabelSelected(label);
+                          Navigator.pop(context);
+                        }, //! Select label handler placeholder
                       );
                     },
                   );
@@ -268,18 +290,21 @@ class _CustomDrawerState extends State<CustomDrawer> {
                                   hintText: 'A creative label name',
                                 ),
                                 const SizedBox(height: 40),
-
                                 DialogButtons(
                                   isTextButton: true,
                                   elevatedButtonOnpressed: () async {
                                     final labeleName =
                                         labelController.text.trim();
                                     if (labeleName.isNotEmpty) {
-                                      
-                                      await widget.addLabel(Label(name: labeleName));
+                                      await widget
+                                          .addLabel(Label(name: labeleName));
                                       awaitCubit.refresh();
                                       if (Navigator.canPop(context)) {
                                         Navigator.pop(context);
+                                      }
+                                      if (widget.onLabelAdded != null) {
+                                        widget.onLabelAdded!(
+                                            Label(name: labeleName));
                                       }
                                     }
                                   },

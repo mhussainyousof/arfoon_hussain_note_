@@ -1,3 +1,4 @@
+import 'package:arfoon_note/client/models/models.dart';
 import 'package:arfoon_note/frontend/features/add_note/add_note_view.dart';
 import 'package:arfoon_note/frontend/widgets/widget.dart';
 import 'package:arfoon_note/integration/integration.dart';
@@ -5,12 +6,10 @@ import 'package:arfoon_note/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import '../../../../client/models/models.dart';
 
 class NoteCard extends StatefulWidget {
   final Note note;
-    final Future<List<Label>> Function(Filter?) getLabels;
-
+  final Future<List<Label>> Function(Filter?) getLabels;
 
   const NoteCard({super.key, required this.note, required this.getLabels});
 
@@ -19,8 +18,7 @@ class NoteCard extends StatefulWidget {
 }
 
 class _NoteCardState extends State<NoteCard> {
-
-final labelCubit = AwaitCubit<List<Label>>();
+  final labelCubit = AwaitCubit<List<Label>>();
 
   @override
   Widget build(BuildContext context) {
@@ -30,20 +28,23 @@ final labelCubit = AwaitCubit<List<Label>>();
       children: [
         InkWell(
           onTap: () async {
-           
-
-           final updateNote =  await Navigator.push(context, MaterialPageRoute(builder: (_)=> AddNoteView(onSave: (note)async{
-              await api.notes.updateNote(note);
-              return note;
-            } , getLabels: widget.getLabels, note: widget.note,)
-            
-            ),
+            final updateNote = await Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) => AddNoteView(
+                        onSave: (note) async {
+                          await api.notes.updateNote(note);
+                          return note;
+                        },
+                        getLabels: widget.getLabels,
+                        note: widget.note,
+                      )),
             );
-            if(updateNote != null ){
-              context.read<AwaitCubit<List<Note>>>().refresh();
+            if (updateNote != null) {
+           final notesCubit = context.read<AwaitCubit<List<Note>>>();
+           notesCubit.refresh(filter:     notesCubit.state.filter);
+
             }
-
-
           },
           onLongPress: () async {
             final confirm = await showDialog(
@@ -104,29 +105,25 @@ final labelCubit = AwaitCubit<List<Label>>();
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 20),
-               
-                   AwaitBuilder<List<Label?>>(
-                      getData: widget.getLabels,
-                      cubit: labelCubit,
-                      builder: (context, state) {
-                        final label = state.data ?? [];
-                        final selectedLabels = label.where((label)=> widget.note.labelIds.contains(label?.id));
-                        return Wrap(
-                          spacing: 6,
-                          runSpacing: 3,
-                          children: selectedLabels.map((label){
-                            if(label == null ) return const SizedBox();
-                            return  Chip(
-                              label: Text(label.name),
-                              backgroundColor: Colors.grey.shade200,
-                            );
-                          }).toList()
-                           
-                          
-                        );
-                      },
-                    ),
-               
+                AwaitBuilder<List<Label?>>(
+                  getData: widget.getLabels,
+                  cubit: labelCubit,
+                  builder: (context, state) {
+                    final label = state.data ?? [];
+                    final selectedLabels = label.where(
+                        (label) => widget.note.labelIds.contains(label?.id));
+                    return Wrap(
+                        spacing: 6,
+                        runSpacing: 3,
+                        children: selectedLabels.map((label) {
+                          if (label == null) return const SizedBox();
+                          return Chip(
+                            label: Text(label.name),
+                            backgroundColor: Colors.grey.shade200,
+                          );
+                        }).toList());
+                  },
+                ),
                 const SizedBox(height: 20),
               ],
             ),

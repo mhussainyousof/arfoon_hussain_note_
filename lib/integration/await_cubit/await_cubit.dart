@@ -28,10 +28,9 @@ class AwaitCubit<T> extends Cubit<AwaitState<T>> {
     load(initalGetData!, filter);
   }
 
-  refresh() {
-    load(initalGetData!, initalFilter);
+  refresh({Filter? filter}) {
+    load(initalGetData!, filter ?? state.filter ?? initalFilter );
   }
-  
 }
 
 
