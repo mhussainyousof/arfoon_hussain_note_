@@ -1,4 +1,3 @@
-
 import 'package:arfoon_note/integration/blocs/note/note_bloc.dart';
 import 'package:arfoon_note/integration/integration.dart';
 import 'package:flutter/material.dart';
@@ -13,10 +12,9 @@ class HomeView extends StatefulWidget {
   const HomeView({
     super.key,
     required this.getNotes,
-    required this.addNote, required this.getLabels,
+    required this.addNote,
   });
   final Future<List<Note>> Function(Filter?) getNotes;
-  final Future<List<Label>> Function(Filter?) getLabels;
 
   final Future<Note> Function(Note) addNote;
 
@@ -37,11 +35,7 @@ class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: 
-             const CustomDrawer(
-              userName: 'Abdurahman Popal',
-              userGreeting: 'Good Morning',
-            ),
+      drawer: const DrawerPage(),
       backgroundColor: AppColors.background,
       appBar: HomeAppBar(
         leading: Builder(
@@ -104,21 +98,13 @@ class _HomeViewState extends State<HomeView> {
           ),
         ],
       ),
-
       floatingActionButton: AddNoteButton(
           child: const Icon(Icons.add, color: Colors.white),
           onPressed: () async {
-            final result = await Navigator.push<Note>(
-              context,
-              MaterialPageRoute(builder: (context) => const AddNotePage()),
-            );
-            if (result is Note &&
-                (((result.title ?? '').isNotEmpty) ||
-                    (result.details ?? '').isNotEmpty)) {
-              widget.addNote(result).then((v) {
-                notesCubit.refresh();
-              });
-            }
+            Navigator.push<Note>(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => AddNoteView(onSave: widget.addNote)));
           }),
     );
   }

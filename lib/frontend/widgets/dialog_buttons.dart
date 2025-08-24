@@ -1,7 +1,7 @@
 import 'package:arfoon_note/frontend/widgets/widget.dart';
 import 'package:flutter/material.dart';
 
-class dialogButtons extends StatefulWidget {
+class DialogButtons extends StatefulWidget {
   final double? textButtonElevation;
   final void Function()? textButtonOnpressed;
   final Future<void> Function()? elevatedButtonOnpressed;
@@ -11,7 +11,7 @@ class dialogButtons extends StatefulWidget {
   final bool? isTextButton;
   final double? width;
 
-  const dialogButtons({
+  const DialogButtons({
     super.key,
     this.textButtonElevation,
     this.textButtonOnpressed,
@@ -24,10 +24,10 @@ class dialogButtons extends StatefulWidget {
   });
 
   @override
-  State<dialogButtons> createState() => _dialogButtonsState();
+  State<DialogButtons> createState() => _DialogButtonsState();
 }
 
-class _dialogButtonsState extends State<dialogButtons> {
+class _DialogButtonsState extends State<DialogButtons> {
   bool isLoading = false;
   @override
   Widget build(BuildContext context) {
@@ -78,7 +78,7 @@ class _dialogButtonsState extends State<dialogButtons> {
                             title: "Error",
                             details: '$e',
                             children: [
-                              dialogButtons(
+                              DialogButtons(
                                 textButtonText: 'textButtonText',
                                 elevatedButtonText: 'Ok',
                                 isTextButton: false,

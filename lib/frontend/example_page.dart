@@ -1,3 +1,4 @@
+import 'package:arfoon_note/client/models/label.dart';
 import 'package:arfoon_note/frontend/features/features.dart';
 import 'package:arfoon_note/frontend/features/home/home_example.dart';
 import 'package:arfoon_note/integration/main_app.dart';
@@ -31,10 +32,22 @@ class _MyHomePageState extends State<ExamplePage> {
             text: 'Main App',
             route: MainApp(),
           ),
-          ExampleButton(
-            text: 'add App',
-            route: CustomDrawer(userName: 'sdf', userGreeting: 'asdf',),
-          ),
+          // ExampleButton(
+          //   text: 'add App',
+          //   route: CustomDrawer(
+          //     userName: 'sdf',
+          //     userGreeting: 'asdf',
+          //     getLabels: () async {
+          //       return [];
+          //     },
+          //     deleteLabel: (l) async {
+          //       return Label(name: '');
+          //     },
+          //     updateLabel: (l) async {
+          //       return l;
+          //     },
+          //   ),
+          // ),
         ],
       ),
     );

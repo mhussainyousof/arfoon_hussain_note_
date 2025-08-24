@@ -9,7 +9,7 @@ import '../../theme/theme.dart';
 class AddNoteView extends StatefulWidget {
   final Note? note;
 
-  final Future<Note> Function(Note?) onSave;
+  final Future<Note> Function(Note) onSave;
   const AddNoteView({super.key, this.note, required this.onSave});
 
   @override
@@ -154,8 +154,9 @@ class _AddNoteViewState extends State<AddNoteView> {
                           .map((id) => FutureBuilder<Label?>(
                                 future: api.labels.get(id),
                                 builder: (context, snapshot) {
-                                  if (!snapshot.hasData)
+                                  if (!snapshot.hasData){
                                     return const SizedBox();
+                                  }
                                   return Chip(
                                     label: Text(snapshot.data!.name),
                                     deleteIcon: const Icon(

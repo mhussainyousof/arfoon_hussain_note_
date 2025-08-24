@@ -1,12 +1,9 @@
-import 'package:arfoon_note/client/models/note.dart';
 import 'package:arfoon_note/frontend/widgets/widget.dart';
 import 'package:arfoon_note/integration/blocs/note/note_bloc.dart';
-import 'package:arfoon_note/integration/pages/add_note_page.dart';
 import 'package:arfoon_note/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-
 import '../../../../client/models/models.dart';
 
 class NoteCard extends StatelessWidget {
@@ -22,18 +19,16 @@ class NoteCard extends StatelessWidget {
       children: [
         InkWell(
           onTap: () async {
-            final updateNote = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (_) => AddNotePage(
-                          note: note,
-                        )));
-            if (updateNote != null) {
-              api.notes.updateNote(updateNote);
-              context
-                  .read<AwaitCubit<List<Note>>>()
-                  .refresh();
-            }
+            // final updateNote = await Navigator.push(
+            //     context,
+            //     MaterialPageRoute(
+            //         builder: (_) => AddNoteView(
+            //               note: note,
+            //             )));
+            // if (updateNote != null) {
+            //   api.notes.updateNote(updateNote);
+            //   context.read<AwaitCubit<List<Note>>>().refresh();
+            // }
           },
           onLongPress: () async {
             final confirm = await showDialog(
@@ -45,7 +40,7 @@ class NoteCard extends StatelessWidget {
                     details: 'Are you sure you want to delete it?',
                     children: [
                       const SizedBox(height: 20),
-                      dialogButtons(
+                      DialogButtons(
                         mainAxisAlignment: MainAxisAlignment.end,
                         width: 20,
                         textButtonElevation: 1,
@@ -94,67 +89,26 @@ class NoteCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 20),
-                    Wrap(
-      spacing: 6,
-      children: note.labelIds.map((id) {
-        return FutureBuilder<Label?>(
-          future: api.labels.get(id),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) return const SizedBox();
-            return Chip(
-              label: Text(snapshot.data!.name),
-              backgroundColor: Colors.grey.shade200,
-            );
-          },
-        );
-      }).toList(),
-    ),
+                Wrap(
+                  spacing: 6,
+                  children: note.labelIds.map((id) {
+                    return FutureBuilder<Label?>(
+                      future: api.labels.get(id),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) return const SizedBox();
+                        return Chip(
+                          label: Text(snapshot.data!.name),
+                          backgroundColor: Colors.grey.shade200,
+                        );
+                      },
+                    );
+                  }).toList(),
+                ),
                 const SizedBox(height: 20),
-
-                // Wrap(
-                //   spacing: 6,
-                //   children: note.labelIds
-                //       .map((tag) => Chip(
-                //           backgroundColor:
-                //               const Color.fromARGB(255, 253, 253, 254),
-                //           side: const BorderSide(color: Color(0xFFE4E4E7)),
-                //           visualDensity:
-                //               const VisualDensity(horizontal: 0, vertical: -4),
-                //           padding: const EdgeInsets.symmetric(
-                //               vertical: 1, horizontal: 3),
-                //           label: Text(
-                //             tag.toString(),
-                //             style: const TextStyle(
-                //                 fontSize: 12,
-                //                 color: Color(0XFFA2A2A2),
-                //                 fontWeight: FontWeight.w500),
-                //           )))
-                //       .toList(),
-                // ),
               ],
             ),
           ),
         ),
-        // Positioned(
-        //     top: 16,
-        //     right: 20,
-        //     child: Card(
-        //       elevation: 0.1,
-        //       shape: RoundedRectangleBorder(
-        //         borderRadius: BorderRadius.circular(10),
-        //       ),
-        //       color: data.isPinned ? Colors.black : Colors.white,
-        //       child: Padding(
-        //         padding: const EdgeInsets.all(13),
-        //         child: Image.asset(
-        //           data.isPinned
-        //               ? 'assets/images/card_pin_tag.png'
-        //               : 'assets/images/card_pin.png',
-        //           width: 14,
-        //           height: 14,
-        //         ),
-        //       ),
-        //     )),
       ],
     );
   }

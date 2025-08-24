@@ -38,7 +38,7 @@ class WelcomDialgo extends StatelessWidget {
         const SizedBox(height: 20),
 
         //! Dialog action buttons centered horizontally
-        dialogButtons(
+        DialogButtons(
           mainAxisAlignment: MainAxisAlignment.center,
           elevatedButtonOnpressed: ()async {},  
           isTextButton: false,              
