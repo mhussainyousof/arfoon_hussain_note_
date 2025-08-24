@@ -10,6 +10,7 @@ import 'package:flutter/widgets.dart';
       return HomeView(
         addNote: api.notes.insert,
         getNotes: api.notes.list,
+        getLabels: api.labels.list,
       );
     }
   }

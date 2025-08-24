@@ -12,9 +12,11 @@ class HomeView extends StatefulWidget {
   const HomeView({
     super.key,
     required this.getNotes,
-    required this.addNote,
+    required this.addNote, required this.getLabels,
+
   });
   final Future<List<Note>> Function(Filter?) getNotes;
+  final Future<List<Label>> Function(Filter?) getLabels;
 
   final Future<Note> Function(Note) addNote;
 
@@ -89,7 +91,7 @@ class _HomeViewState extends State<HomeView> {
                     final note = state.data![index];
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 12),
-                      child: NoteCard(note: note),
+                      child: NoteCard(note: note, getLabels: widget.getLabels),
                     );
                   },
                 );
@@ -104,7 +106,7 @@ class _HomeViewState extends State<HomeView> {
             await Navigator.push<Note>(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => AddNoteView(onSave: widget.addNote)));
+                    builder: (context) => AddNoteView(onSave: widget.addNote, getLabels: widget.getLabels,)));
 
             notesCubit.refresh();
           }),

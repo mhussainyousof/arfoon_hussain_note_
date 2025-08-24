@@ -1,5 +1,6 @@
 import 'package:arfoon_note/frontend/features/home/widgets/home_appbar.dart';
 import 'package:arfoon_note/frontend/widgets/widget.dart';
+import 'package:arfoon_note/integration/integration.dart';
 import 'package:arfoon_note/main.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -8,9 +9,10 @@ import '../../theme/theme.dart';
 
 class AddNoteView extends StatefulWidget {
   final Note? note;
-
+  final Future<List<Label>> Function(Filter?) getLabels;
   final Future<Note> Function(Note) onSave;
-  const AddNoteView({super.key, this.note, required this.onSave});
+  const AddNoteView(
+      {super.key, this.note, required this.onSave, required this.getLabels});
 
   @override
   State<AddNoteView> createState() => _AddNoteViewState();
@@ -20,9 +22,11 @@ class _AddNoteViewState extends State<AddNoteView> {
   late TextEditingController _titleController;
   late TextEditingController _descriptionController;
   late TextEditingController _labelController;
+
   bool _isLoading = false;
   List<int> _selectedLabelIds = [];
 
+  late final AwaitCubit<List<Label?>> labelsCubit;
 
   @override
   void initState() {
@@ -32,6 +36,9 @@ class _AddNoteViewState extends State<AddNoteView> {
         TextEditingController(text: widget.note?.details ?? '');
     _labelController = TextEditingController();
     _selectedLabelIds = List<int>.from(widget.note?.labelIds ?? <int>[]);
+
+    labelsCubit = AwaitCubit<List<Label?>>();
+    labelsCubit.load(widget.getLabels, null, inital: true);
   }
 
   Note get currentNote {
@@ -53,13 +60,12 @@ class _AddNoteViewState extends State<AddNoteView> {
 
     try {
       final saveNote = await widget.onSave(currentNote);
-      
-      Navigator.pop(context, saveNote);
 
+      Navigator.pop(context, saveNote);
     } catch (e) {
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text('Some thing went wrong')));
-    } finally { 
+    } finally {
       if (mounted) {
         setState(() {
           _isLoading = false;
@@ -88,7 +94,6 @@ class _AddNoteViewState extends State<AddNoteView> {
         title: '',
         leading: IconButton(
           onPressed: _onSave,
-
           icon: const Icon(
             Icons.arrow_back_ios,
             color: Color(0XFF646464),
@@ -120,7 +125,6 @@ class _AddNoteViewState extends State<AddNoteView> {
                           ),
                     ),
                   const SizedBox(height: 8),
-
                   //! Title input field
                   TextField(
                     controller: _titleController,
@@ -152,32 +156,40 @@ class _AddNoteViewState extends State<AddNoteView> {
                   ),
 
                   const SizedBox(height: 12),
-                  Wrap(
-                      spacing: 6,
-                      children: _selectedLabelIds
-                          .map((id) => FutureBuilder<Label?>(
-                                future: api.labels.get(id),
-                                builder: (context, snapshot) {
-                                  if (!snapshot.hasData){
-                                    return const SizedBox();
-                                  }
-                                  return Chip(
-                                    label: Text(snapshot.data!.name),
-                                    deleteIcon: const Icon(
-                                      Icons.close,
-                                      size: 18,
-                                    ),
-                                    onDeleted: () {
-                                      setState(() {
-                                        _selectedLabelIds.remove(id);
-                                      });
-                                    },
-                                  );
-                                },
-                              ))
-                          .toList()),
+                  AwaitBuilder<List<Label?>>(
+                    cubit: labelsCubit,
+                    getData: widget.getLabels,
+                    builder: (context, state) {
+                      if (state.status == AwaitStatus.loading) {
+                        return const SizedBox();
+                      }
 
-                          const Divider(),
+                      final labels = state.data ?? [];
+                      final selectedLabels = labels
+                          .where(
+                              (label) => _selectedLabelIds.contains(label?.id))
+                          .toList();
+
+                      return Wrap(
+                        spacing: 6,
+                        runSpacing: 6,
+                        children: selectedLabels.map((label) {
+                          if (label == null) return const SizedBox();
+                          return Chip(
+                            label: Text(label.name),
+                            deleteIcon: const Icon(Icons.close, size: 18),
+                            onDeleted: () {
+                              setState(() {
+                                _selectedLabelIds.remove(label.id);
+                              });
+                            },
+                          );
+                        }).toList(),
+                      );
+                    },
+                  ),
+
+                  const Divider(),
                   Row(
                     children: [
                       Expanded(

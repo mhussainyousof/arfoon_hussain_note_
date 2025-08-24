@@ -7,7 +7,7 @@ class HomeExample extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return HomeView(
-
+      getLabels: (p0) => Future.delayed(const Duration(seconds: 2)),
       addNote: (n) async {
         await Future.delayed(const Duration(seconds: 1));
         return n.copyWith(id: 11);
