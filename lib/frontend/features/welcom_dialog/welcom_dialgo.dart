@@ -40,10 +40,10 @@ class WelcomDialgo extends StatelessWidget {
         //! Dialog action buttons centered horizontally
         DialogButtons(
           mainAxisAlignment: MainAxisAlignment.center,
-          elevatedButtonOnpressed: ()async {},  
-          isTextButton: false,              
-          textButtonText: 'textButtonText', 
-          elevatedButtonText: 'Continue',
+          primaryButtonOnPressed: ()async {},  
+          showSecondary: false,              
+          secondaryButtonText: 'textButtonText', 
+          primaryButtonText: 'Continue',
         ),
         const SizedBox(height: 20),
 

@@ -2,25 +2,25 @@ import 'package:arfoon_note/frontend/widgets/widget.dart';
 import 'package:flutter/material.dart';
 
 class DialogButtons extends StatefulWidget {
-  final double? textButtonElevation;
-  final void Function()? textButtonOnpressed;
-  final Future<void> Function()? elevatedButtonOnpressed;
-  final String textButtonText;
-  final String elevatedButtonText;
+  final double? secondaryButtonElevation;
+  final void Function()? secondaryButtonOnPressed;
+  final Future<void> Function()? primaryButtonOnPressed;
+  final String secondaryButtonText;
+  final String primaryButtonText;
   final MainAxisAlignment? mainAxisAlignment;
-  final bool? isTextButton;
+  final bool? showSecondary;
   final double? width;
 
   const DialogButtons({
     super.key,
-    this.textButtonElevation,
-    this.textButtonOnpressed,
-    this.elevatedButtonOnpressed,
-    required this.textButtonText,
-    required this.elevatedButtonText,
+    this.secondaryButtonElevation,
+    this.secondaryButtonOnPressed,
+    this.primaryButtonOnPressed,
+    required this.secondaryButtonText,
+    required this.primaryButtonText,
     this.mainAxisAlignment,
     this.width,
-    this.isTextButton,
+    this.showSecondary,
   });
 
   @override
@@ -35,19 +35,19 @@ class _DialogButtonsState extends State<DialogButtons> {
       mainAxisAlignment:
           widget.mainAxisAlignment ?? MainAxisAlignment.spaceBetween,
       children: [
-        widget.isTextButton == true
+        widget.showSecondary == true
             ? Material(
                 color: Colors.white,
-                elevation: widget.textButtonElevation ?? 1,
+                elevation: widget.secondaryButtonElevation ?? 1,
                 borderRadius: BorderRadius.circular(8),
                 child: InkWell(
                   borderRadius: BorderRadius.circular(8),
-                  onTap: widget.textButtonOnpressed,
+                  onTap: widget.secondaryButtonOnPressed,
                   child: Padding(
                     padding:
                         const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                     child: Text(
-                      widget.textButtonText,
+                      widget.secondaryButtonText,
                       style: const TextStyle(
                         color: Color(0XFF646464),
                         fontSize: 14,
@@ -66,11 +66,11 @@ class _DialogButtonsState extends State<DialogButtons> {
             onPressed: isLoading
                 ? null
                 : () async {
-                    if (widget.elevatedButtonOnpressed != null) {
+                    if (widget.primaryButtonOnPressed != null) {
                       setState(() => isLoading = true);
 
                       try {
-                        await widget.elevatedButtonOnpressed!();
+                        await widget.primaryButtonOnPressed!();
                       } catch (e) {
                         showDialog(
                           context: context, 
@@ -79,10 +79,10 @@ class _DialogButtonsState extends State<DialogButtons> {
                             details: '$e',
                             children: [
                               DialogButtons(
-                                textButtonText: 'textButtonText',
-                                elevatedButtonText: 'Ok',
-                                isTextButton: false,
-                                elevatedButtonOnpressed: () async {
+                                secondaryButtonText: 'textButtonText',
+                                primaryButtonText: 'Ok',
+                                showSecondary: false,
+                                primaryButtonOnPressed: () async {
                                   Navigator.pop(context);
                                 },
                               )
@@ -101,7 +101,7 @@ class _DialogButtonsState extends State<DialogButtons> {
                     child: CircularProgressIndicator(),
                   )
                 : Text(
-                    widget.elevatedButtonText,
+                    widget.primaryButtonText,
                     style: const TextStyle(fontSize: 14, color: Colors.white),
                   ))
       ],

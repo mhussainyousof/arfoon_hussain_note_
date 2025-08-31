@@ -59,16 +59,16 @@ class _NoteCardState extends State<NoteCard> {
                       DialogButtons(
                         mainAxisAlignment: MainAxisAlignment.end,
                         width: 20,
-                        textButtonElevation: 1,
-                        textButtonText: 'Stop',
-                        elevatedButtonText: 'Do it',
-                        isTextButton: true,
-                        elevatedButtonOnpressed: () async {
+                        secondaryButtonElevation: 1,
+                        secondaryButtonText: 'Stop',
+                        primaryButtonText: 'Do it',
+                        showSecondary: true,
+                        primaryButtonOnPressed: () async {
                           await api.notes.deleteNote(widget.note.id!);
 
                           Navigator.pop(context, true);
                         },
-                        textButtonOnpressed: () {
+                        secondaryButtonOnPressed: () {
                           Navigator.pop(context, false);
                         },
                       )

@@ -51,26 +51,32 @@ class _HomeViewState extends State<HomeView> {
     return Scaffold(
       drawer: DrawerPage(
         onLabelSelected: (label) {
+          final chips = [Label(name: 'All Notes', id: null), ...allLabels];
+          final index = chips.indexWhere((l) => l.id == label.id);
+
+          setState(() {
+            selectedChipIndex = index == -1 ? 0 : index;
+            selectedLabel = label;
+          });
+
           if (label.id == null) {
             notesCubit.filter(Filter());
           } else {
             notesCubit.filter(Filter(label: label));
           }
         },
-        onLabelAdded: (newlable)async{
+        onLabelAdded: (newlable) async {
           final labels = await widget.getLabels(null);
-          setState(()=> allLabels = labels);
+          setState(() => allLabels = labels);
         },
-        onLabelDelete: (id) async{
+        onLabelDelete: (id) async {
           final labels = await widget.getLabels(null);
-          setState(()=> allLabels = labels);
+          setState(() => allLabels = labels);
         },
-        onLabelUpdate: (udatedLabel) async{
+        onLabelUpdate: (udatedLabel) async {
           final labels = await widget.getLabels(null);
-          setState(()=> allLabels = labels);
+          setState(() => allLabels = labels);
         },
-
-
       ),
       backgroundColor: AppColors.background,
       appBar: HomeAppBar(
@@ -94,21 +100,19 @@ class _HomeViewState extends State<HomeView> {
             hintText: 'Search Notes',
             onChanged: (s) {
               notesCubit.filter(Filter(search: s));
-            
             },
           ),
           CategoryFilterChips(
-
             onSelectLabel: (label, index) {
-              setState((){selectedChipIndex = index;
-              selectedLabel = label;
+              setState(() {
+                selectedChipIndex = index;
+                selectedLabel = label;
               });
 
-              if(label.id == null){
+              if (label.id == null) {
                 notesCubit.filter(Filter());
-              }else{
-              notesCubit.filter(Filter(label: label));
-
+              } else {
+                notesCubit.filter(Filter(label: label));
               }
             },
             labels: allLabels,

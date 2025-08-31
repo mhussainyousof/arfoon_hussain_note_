@@ -177,10 +177,10 @@ class _CustomDrawerState extends State<CustomDrawer> {
                                     ),
                                     const SizedBox(height: 40),
                                     DialogButtons(
-                                      isTextButton: true,
-                                      textButtonText: 'Delete',
-                                      elevatedButtonText: 'Update',
-                                      textButtonOnpressed: () {
+                                      showSecondary: true,
+                                      secondaryButtonText: 'Delete',
+                                      primaryButtonText: 'Update',
+                                      secondaryButtonOnPressed: () {
                                         showDialog(
                                           context: context,
                                           builder: (context) => NoteDialog(
@@ -192,12 +192,12 @@ class _CustomDrawerState extends State<CustomDrawer> {
                                               const SizedBox(height: 15),
                                               //! Cancel and Delete buttons in confirmation dialog
                                               DialogButtons(
-                                                  isTextButton: true,
-                                                  textButtonElevation: 0,
+                                                  showSecondary: true,
+                                                  secondaryButtonElevation: 0,
                                                   mainAxisAlignment:
                                                       MainAxisAlignment.end,
                                                   width: 15,
-                                                  elevatedButtonOnpressed:
+                                                  primaryButtonOnPressed:
                                                       () async {
                                                     await widget
                                                         .deleteLabel(label.id!);
@@ -213,11 +213,11 @@ class _CustomDrawerState extends State<CustomDrawer> {
                                                     Navigator.pop(context);
                                                     Navigator.pop(context);
                                                   },
-                                                  textButtonOnpressed: () {
+                                                  secondaryButtonOnPressed: () {
                                                     Navigator.pop(context);
                                                   },
-                                                  textButtonText: 'Cancel',
-                                                  elevatedButtonText:
+                                                  secondaryButtonText: 'Cancel',
+                                                  primaryButtonText:
                                                       'Delete It.')
                                             ],
                                           ),
@@ -225,7 +225,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                                       },
 
                                       // Update Label Button
-                                      elevatedButtonOnpressed: () async {
+                                      primaryButtonOnPressed: () async {
                                         final newName = controller.text.trim();
                                         if (newName.isNotEmpty) {
                                           final updatedLabel =
@@ -291,8 +291,8 @@ class _CustomDrawerState extends State<CustomDrawer> {
                                 ),
                                 const SizedBox(height: 40),
                                 DialogButtons(
-                                  isTextButton: true,
-                                  elevatedButtonOnpressed: () async {
+                                  showSecondary: true,
+                                  primaryButtonOnPressed: () async {
                                     final labeleName =
                                         labelController.text.trim();
                                     if (labeleName.isNotEmpty) {
@@ -308,9 +308,9 @@ class _CustomDrawerState extends State<CustomDrawer> {
                                       }
                                     }
                                   },
-                                  textButtonText: 'Cancel',
-                                  elevatedButtonText: 'Save Label',
-                                  textButtonOnpressed: () {
+                                  secondaryButtonText: 'Cancel',
+                                  primaryButtonText: 'Save Label',
+                                  secondaryButtonOnPressed: () {
                                     Navigator.pop(context);
                                   },
                                 )
