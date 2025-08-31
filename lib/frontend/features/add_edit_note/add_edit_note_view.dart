@@ -7,18 +7,18 @@ import 'package:intl/intl.dart';
 import '../../../client/client.dart';
 import '../../theme/theme.dart';
 
-class AddNoteView extends StatefulWidget {
+class AddEditNoteView extends StatefulWidget {
   final Note? note;
   final Future<List<Label>> Function(Filter?) getLabels;
   final Future<Note> Function(Note) onSave;
-  const AddNoteView(
+  const AddEditNoteView(
       {super.key, this.note, required this.onSave, required this.getLabels});
 
   @override
-  State<AddNoteView> createState() => _AddNoteViewState();
+  State<AddEditNoteView> createState() => _AddEditNoteViewState();
 }
 
-class _AddNoteViewState extends State<AddNoteView> {
+class _AddEditNoteViewState extends State<AddEditNoteView> {
   late TextEditingController _titleController;
   late TextEditingController _descriptionController;
   late TextEditingController _labelController;
@@ -52,27 +52,60 @@ class _AddNoteViewState extends State<AddNoteView> {
     );
   }
 
-  Future<void> _onSave() async {
-    if (_isLoading) return;
-    setState(() {
-      _isLoading = true;
-    });
+Future<void> _onSave(TextEditingController? autocompleteController) async {
+  if (_isLoading) return;
 
-    try {
-      final saveNote = await widget.onSave(currentNote);
+  // 1. Don't save if everything is empty
+ final text = autocompleteController?.text.trim() ?? '';
+    if (_titleController.text.trim().isEmpty &&
+        _descriptionController.text.trim().isEmpty &&
+        _selectedLabelIds.isEmpty &&
+        text.isEmpty) {
+      if (mounted) Navigator.pop(context);
+      return;
+    }
 
-      Navigator.pop(context, saveNote);
-    } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Some thing went wrong')));
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
+  setState(() => _isLoading = true);
+
+  try {
+    // final text = _labelController.text.trim();
+
+    // 2. Handle new label
+    if (text.isNotEmpty) {
+      final allLabels = await api.labels.list(null);
+      if (!mounted) return; // <- guard
+
+      final exists = allLabels.any(
+          (l) => l.name.toLowerCase() == text.toLowerCase());
+
+      if (!exists) {
+        final newLabel = await api.labels.insert(Label(name: text));
+        if (!mounted) return; // <- guard
+
+        if (!_selectedLabelIds.contains(newLabel.id)) {
+          _selectedLabelIds.add(newLabel.id!);
+        }
       }
+
+      _labelController.clear();
+    }
+
+    // 3. Save note
+    final saveNote = await widget.onSave(currentNote);
+    if (!mounted) return; // <- guard
+
+    Navigator.pop(context, saveNote);
+  } catch (e) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Something went wrong')));
+    }
+  } finally {
+    if (mounted) {
+      setState(() => _isLoading = false);
     }
   }
+}
 
   @override
   void dispose() {
@@ -93,7 +126,7 @@ class _AddNoteViewState extends State<AddNoteView> {
       appBar: HomeAppBar(
         title: '',
         leading: IconButton(
-          onPressed: _onSave,
+          onPressed:()=> _onSave(_labelController),
           icon: const Icon(
             Icons.arrow_back_ios,
             color: Color(0XFF646464),
@@ -220,9 +253,8 @@ class _AddNoteViewState extends State<AddNoteView> {
                             );
                           },
                           optionsBuilder: (TextEditingValue value) async {
-                            if (value.text.isEmpty) {
-                              return const Iterable<Label>.empty();
-                            }
+                            if (value.text.isEmpty) return const Iterable<Label>.empty();
+                            
 
                             final labels = await api.labels.list(null);
                             final query = value.text.toLowerCase();
@@ -240,14 +272,17 @@ class _AddNoteViewState extends State<AddNoteView> {
                               }
                             });
                           },
-                          fieldViewBuilder: (context, textEditingController,
+                          fieldViewBuilder: (context, fieldContrller,
                               focusNode, onFieldSubmitted) {
+
                             return NoteTextField(
                               borderWidth: 0,
                               borderColor: Colors.transparent,
-                              controller: textEditingController,
+                              controller: fieldContrller,
                               focusNode: focusNode,
                               hintText: 'Type to add label',
+                              onChanged: (v)=> _labelController.text = v,
+                              
                             );
                           },
                         ),

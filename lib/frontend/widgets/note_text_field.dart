@@ -14,6 +14,7 @@ class NoteTextField extends StatelessWidget {
   final bool hasBorder;
   final Widget? prefixIcon;
   final Widget? suffixIcon;
+  final void Function(String)? onChanged;
 
   const NoteTextField({
     super.key,
@@ -29,7 +30,7 @@ class NoteTextField extends StatelessWidget {
     this.borderWidth = 1,
     this.hasBorder = true,
     this.prefixIcon,
-    this.suffixIcon,
+    this.suffixIcon, this.onChanged,
   });
 
   @override
@@ -41,6 +42,7 @@ class NoteTextField extends StatelessWidget {
         borderRadius: borderRadius ?? BorderRadius.circular(8),
       ),
       child: TextField(
+        onChanged:onChanged ,
         controller: controller,
         focusNode: focusNode,
         maxLines: isMultiline ? maxLines : 1,
@@ -52,6 +54,7 @@ class NoteTextField extends StatelessWidget {
           suffixIcon: suffixIcon,
           isDense: true,
           contentPadding: EdgeInsets.zero,
+          
         ),
       ),
     );

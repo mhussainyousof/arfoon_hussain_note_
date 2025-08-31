@@ -7,7 +7,7 @@ class NoteServer {
   final Isar isar;
   const NoteServer(this.isar, {required this.labels, required this.notes});
 
-  static NoteServer instance(Isar isar) {
+static NoteServer instance(Isar isar) {
     return NoteServer(
       isar,
       labels: Labels(isar: isar),

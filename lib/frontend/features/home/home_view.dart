@@ -16,7 +16,6 @@ class HomeView extends StatefulWidget {
   });
   final Future<List<Note>> Function(Filter?) getNotes;
   final Future<List<Label>> Function(Filter?) getLabels;
-
   final Future<Note> Function(Note) addNote;
 
   @override
@@ -26,18 +25,15 @@ class HomeView extends StatefulWidget {
 class _HomeViewState extends State<HomeView> {
   final searchController = TextEditingController();
   final notesCubit = AwaitCubit<List<Note>>();
+  final labelsCubit = AwaitCubit<List<Label>>();
   int selectedChipIndex = 0;
-  List<Label> allLabels = [];
   Label? selectedLabel;
 
   @override
   void initState() {
     super.initState();
-    widget.getLabels(null).then((labels) {
-      setState(() => allLabels = labels);
-    });
-
     notesCubit.load(widget.getNotes, null, inital: true);
+    labelsCubit.load(widget.getLabels, null, inital: true);
   }
 
   @override
@@ -50,8 +46,12 @@ class _HomeViewState extends State<HomeView> {
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: DrawerPage(
+
+        labelsCubit: labelsCubit,
+
         onLabelSelected: (label) {
-          final chips = [Label(name: 'All Notes', id: null), ...allLabels];
+          final labels = labelsCubit.state.data ?? [];
+          final chips = [Label(name: 'All Notes', id: null), ...labels];
           final index = chips.indexWhere((l) => l.id == label.id);
 
           setState(() {
@@ -66,16 +66,13 @@ class _HomeViewState extends State<HomeView> {
           }
         },
         onLabelAdded: (newlable) async {
-          final labels = await widget.getLabels(null);
-          setState(() => allLabels = labels);
+        labelsCubit.refresh();
         },
         onLabelDelete: (id) async {
-          final labels = await widget.getLabels(null);
-          setState(() => allLabels = labels);
+         labelsCubit.refresh();
         },
         onLabelUpdate: (udatedLabel) async {
-          final labels = await widget.getLabels(null);
-          setState(() => allLabels = labels);
+           labelsCubit.refresh();
         },
       ),
       backgroundColor: AppColors.background,
@@ -102,7 +99,19 @@ class _HomeViewState extends State<HomeView> {
               notesCubit.filter(Filter(search: s));
             },
           ),
-          CategoryFilterChips(
+          
+          // list of labels: 
+          AwaitBuilder(getData: widget.getLabels,
+          
+          cubit: labelsCubit,
+          
+           builder: (context, state){
+            final labels = state.data ?? [];
+
+            return CategoryFilterChips(
+            labels: labels,
+            selectedIndex: selectedChipIndex,
+
             onSelectLabel: (label, index) {
               setState(() {
                 selectedChipIndex = index;
@@ -115,9 +124,11 @@ class _HomeViewState extends State<HomeView> {
                 notesCubit.filter(Filter(label: label));
               }
             },
-            labels: allLabels,
-            selectedIndex: selectedChipIndex,
-          ),
+          );
+           }),
+
+
+
           Expanded(
             child: AwaitBuilder<List<Note>>(
               cubit: notesCubit,
@@ -158,12 +169,13 @@ class _HomeViewState extends State<HomeView> {
             await Navigator.push<Note>(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => AddNoteView(
+                    builder: (context) => AddEditNoteView(
                           onSave: widget.addNote,
                           getLabels: widget.getLabels,
                         )));
 
             notesCubit.refresh();
+            labelsCubit.refresh();
           }),
     );
   }

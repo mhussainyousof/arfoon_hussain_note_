@@ -1,5 +1,5 @@
 import 'package:arfoon_note/client/models/models.dart';
-import 'package:arfoon_note/frontend/features/add_note/add_note_view.dart';
+import 'package:arfoon_note/frontend/features/add_edit_note/add_edit_note_view.dart';
 import 'package:arfoon_note/frontend/widgets/widget.dart';
 import 'package:arfoon_note/integration/integration.dart';
 import 'package:arfoon_note/main.dart';
@@ -31,7 +31,7 @@ class _NoteCardState extends State<NoteCard> {
             final updateNote = await Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (_) => AddNoteView(
+                  builder: (_) => AddEditNoteView(
                         onSave: (note) async {
                           await api.notes.updateNote(note);
                           return note;

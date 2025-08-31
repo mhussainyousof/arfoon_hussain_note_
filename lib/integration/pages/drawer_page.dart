@@ -1,9 +1,11 @@
 import 'package:arfoon_note/client/models/models.dart';
 import 'package:arfoon_note/frontend/features/drawer/drawer.dart';
+import 'package:arfoon_note/integration/await_cubit/await_cubit.dart';
 import 'package:arfoon_note/main.dart';
 import 'package:flutter/material.dart';
 
 class DrawerPage extends StatelessWidget {
+  final AwaitCubit<List<Label>> labelsCubit;
   final void Function(Label) onLabelSelected;
   final void Function(Label)? onLabelAdded;
   final void Function(Label)? onLabelUpdate;
@@ -14,7 +16,7 @@ class DrawerPage extends StatelessWidget {
       required this.onLabelSelected,
       this.onLabelAdded,
       this.onLabelUpdate,
-      this.onLabelDelete});
+      this.onLabelDelete, required this.labelsCubit});
 
   @override
   Widget build(BuildContext context) {
