@@ -42,37 +42,33 @@ class _HomeViewState extends State<HomeView> {
     super.dispose();
   }
 
+ void applyFilter(Label? label) {
+  setState(() {
+    selectedLabel = label;
+    final labels = labelsCubit.state.data ?? [];
+    selectedChipIndex = label == null
+        ? 0
+        : labels.indexWhere((l) => l.id == label.id) + 1;
+  });
+
+  notesCubit.filter(Filter(label: (label?.id != null) ? label : null));
+}
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: DrawerPage(
-
         labelsCubit: labelsCubit,
-
-        onLabelSelected: (label) {
-          final labels = labelsCubit.state.data ?? [];
-          final chips = [Label(name: 'All Notes', id: null), ...labels];
-          final index = chips.indexWhere((l) => l.id == label.id);
-
-          setState(() {
-            selectedChipIndex = index == -1 ? 0 : index;
-            selectedLabel = label;
-          });
-
-          if (label.id == null) {
-            notesCubit.filter(Filter());
-          } else {
-            notesCubit.filter(Filter(label: label));
-          }
-        },
+        onLabelSelected: applyFilter,
         onLabelAdded: (newlable) async {
-        labelsCubit.refresh();
+          labelsCubit.refresh();
         },
         onLabelDelete: (id) async {
-         labelsCubit.refresh();
+          labelsCubit.refresh();
         },
         onLabelUpdate: (udatedLabel) async {
-           labelsCubit.refresh();
+          labelsCubit.refresh();
         },
       ),
       backgroundColor: AppColors.background,
@@ -99,35 +95,21 @@ class _HomeViewState extends State<HomeView> {
               notesCubit.filter(Filter(search: s));
             },
           ),
-          
-          // list of labels: 
-          AwaitBuilder(getData: widget.getLabels,
-          
-          cubit: labelsCubit,
-          
-           builder: (context, state){
-            final labels = state.data ?? [];
 
-            return CategoryFilterChips(
-            labels: labels,
-            selectedIndex: selectedChipIndex,
+          // list of labels:
+          AwaitBuilder(
+              getData: widget.getLabels,
+              cubit: labelsCubit,
+              builder: (context, state) {
+                final labels = state.data ?? [];
 
-            onSelectLabel: (label, index) {
-              setState(() {
-                selectedChipIndex = index;
-                selectedLabel = label;
-              });
-
-              if (label.id == null) {
-                notesCubit.filter(Filter());
-              } else {
-                notesCubit.filter(Filter(label: label));
-              }
-            },
-          );
-           }),
-
-
+                return CategoryFilterChips(
+                  labels: labels,
+                  selectedIndex: selectedChipIndex,
+                  onSelectLabel:  applyFilter,
+                  // onSelectLabel: (label) => applyFilter(label),
+                );
+              }),
 
           Expanded(
             child: AwaitBuilder<List<Note>>(

@@ -6,7 +6,7 @@ class CategoryFilterChips extends StatelessWidget {
   final List<Label> labels;
   final int selectedIndex;
 
-  final void Function(Label, int) onSelectLabel;
+  final void Function(Label) onSelectLabel;
 
   const CategoryFilterChips({
     super.key,
@@ -51,7 +51,7 @@ class CategoryFilterChips extends StatelessWidget {
                 ),
                 selected: selected,
                 selectedColor: AppColors.chipSelected,
-                onSelected: (_) => onSelectLabel(label, index)
+                onSelected: (_) => onSelectLabel(label)
               ),
             );
           },
