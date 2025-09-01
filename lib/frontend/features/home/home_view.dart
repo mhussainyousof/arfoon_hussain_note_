@@ -42,18 +42,16 @@ class _HomeViewState extends State<HomeView> {
     super.dispose();
   }
 
- void applyFilter(Label? label) {
-  setState(() {
-    selectedLabel = label;
-    final labels = labelsCubit.state.data ?? [];
-    selectedChipIndex = label == null
-        ? 0
-        : labels.indexWhere((l) => l.id == label.id) + 1;
-  });
+  void applyFilter(Label? label) {
+    setState(() {
+      selectedLabel = label;
+      final labels = labelsCubit.state.data ?? [];
+      selectedChipIndex =
+          label == null ? 0 : labels.indexWhere((l) => l.id == label.id) + 1;
+    });
 
-  notesCubit.filter(Filter(label: (label?.id != null) ? label : null));
-}
-
+    notesCubit.filter(Filter(label: (label?.id != null) ? label : null));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,9 +64,11 @@ class _HomeViewState extends State<HomeView> {
         },
         onLabelDelete: (id) async {
           labelsCubit.refresh();
+          notesCubit.refresh(filter: notesCubit.state.filter);
         },
         onLabelUpdate: (udatedLabel) async {
           labelsCubit.refresh();
+          notesCubit.refresh(filter: notesCubit.state.filter);
         },
       ),
       backgroundColor: AppColors.background,
@@ -106,7 +106,7 @@ class _HomeViewState extends State<HomeView> {
                 return CategoryFilterChips(
                   labels: labels,
                   selectedIndex: selectedChipIndex,
-                  onSelectLabel:  applyFilter,
+                  onSelectLabel: applyFilter,
                   // onSelectLabel: (label) => applyFilter(label),
                 );
               }),
@@ -136,7 +136,7 @@ class _HomeViewState extends State<HomeView> {
                     final note = state.data![index];
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 12),
-                      child: NoteCard(note: note, getLabels: widget.getLabels),
+                      child: NoteCard(note: note, getLabels: widget.getLabels,),
                     );
                   },
                 );
@@ -148,16 +148,20 @@ class _HomeViewState extends State<HomeView> {
       floatingActionButton: AddNoteButton(
           child: const Icon(Icons.add, color: Colors.white),
           onPressed: () async {
-            await Navigator.push<Note>(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => AddEditNoteView(
-                          onSave: widget.addNote,
-                          getLabels: widget.getLabels,
-                        )));
+            final result = await Navigator.push<Note>(
+              context,
+              MaterialPageRoute(
+                builder: (context) => AddEditNoteView(
+                  onSave: widget.addNote,
+                  getLabels: widget.getLabels,
+                ),
+              ),
+            );
 
-            notesCubit.refresh();
-            labelsCubit.refresh();
+            if (result != null) {
+              notesCubit.refresh();
+              labelsCubit.refresh();
+            }
           }),
     );
   }

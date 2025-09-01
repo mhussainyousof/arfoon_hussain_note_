@@ -68,19 +68,16 @@ Future<void> _onSave(TextEditingController? autocompleteController) async {
   setState(() => _isLoading = true);
 
   try {
-    // final text = _labelController.text.trim();
-
     // 2. Handle new label
     if (text.isNotEmpty) {
       final allLabels = await api.labels.list(null);
-      if (!mounted) return; // <- guard
+  
 
       final exists = allLabels.any(
           (l) => l.name.toLowerCase() == text.toLowerCase());
 
       if (!exists) {
         final newLabel = await api.labels.insert(Label(name: text));
-        if (!mounted) return; // <- guard
 
         if (!_selectedLabelIds.contains(newLabel.id)) {
           _selectedLabelIds.add(newLabel.id!);
@@ -92,6 +89,7 @@ Future<void> _onSave(TextEditingController? autocompleteController) async {
 
     // 3. Save note
     final saveNote = await widget.onSave(currentNote);
+    
     if (!mounted) return; // <- guard
 
     Navigator.pop(context, saveNote);
@@ -126,7 +124,11 @@ Future<void> _onSave(TextEditingController? autocompleteController) async {
       appBar: HomeAppBar(
         title: '',
         leading: IconButton(
-          onPressed:()=> _onSave(_labelController),
+           onPressed: () async {
+    // Await the save function fully
+    await _onSave(_labelController);
+  
+  },
           icon: const Icon(
             Icons.arrow_back_ios,
             color: Color(0XFF646464),
@@ -263,6 +265,7 @@ Future<void> _onSave(TextEditingController? autocompleteController) async {
                               (label) =>
                                   label.name.toLowerCase().contains(query),
                             );
+
                           },
                           displayStringForOption: (Label option) => option.name,
                           onSelected: (Label selected) {
@@ -270,6 +273,7 @@ Future<void> _onSave(TextEditingController? autocompleteController) async {
                               if (!_selectedLabelIds.contains(selected.id)) {
                                 _selectedLabelIds.add(selected.id!);
                               }
+                              _labelController.clear();
                             });
                           },
                           fieldViewBuilder: (context, fieldContrller,

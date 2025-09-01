@@ -25,14 +25,13 @@ class AwaitCubit<T> extends Cubit<AwaitState<T>> {
   }
 
   filter(Filter filter) {
-    if (initalGetData != null) {
       load(initalGetData!, filter);
-    }
+    
   }
 
   refresh({Filter? filter}) {
-    if (initalGetData != null) {
+    
       load(initalGetData!, filter ?? state.filter ?? initalFilter);
-    }
+    
   }
 }

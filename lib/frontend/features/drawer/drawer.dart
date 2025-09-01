@@ -143,8 +143,6 @@ class _CustomDrawerState extends State<CustomDrawer> {
                     itemBuilder: (context, index) {
                       final label = labels[index];
                       return ListTile(
-                       
-
                         horizontalTitleGap: 6,
                         leading: SvgPicture.asset('assets/images/label.svg',
                             width: 24, height: 24),

@@ -3,6 +3,7 @@ import 'package:arfoon_note/frontend/features/add_edit_note/add_edit_note_view.d
 import 'package:arfoon_note/frontend/widgets/widget.dart';
 import 'package:arfoon_note/integration/integration.dart';
 import 'package:arfoon_note/main.dart';
+import 'package:arfoon_note/server/labels.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -10,6 +11,7 @@ import 'package:intl/intl.dart';
 class NoteCard extends StatefulWidget {
   final Note note;
   final Future<List<Label>> Function(Filter?) getLabels;
+  
 
   const NoteCard({super.key, required this.note, required this.getLabels});
 
@@ -41,9 +43,9 @@ class _NoteCardState extends State<NoteCard> {
                       )),
             );
             if (updateNote != null) {
-           final notesCubit = context.read<AwaitCubit<List<Note>>>();
-           notesCubit.refresh(filter:     notesCubit.state.filter);
-
+              final notesCubit = context.read<AwaitCubit<List<Note>>>();
+              notesCubit.refresh(filter: notesCubit.state.filter);
+              await labelCubit.refresh();
             }
           },
           onLongPress: () async {
@@ -78,6 +80,7 @@ class _NoteCardState extends State<NoteCard> {
 
             if (confirm == true) {
               context.read<AwaitCubit<List<Note>>>().refresh();
+              labelCubit.refresh();
             }
           },
           child: Container(
