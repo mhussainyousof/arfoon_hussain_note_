@@ -11,17 +11,20 @@ import 'package:intl/intl.dart';
 class NoteCard extends StatefulWidget {
   final Note note;
   final Future<List<Label>> Function(Filter?) getLabels;
-  
-
-  const NoteCard({super.key, required this.note, required this.getLabels});
+  final List<Label> allLabels;
+  final AwaitCubit<List<Label>> labelsCubit;
+  const NoteCard(
+      {super.key,
+      required this.note,
+      required this.getLabels,
+      required this.allLabels,
+      required this.labelsCubit});
 
   @override
   State<NoteCard> createState() => _NoteCardState();
 }
 
 class _NoteCardState extends State<NoteCard> {
-  final labelCubit = AwaitCubit<List<Label>>();
-
   @override
   Widget build(BuildContext context) {
     Color? bgColor, textColor;
@@ -44,8 +47,9 @@ class _NoteCardState extends State<NoteCard> {
             );
             if (updateNote != null) {
               final notesCubit = context.read<AwaitCubit<List<Note>>>();
+
               notesCubit.refresh(filter: notesCubit.state.filter);
-              await labelCubit.refresh();
+              await widget.labelsCubit.refresh();
             }
           },
           onLongPress: () async {
@@ -80,7 +84,7 @@ class _NoteCardState extends State<NoteCard> {
 
             if (confirm == true) {
               context.read<AwaitCubit<List<Note>>>().refresh();
-              labelCubit.refresh();
+              await widget.labelsCubit.refresh();
             }
           },
           child: Container(
@@ -108,24 +112,17 @@ class _NoteCardState extends State<NoteCard> {
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 20),
-                AwaitBuilder<List<Label?>>(
-                  getData: widget.getLabels,
-                  cubit: labelCubit,
-                  builder: (context, state) {
-                    final label = state.data ?? [];
-                    final selectedLabels = label.where(
-                        (label) => widget.note.labelIds.contains(label?.id));
-                    return Wrap(
-                        spacing: 6,
-                        runSpacing: 3,
-                        children: selectedLabels.map((label) {
-                          if (label == null) return const SizedBox();
-                          return Chip(
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 3,
+                  children: widget.allLabels
+                      .where((label) => widget.note.labelIds
+                          .contains(label.id)) // Find relevant labels
+                      .map((label) => Chip(
                             label: Text(label.name),
                             backgroundColor: Colors.grey.shade200,
-                          );
-                        }).toList());
-                  },
+                          ))
+                      .toList(),
                 ),
                 const SizedBox(height: 20),
               ],

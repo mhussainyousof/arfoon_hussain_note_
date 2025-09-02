@@ -129,6 +129,7 @@ class _HomeViewState extends State<HomeView> {
                     child: Text('No Data found'),
                   );
                 }
+                 final currentLabels = labelsCubit.state.data ?? [];
                 return ListView.builder(
                   padding: const EdgeInsets.all(16),
                   itemCount: state.data!.length,
@@ -136,7 +137,7 @@ class _HomeViewState extends State<HomeView> {
                     final note = state.data![index];
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 12),
-                      child: NoteCard(note: note, getLabels: widget.getLabels,),
+                      child: NoteCard(note: note, getLabels: widget.getLabels,allLabels: currentLabels, labelsCubit: labelsCubit,),
                     );
                   },
                 );
@@ -148,7 +149,7 @@ class _HomeViewState extends State<HomeView> {
       floatingActionButton: AddNoteButton(
           child: const Icon(Icons.add, color: Colors.white),
           onPressed: () async {
-            final result = await Navigator.push<Note>(
+            final result = await Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => AddEditNoteView(
@@ -158,9 +159,9 @@ class _HomeViewState extends State<HomeView> {
               ),
             );
 
-            if (result != null) {
-              notesCubit.refresh();
-              labelsCubit.refresh();
+            if (result != null){
+            await  notesCubit.refresh();
+             await labelsCubit.refresh();
             }
           }),
     );

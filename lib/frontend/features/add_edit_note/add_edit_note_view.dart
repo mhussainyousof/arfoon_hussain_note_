@@ -3,6 +3,7 @@ import 'package:arfoon_note/frontend/widgets/widget.dart';
 import 'package:arfoon_note/integration/integration.dart';
 import 'package:arfoon_note/main.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import '../../../client/client.dart';
 import '../../theme/theme.dart';
@@ -23,10 +24,11 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
   late TextEditingController _descriptionController;
   late TextEditingController _labelController;
 
+
   bool _isLoading = false;
   List<int> _selectedLabelIds = [];
 
-  late final AwaitCubit<List<Label?>> labelsCubit;
+  final labelsCubit = AwaitCubit<List<Label?>>();
 
   @override
   void initState() {
@@ -37,7 +39,7 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
     _labelController = TextEditingController();
     _selectedLabelIds = List<int>.from(widget.note?.labelIds ?? <int>[]);
 
-    labelsCubit = AwaitCubit<List<Label?>>();
+    
     labelsCubit.load(widget.getLabels, null, inital: true);
   }
 
@@ -52,11 +54,11 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
     );
   }
 
-Future<void> _onSave(TextEditingController? autocompleteController) async {
-  if (_isLoading) return;
+  Future<void> _onSave(TextEditingController? autocompleteController) async {
+    if (_isLoading) return;
 
-  // 1. Don't save if everything is empty
- final text = autocompleteController?.text.trim() ?? '';
+    // 1. Don't save if everything is empty
+    final text = autocompleteController?.text.trim() ?? '';
     if (_titleController.text.trim().isEmpty &&
         _descriptionController.text.trim().isEmpty &&
         _selectedLabelIds.isEmpty &&
@@ -65,45 +67,45 @@ Future<void> _onSave(TextEditingController? autocompleteController) async {
       return;
     }
 
-  setState(() => _isLoading = true);
+    setState(() => _isLoading = true);
 
-  try {
-    // 2. Handle new label
-    if (text.isNotEmpty) {
-      final allLabels = await api.labels.list(null);
-  
+    try {
+      // 2. Handle new label
+      if (text.isNotEmpty) {
+        final allLabels = await api.labels.list(null);
 
-      final exists = allLabels.any(
-          (l) => l.name.toLowerCase() == text.toLowerCase());
+        final exists =
+            allLabels.any((l) => l.name.toLowerCase() == text.toLowerCase());
 
-      if (!exists) {
-        final newLabel = await api.labels.insert(Label(name: text));
-
-        if (!_selectedLabelIds.contains(newLabel.id)) {
-          _selectedLabelIds.add(newLabel.id!);
+        if (!exists) {
+          final newLabel = await api.labels.insert(Label(name: text));
+          if (!_selectedLabelIds.contains(newLabel.id)) {
+            _selectedLabelIds.add(newLabel.id!);
+          }
+         
         }
+
+        _labelController.clear();
       }
 
-      _labelController.clear();
-    }
+      // 3. Save note
+      final updateNote = currentNote.copyWith(labelIds: _selectedLabelIds);
+      final saveNote = await widget.onSave(updateNote);
+      if (!mounted) return;
 
-    // 3. Save note
-    final saveNote = await widget.onSave(currentNote);
-    
-    if (!mounted) return; // <- guard
+      Navigator.pop(context, saveNote);
 
-    Navigator.pop(context, saveNote);
-  } catch (e) {
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Something went wrong')));
-    }
-  } finally {
-    if (mounted) {
-      setState(() => _isLoading = false);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Something went wrong')));
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
-}
 
   @override
   void dispose() {
@@ -124,11 +126,10 @@ Future<void> _onSave(TextEditingController? autocompleteController) async {
       appBar: HomeAppBar(
         title: '',
         leading: IconButton(
-           onPressed: () async {
-    // Await the save function fully
-    await _onSave(_labelController);
-  
-  },
+          onPressed: () async {
+            // Await the save function fully
+            await _onSave(_labelController);
+          },
           icon: const Icon(
             Icons.arrow_back_ios,
             color: Color(0XFF646464),
@@ -255,8 +256,8 @@ Future<void> _onSave(TextEditingController? autocompleteController) async {
                             );
                           },
                           optionsBuilder: (TextEditingValue value) async {
-                            if (value.text.isEmpty) return const Iterable<Label>.empty();
-                            
+                            if (value.text.isEmpty)
+                              return const Iterable<Label>.empty();
 
                             final labels = await api.labels.list(null);
                             final query = value.text.toLowerCase();
@@ -265,7 +266,6 @@ Future<void> _onSave(TextEditingController? autocompleteController) async {
                               (label) =>
                                   label.name.toLowerCase().contains(query),
                             );
-
                           },
                           displayStringForOption: (Label option) => option.name,
                           onSelected: (Label selected) {
@@ -276,17 +276,15 @@ Future<void> _onSave(TextEditingController? autocompleteController) async {
                               _labelController.clear();
                             });
                           },
-                          fieldViewBuilder: (context, fieldContrller,
-                              focusNode, onFieldSubmitted) {
-
+                          fieldViewBuilder: (context, fieldContrller, focusNode,
+                              onFieldSubmitted) {
                             return NoteTextField(
                               borderWidth: 0,
                               borderColor: Colors.transparent,
                               controller: fieldContrller,
                               focusNode: focusNode,
                               hintText: 'Type to add label',
-                              onChanged: (v)=> _labelController.text = v,
-                              
+                              onChanged: (v) => _labelController.text = v,
                             );
                           },
                         ),
