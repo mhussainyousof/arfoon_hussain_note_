@@ -3,7 +3,6 @@ import 'package:arfoon_note/frontend/features/add_edit_note/add_edit_note_view.d
 import 'package:arfoon_note/frontend/widgets/widget.dart';
 import 'package:arfoon_note/integration/integration.dart';
 import 'package:arfoon_note/main.dart';
-import 'package:arfoon_note/server/labels.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
