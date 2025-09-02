@@ -11,8 +11,9 @@ class AddEditNoteView extends StatefulWidget {
   final Note? note;
   final Future<List<Label>> Function(Filter?) getLabels;
   final Future<Note> Function(Note) onSave;
+    final Label? initialLabel; 
   const AddEditNoteView(
-      {super.key, this.note, required this.onSave, required this.getLabels});
+      {super.key, this.note, required this.onSave, required this.getLabels, this.initialLabel});
 
   @override
   State<AddEditNoteView> createState() => _AddEditNoteViewState();
@@ -22,7 +23,6 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
   late TextEditingController _titleController;
   late TextEditingController _descriptionController;
   late TextEditingController _labelController;
-
 
   bool _isLoading = false;
   List<int> _selectedLabelIds = [];
@@ -36,9 +36,14 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
     _descriptionController =
         TextEditingController(text: widget.note?.details ?? '');
     _labelController = TextEditingController();
-    _selectedLabelIds = List<int>.from(widget.note?.labelIds ?? <int>[]);
 
-    
+
+    _selectedLabelIds = List<int>.from(widget.note?.labelIds ?? <int>[]);
+ if (widget.note == null && widget.initialLabel != null && widget.initialLabel!.id != null) {
+      _selectedLabelIds.add(widget.initialLabel!.id!);
+    }
+
+
     labelsCubit.load(widget.getLabels, null, inital: true);
   }
 
@@ -81,7 +86,6 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
           if (!_selectedLabelIds.contains(newLabel.id)) {
             _selectedLabelIds.add(newLabel.id!);
           }
-         
         }
 
         _labelController.clear();
@@ -93,7 +97,6 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
       if (!mounted) return;
 
       Navigator.pop(context, saveNote);
-
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

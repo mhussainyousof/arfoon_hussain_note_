@@ -107,7 +107,6 @@ class _HomeViewState extends State<HomeView> {
                   labels: labels,
                   selectedIndex: selectedChipIndex,
                   onSelectLabel: applyFilter,
-                  // onSelectLabel: (label) => applyFilter(label),
                 );
               }),
 
@@ -155,6 +154,7 @@ class _HomeViewState extends State<HomeView> {
                 builder: (context) => AddEditNoteView(
                   onSave: widget.addNote,
                   getLabels: widget.getLabels,
+                  initialLabel: selectedLabel,
                 ),
               ),
             );
