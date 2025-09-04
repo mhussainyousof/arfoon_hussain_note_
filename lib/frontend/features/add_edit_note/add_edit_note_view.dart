@@ -1,4 +1,5 @@
 import 'package:arfoon_note/frontend/features/home/widgets/home_appbar.dart';
+import 'package:arfoon_note/frontend/widgets/custom_chip.dart';
 import 'package:arfoon_note/frontend/widgets/widget.dart';
 import 'package:arfoon_note/integration/integration.dart';
 import 'package:arfoon_note/main.dart';
@@ -24,44 +25,55 @@ class AddEditNoteView extends StatefulWidget {
 }
 
 class _AddEditNoteViewState extends State<AddEditNoteView> {
-  late TextEditingController _titleController;
-  late TextEditingController _descriptionController;
-  late TextEditingController _labelController;
-  bool _isLoading = false;
-  List<int> _selectedLabelIds = [];
+  // Text controllers for form fields8
+  late final TextEditingController _titleController;
+  late final TextEditingController _descriptionController;
+  late final TextEditingController _labelController;
+
   final labelsCubit = AwaitCubit<List<Label?>>();
 
-  int? _selectedColorId;
-  bool _isExpanded = false;
+  // State variables
+  final List<int> _selectedLabelIds = [];
+  bool _isLoading = false;
+  bool _isColorExpanded = false;
+  int? _selectedColorId; // Currently selected color ID
 
   @override
   void initState() {
     super.initState();
+    _initializeControllers();
+    _initializeSelections(); // Initialize selected labels and color
+    _loadLabels(); // Load available labels
+  }
+
+// Initialize text controllers
+  void _initializeControllers() {
     _titleController = TextEditingController(text: widget.note?.title ?? '');
     _descriptionController =
         TextEditingController(text: widget.note?.details ?? '');
     _labelController = TextEditingController();
-
-    _selectedLabelIds = List<int>.from(widget.note?.labelIds ?? <int>[]);
-
-    if (widget.note == null &&
-        widget.initialLabel != null &&
-        widget.initialLabel!.id != null) {
-      _selectedLabelIds.add(widget.initialLabel!.id!);
-    }
-
-    _selectedColorId = widget.note?.colorId;
-
-    labelsCubit.load(widget.getLabels, null, inital: true);
-
-    _isExpanded = false;
   }
 
-  void _toggleColorExpansion() => setState(() => _isExpanded = !_isExpanded);
+  // Initialize selected labels and color
+  void _initializeSelections() {
+    _selectedLabelIds.addAll(widget.note?.labelIds ?? []);
+    if (widget.note == null && widget.initialLabel?.id != null) {
+      _selectedLabelIds.add(widget.initialLabel!.id!);
+    }
+    _selectedColorId = widget.note?.colorId;
+  }
+
+  //Load labels using the cubit's load method
+
+  void _loadLabels() => labelsCubit.load(widget.getLabels, null, inital: true);
+
+  // Toggle the expanded state of the color selector
+  void _toggleColorExpansion() =>
+      setState(() => _isColorExpanded = !_isColorExpanded);
 
   void _selectColor(int? colorIndex) => setState(() {
         _selectedColorId = colorIndex;
-        _isExpanded = false;
+        _isColorExpanded = false;
       });
 
   Note get currentNote {
@@ -75,15 +87,19 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
         colorId: _selectedColorId);
   }
 
-  Future<void> _onSave(TextEditingController? autocompleteController) async {
-    if (_isLoading) return;
-
-    // 1. Don't save if everything is empty
-    final text = autocompleteController?.text.trim() ?? '';
-    if (_titleController.text.trim().isEmpty &&
+// Check if the note is empty (no content, labels, or title)
+  bool get _isEmptyNote {
+    return _titleController.text.trim().isEmpty &&
         _descriptionController.text.trim().isEmpty &&
         _selectedLabelIds.isEmpty &&
-        text.isEmpty) {
+        _labelController.text.trim().isEmpty;
+  }
+
+  // Save the note, handling new label creation
+  Future<void> _onSave() async {
+    if (_isLoading) return;
+
+    if (_isEmptyNote) {
       if (mounted) Navigator.pop(context);
       return;
     }
@@ -91,38 +107,52 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
     setState(() => _isLoading = true);
 
     try {
-      // 2. Handle new label
-      if (text.isNotEmpty) {
-        final allLabels = await api.labels.list(null);
-
-        final exists =
-            allLabels.any((l) => l.name.toLowerCase() == text.toLowerCase());
-
-        if (!exists) {
-          final newLabel = await api.labels.insert(Label(name: text));
-          if (!_selectedLabelIds.contains(newLabel.id)) {
-            _selectedLabelIds.add(newLabel.id!);
-          }
-        }
-
-        _labelController.clear();
-      }
-
-      // 3. Save note
-      final updateNote = currentNote.copyWith(labelIds: _selectedLabelIds);
-      final saveNote = await widget.onSave(updateNote);
-      if (!mounted) return;
-
-      Navigator.pop(context, saveNote);
+      await _handleNewLabelCreation(); // Create new label if needed
+      await _saveNote(); // Save the note
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Something went wrong')));
-      }
+      _showErrorSnackbar();
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
       }
+    }
+  }
+
+  // Handle creation of a new label from the label input field
+  Future<void> _handleNewLabelCreation() async {
+    final text = _labelController.text.trim();
+    if (text.isEmpty) return;
+
+    // Check if label already exists
+    final allLabels = await api.labels.list(null);
+    final exists =
+        allLabels.any((l) => l.name.toLowerCase() == text.toLowerCase());
+
+    // Create new label if it doesn't exist
+    if (!exists) {
+      final newLabel = await api.labels.insert(Label(name: text));
+      if (newLabel.id != null && !_selectedLabelIds.contains(newLabel.id)) {
+        _selectedLabelIds.add(newLabel.id!);
+      }
+    }
+
+    _labelController.clear();
+  }
+
+  // Save the note using the provided onSave callback
+  Future<void> _saveNote() async {
+    final updatedNote = currentNote.copyWith(labelIds: _selectedLabelIds);
+    final savedNote = await widget.onSave(updatedNote);
+
+    if (!mounted) return;
+    Navigator.pop(context, savedNote);
+  }
+
+  void _showErrorSnackbar() {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Something went wrong')),
+      );
     }
   }
 
@@ -137,18 +167,14 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      //! Ensures that the keyboard pushes up content instead of overlapping it
+      // keyboard pushes up content instead of overlapping it
       resizeToAvoidBottomInset: true,
       backgroundColor: AppColors.background,
 
-      //! Custom AppBar with back navigation and an extra options button
       appBar: HomeAppBar(
         title: '',
         leading: IconButton(
-          onPressed: () async {
-            // Await the save function fully
-            await _onSave(_labelController);
-          },
+          onPressed: _onSave,
           icon: const Icon(
             Icons.arrow_back_ios,
             color: Color(0XFF646464),
@@ -181,36 +207,25 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
                     ),
                   const SizedBox(height: 8),
                   //! Title input field
-                  TextField(
+                  CustomeTextField(
                     controller: _titleController,
-                    decoration: const InputDecoration(
-                      hintText: 'Untitled',
-                      hintStyle:
-                          TextStyle(color: Color(0xFF9B9696), fontSize: 36),
-                      border: InputBorder.none,
-                    ),
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                    hintText: 'Untitled',
+                    hintSize: 36,
+                    hasBorder: false,
+                    fontWeight: FontWeight.bold,
                   ),
 
                   //! Expanded description text field
                   Expanded(
-                    child: TextField(
+                    child: CustomeTextField(
                       controller: _descriptionController,
-                      decoration: const InputDecoration(
-                        hintText: 'Description',
-                        hintStyle:
-                            TextStyle(color: Color(0xFF9B9696), fontSize: 16),
-                        border: InputBorder.none,
-                      ),
+                      hintText: 'Description',
+                      hasBorder: false,
+                      isMultiline: true,
                       maxLines: null,
-                      expands: true,
-                      textAlignVertical: TextAlignVertical.top,
                     ),
                   ),
-
-                  const SizedBox(height: 12),
+                  //selected labels display using chips
                   AwaitBuilder<List<Label?>>(
                     cubit: labelsCubit,
                     getData: widget.getLabels,
@@ -220,25 +235,24 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
                       }
 
                       final labels = state.data ?? [];
+
+                      // Filter to only selected labels
                       final selectedLabels = labels
                           .where(
                               (label) => _selectedLabelIds.contains(label?.id))
                           .toList();
 
+                      // Display selected labels as chips
                       return Wrap(
                         spacing: 6,
                         runSpacing: 6,
                         children: selectedLabels.map((label) {
                           if (label == null) return const SizedBox();
-                          return Chip(
-                            label: Text(label.name),
-                            deleteIcon: const Icon(Icons.close, size: 18),
-                            onDeleted: () {
-                              setState(() {
-                                _selectedLabelIds.remove(label.id);
-                              });
-                            },
-                          );
+                          return NoteChip(
+                              text: label.name,
+                              onDeleted: () => setState(() {
+                                    _selectedLabelIds.remove(label.id);
+                                  }));
                         }).toList(),
                       );
                     },
@@ -298,7 +312,7 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
                           },
                           fieldViewBuilder: (context, fieldContrller, focusNode,
                               onFieldSubmitted) {
-                            return NoteTextField(
+                            return CustomeTextField(
                               borderWidth: 0,
                               borderColor: Colors.transparent,
                               controller: fieldContrller,
@@ -312,21 +326,22 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
                       GestureDetector(
                         onTap: _toggleColorExpansion,
                         child: SizedBox(
-                          width: _isExpanded ? 150 : 80,
+                          width: _isColorExpanded ? 150 : 80,
                           height: 35,
                           child: Stack(
                             children: [
-                              //
-                              //! when user see first of note colors
-                              //
-                              if (_selectedColorId == null && !_isExpanded) ...[
+                              //!
+                              // when user see first of note colors
+                              //!
+                              if (_selectedColorId == null &&
+                                  !_isColorExpanded) ...[
                                 _buildColorCircle(0, 0),
                                 _buildColorCircle(1, 15),
                                 _buildColorCircle(2, 30),
                               ],
 
                               //! when user click on colors to pick one
-                              if (_isExpanded) ...[
+                              if (_isColorExpanded) ...[
                                 _buildSelectableColor(0, 70),
                                 _buildSelectableColor(1, 35),
                                 _buildSelectableColor(2, 0),
@@ -349,11 +364,11 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
                                 ),
                               ],
 
-                                //! when user picks one color
-                                if (_selectedColorId != null && !_isExpanded)
-                                  _buildColorCircle(_selectedColorId!, 0,
-                                      isSelected: true)
-                              ],
+                              //! when user picks one color
+                              if (_selectedColorId != null && !_isColorExpanded)
+                                _buildColorCircle(_selectedColorId!, 0,
+                                    isSelected: true)
+                            ],
                           ),
                         ),
                       ),

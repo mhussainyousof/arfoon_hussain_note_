@@ -11,7 +11,7 @@ import 'package:intl/intl.dart';
 class NoteCard extends StatelessWidget {
   final Note note;
   final Future<List<Label>> Function(Filter?) getLabels;
-  final List<Label> allLabels;
+  final List<Label> allLabels; // All available labels for filtering
   final AwaitCubit<List<Label>> labelsCubit;
   const NoteCard(
       {super.key,
@@ -23,17 +23,16 @@ class NoteCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-     Color? noteColor = note.colorId != null 
-        ? AppColors.noteColors[note.colorId!] 
-        : null;
 
-         Color textColor = noteColor != null ? Colors.white : Theme.of(context).textTheme.bodyLarge!.color!;
-
+    Color? noteColor = note.colorId != null ? AppColors.noteColors[note.colorId!] : null;
+    Color textColor = noteColor != null ? Colors.white : Colors.black;
+    Color dateColor = noteColor != null ? Colors.white : Colors.grey;
 
     return Stack(
       children: [
         InkWell(
           onTap: () async {
+             // Navigate to edit view when card is tapped
             final updateNote = await Navigator.push(
               context,
               MaterialPageRoute(
@@ -43,16 +42,22 @@ class NoteCard extends StatelessWidget {
                           return note;
                         },
                         getLabels: getLabels,
-                        note: note,
+                        note: note,  // Pass current note for editing
                       )),
             );
+
+
+              // If note was updated, refresh both notes and labels
             if (updateNote != null) {
               final notesCubit = context.read<AwaitCubit<List<Note>>>();
-
               notesCubit.refresh(filter: notesCubit.state.filter);
               await labelsCubit.refresh();
             }
           },
+
+
+          //!
+          //Delete Note
           onLongPress: () async {
             final confirm = await showDialog(
                 context: context,
@@ -92,43 +97,56 @@ class NoteCard extends StatelessWidget {
             width: double.infinity,
             decoration: BoxDecoration(
               color: noteColor,
-              //  border: noteColor != null 
-              //     ? Border.all(color: noteColor.withOpacity(0.3), width: 1)
-              //     : null,
               borderRadius: BorderRadius.circular(30),
             ),
             padding: const EdgeInsets.all(25),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+
+                //!
+                //Note Date
                 Text(
                   note.updatedAt != null
                       ? DateFormat('dd MMM').format(note.updatedAt!)
                       : DateFormat('dd MMM').format(note.createdAt),
-                      style: TextStyle(color: textColor),
+                  style: TextStyle(color: dateColor, fontSize: 12),
                 ),
                 const SizedBox(height: 8),
+
+
+                //!
+                // Note title
                 Text(note.title ?? '',
-                    style:  TextStyle( fontSize: 24, color: textColor)),
+                    style: TextStyle(
+                        fontSize: 24,
+                        color: textColor,
+                        fontWeight: FontWeight.w600)),
                 const SizedBox(height: 6),
+
+
+                //! 
+                // Note Details
                 Text(
                   note.details ?? '',
-                  style:  TextStyle(
-                    color: textColor
-                  ),
-                  maxLines: 2,
+                  style: TextStyle(color: dateColor),
+                  maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 40),
+
+                //!
+              // Row of Labels
                 Wrap(
                   spacing: 6,
                   runSpacing: 3,
                   children: allLabels
-                      .where((label) => note.labelIds
-                          .contains(label.id)) 
-                      .map((label) => Chip(
-                            label: Text(label.name),
+                      .where((label) => note.labelIds.contains(label.id))
+                      .map((label) => NoteChip(
+                            text: label.name,
+                            labelStyle: const TextStyle(fontSize: 11),
                             backgroundColor: Colors.grey.shade200,
+                            borderRadius: BorderRadius.circular(8),
                           ))
                       .toList(),
                 ),

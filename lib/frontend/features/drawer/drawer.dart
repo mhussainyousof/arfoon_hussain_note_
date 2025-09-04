@@ -169,7 +169,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                                   details: 'Label Name',
                                   children: [
                                     const SizedBox(height: 8),
-                                    NoteTextField(
+                                    CustomeTextField(
                                       controller: controller,
                                       hintText: 'Enter label name',
                                     ),
@@ -283,7 +283,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                               details: 'Label Name',
                               children: [
                                 const SizedBox(height: 8),
-                                NoteTextField(
+                                CustomeTextField(
                                   controller: labelController,
                                   hintText: 'A creative label name',
                                 ),

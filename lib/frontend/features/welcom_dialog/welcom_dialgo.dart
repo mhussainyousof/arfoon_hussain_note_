@@ -32,7 +32,7 @@ class WelcomDialgo extends StatelessWidget {
         const SizedBox(height: 5),
 
         //! Custom text field for user to enter their full name
-        const NoteTextField(
+        const CustomeTextField(
           hintText: 'Full Name',
         ),
         const SizedBox(height: 20),

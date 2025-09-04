@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class NoteTextField extends StatelessWidget {
+class CustomeTextField extends StatelessWidget {
   final String? hintText;
   final double? hintSize;
   final TextEditingController? controller;
@@ -13,10 +13,11 @@ class NoteTextField extends StatelessWidget {
   final double borderWidth;
   final bool hasBorder;
   final Widget? prefixIcon;
+  final FontWeight? fontWeight;
   final Widget? suffixIcon;
   final void Function(String)? onChanged;
 
-  const NoteTextField({
+  const CustomeTextField({
     super.key,
     this.hintText,
     this.hintSize,
@@ -30,7 +31,7 @@ class NoteTextField extends StatelessWidget {
     this.borderWidth = 1,
     this.hasBorder = true,
     this.prefixIcon,
-    this.suffixIcon, this.onChanged,
+    this.suffixIcon, this.onChanged, this.fontWeight,
   });
 
   @override
@@ -48,7 +49,7 @@ class NoteTextField extends StatelessWidget {
         maxLines: isMultiline ? maxLines : 1,
         decoration: InputDecoration(
           hintText: hintText,
-          hintStyle: TextStyle(fontSize: hintSize ?? 14, color: const Color(0xFF71717A)),
+          hintStyle: TextStyle(fontSize: hintSize ?? 14, color: const Color.fromARGB(255, 150, 150, 158), fontWeight: fontWeight),
           border: InputBorder.none,
           prefixIcon: prefixIcon,
           suffixIcon: suffixIcon,
