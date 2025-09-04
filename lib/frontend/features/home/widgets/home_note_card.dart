@@ -33,6 +33,8 @@ class NoteCard extends StatelessWidget {
 
     return Stack(
       children: [
+
+
         InkWell(
           onTap: () async {
              // Navigate to edit view when card is tapped
@@ -93,6 +95,8 @@ class NoteCard extends StatelessWidget {
               await labelsCubit.refresh();
             }
           },
+
+          
           child: Container(
             width: double.infinity,
             decoration: BoxDecoration(
@@ -103,33 +107,7 @@ class NoteCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Align(
-                alignment: Alignment.topRight,
-                child: GestureDetector(
-                  onTap: () => _togglePinStatus(context),
-                  child: Container(
-                    
-                    width: 31,
-                    height: 31,
-                    padding: const EdgeInsets.all(3),
-                   decoration: BoxDecoration(
-                    boxShadow: const [
-                      BoxShadow(blurRadius: 3, color: Colors.black26)
-                    ],
-                    color: isPinnedBGColor,
-                    borderRadius: BorderRadius.circular(5)
-                   ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(6),
-                      child: Image.asset(
-                        note.isPinned 
-                          ? 'assets/images/card_pin_tag.png' // Pinned icon
-                          : 'assets/images/card_pin.png',    // Unpinned icon
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+             
                 //!
                 //Note Date
                 Text(
@@ -180,6 +158,37 @@ class NoteCard extends StatelessWidget {
             ),
           ),
         ),
+
+        //!
+
+        // pin Part
+        Positioned(
+          top: 20,
+          right: 20,
+          child:    GestureDetector(
+                  onTap: () => _togglePinStatus(context),
+                  child: Container(
+                    
+                    width: 31,
+                    height: 31,
+                    padding: const EdgeInsets.all(3),
+                   decoration: BoxDecoration(
+                    boxShadow: const [
+                      BoxShadow(blurRadius: 3, color: Colors.black26)
+                    ],
+                    color: isPinnedBGColor,
+                    borderRadius: BorderRadius.circular(5)
+                   ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(6),
+                      child: Image.asset(
+                        note.isPinned 
+                          ? 'assets/images/card_pin_tag.png' // Pinned icon
+                          : 'assets/images/card_pin.png',    // Unpinned icon
+                      ),
+                    ),
+                  ),
+                )),
       ],
     );
   }
