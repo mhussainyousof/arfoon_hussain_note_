@@ -11,9 +11,13 @@ class AddEditNoteView extends StatefulWidget {
   final Note? note;
   final Future<List<Label>> Function(Filter?) getLabels;
   final Future<Note> Function(Note) onSave;
-    final Label? initialLabel; 
+  final Label? initialLabel;
   const AddEditNoteView(
-      {super.key, this.note, required this.onSave, required this.getLabels, this.initialLabel});
+      {super.key,
+      this.note,
+      required this.onSave,
+      required this.getLabels,
+      this.initialLabel});
 
   @override
   State<AddEditNoteView> createState() => _AddEditNoteViewState();
@@ -23,11 +27,12 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
   late TextEditingController _titleController;
   late TextEditingController _descriptionController;
   late TextEditingController _labelController;
-
   bool _isLoading = false;
   List<int> _selectedLabelIds = [];
-
   final labelsCubit = AwaitCubit<List<Label?>>();
+
+  int? _selectedColorId;
+  bool _isExpanded = false;
 
   @override
   void initState() {
@@ -37,25 +42,37 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
         TextEditingController(text: widget.note?.details ?? '');
     _labelController = TextEditingController();
 
-
     _selectedLabelIds = List<int>.from(widget.note?.labelIds ?? <int>[]);
- if (widget.note == null && widget.initialLabel != null && widget.initialLabel!.id != null) {
+
+    if (widget.note == null &&
+        widget.initialLabel != null &&
+        widget.initialLabel!.id != null) {
       _selectedLabelIds.add(widget.initialLabel!.id!);
     }
 
+    _selectedColorId = widget.note?.colorId;
 
     labelsCubit.load(widget.getLabels, null, inital: true);
+
+    _isExpanded = false;
   }
+
+  void _toggleColorExpansion() => setState(() => _isExpanded = !_isExpanded);
+
+  void _selectColor(int? colorIndex) => setState(() {
+        _selectedColorId = colorIndex;
+        _isExpanded = false;
+      });
 
   Note get currentNote {
     return Note(
-      id: widget.note?.id,
-      createdAt: widget.note?.createdAt ?? DateTime.now(),
-      updatedAt: widget.note != null ? DateTime.now() : null,
-      title: _titleController.text,
-      details: _descriptionController.text,
-      labelIds: _selectedLabelIds,
-    );
+        id: widget.note?.id,
+        createdAt: widget.note?.createdAt ?? DateTime.now(),
+        updatedAt: widget.note != null ? DateTime.now() : null,
+        title: _titleController.text,
+        details: _descriptionController.text,
+        labelIds: _selectedLabelIds,
+        colorId: _selectedColorId);
   }
 
   Future<void> _onSave(TextEditingController? autocompleteController) async {
@@ -258,8 +275,9 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
                             );
                           },
                           optionsBuilder: (TextEditingValue value) async {
-                            if (value.text.isEmpty)
+                            if (value.text.isEmpty) {
                               return const Iterable<Label>.empty();
+                            }
 
                             final labels = await api.labels.list(null);
                             final query = value.text.toLowerCase();
@@ -291,22 +309,52 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
                           },
                         ),
                       ),
-                      SizedBox(
-                        width: 70,
-                        child: Stack(
-                          children: [
-                            Positioned(
-                              right: 0,
-                              child: _circle(const Color(0XFF00A894)),
-                            ),
-                            Positioned(
-                              right: 18,
-                              child: _circle(const Color(0XFFFF7E56)),
-                            ),
-                            Positioned(
-                              child: _circle(const Color(0XFF0081C8)),
-                            ),
-                          ],
+                      GestureDetector(
+                        onTap: _toggleColorExpansion,
+                        child: SizedBox(
+                          width: _isExpanded ? 150 : 80,
+                          height: 35,
+                          child: Stack(
+                            children: [
+                              //
+                              //! when user see first of note colors
+                              //
+                              if (_selectedColorId == null && !_isExpanded) ...[
+                                _buildColorCircle(0, 0),
+                                _buildColorCircle(1, 15),
+                                _buildColorCircle(2, 30),
+                              ],
+
+                              //! when user click on colors to pick one
+                              if (_isExpanded) ...[
+                                _buildSelectableColor(0, 70),
+                                _buildSelectableColor(1, 35),
+                                _buildSelectableColor(2, 0),
+                                Positioned(
+                                  right: 105,
+                                  top: 2.5,
+                                  child: GestureDetector(
+                                    onTap: () => _selectColor(null),
+                                    child: Container(
+                                      width: 25,
+                                      height: 25,
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[300],
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(Icons.close,
+                                          size: 18, color: Colors.grey),
+                                    ),
+                                  ),
+                                ),
+                              ],
+
+                                //! when user picks one color
+                                if (_selectedColorId != null && !_isExpanded)
+                                  _buildColorCircle(_selectedColorId!, 0,
+                                      isSelected: true)
+                              ],
+                          ),
                         ),
                       ),
                     ],
@@ -323,37 +371,35 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
       ),
     );
   }
+
+  Widget _buildSelectableColor(int colorIndex, double rightSpace) {
+    return Positioned(
+        right: rightSpace,
+        child: GestureDetector(
+          onTap: () => _selectColor(colorIndex),
+          child: _buildColorCircle(colorIndex, rightSpace,
+              isSelected: _selectedColorId == colorIndex),
+        ));
+  }
 }
 
-// //! Helper function to draw a color circle option
-Widget _circle(Color color) {
-  return Container(
-    width: 35,
-    height: 35,
-    decoration: BoxDecoration(
-      color: color,
-      shape: BoxShape.circle,
-      border: Border.all(color: Colors.white, width: 2),
-    ),
-  );
+Widget _buildColorCircle(int colorIndex, double rightSpace,
+    {bool isSelected = false}) {
+  return Positioned(
+      right: rightSpace,
+      child: Container(
+        width: 30,
+        height: 30,
+        decoration: BoxDecoration(
+          color: AppColors.noteColors[colorIndex],
+          shape: BoxShape.circle,
+          border: Border.all(color: Colors.white, width: isSelected ? 2 : 1),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                      blurRadius: 3, color: AppColors.noteColors[colorIndex])
+                ]
+              : null,
+        ),
+      ));
 }
-
- 
-
-  // //! Predefined tag label
-  //                     Container(
-  //                       padding: const EdgeInsets.symmetric(
-  //                           horizontal: 8, vertical: 6),
-  //                       decoration: BoxDecoration(
-  //                         color: const Color(0XFFF4F4F5),
-  //                         borderRadius: BorderRadius.circular(20),
-  //                       ),
-  //                       child: const Text(
-  //                         'Office',
-  //                         style: TextStyle(
-  //                             fontSize: 14,
-  //                             color: Colors.black,
-  //                             fontWeight: FontWeight.w500),
-  //                       ),
-  //                     ),
-  //                     const SizedBox(width: 8),

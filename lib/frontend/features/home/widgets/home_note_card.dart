@@ -1,5 +1,6 @@
 import 'package:arfoon_note/client/models/models.dart';
 import 'package:arfoon_note/frontend/features/add_edit_note/add_edit_note_view.dart';
+import 'package:arfoon_note/frontend/theme/note_colors.dart';
 import 'package:arfoon_note/frontend/widgets/widget.dart';
 import 'package:arfoon_note/integration/integration.dart';
 import 'package:arfoon_note/main.dart';
@@ -7,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
-class NoteCard extends StatefulWidget {
+class NoteCard extends StatelessWidget {
   final Note note;
   final Future<List<Label>> Function(Filter?) getLabels;
   final List<Label> allLabels;
@@ -20,13 +21,14 @@ class NoteCard extends StatefulWidget {
       required this.labelsCubit});
 
   @override
-  State<NoteCard> createState() => _NoteCardState();
-}
-
-class _NoteCardState extends State<NoteCard> {
-  @override
   Widget build(BuildContext context) {
-    Color? bgColor, textColor;
+
+     Color? noteColor = note.colorId != null 
+        ? AppColors.noteColors[note.colorId!] 
+        : null;
+
+         Color textColor = noteColor != null ? Colors.white : Theme.of(context).textTheme.bodyLarge!.color!;
+
 
     return Stack(
       children: [
@@ -40,15 +42,15 @@ class _NoteCardState extends State<NoteCard> {
                           await api.notes.updateNote(note);
                           return note;
                         },
-                        getLabels: widget.getLabels,
-                        note: widget.note,
+                        getLabels: getLabels,
+                        note: note,
                       )),
             );
             if (updateNote != null) {
               final notesCubit = context.read<AwaitCubit<List<Note>>>();
 
               notesCubit.refresh(filter: notesCubit.state.filter);
-              await widget.labelsCubit.refresh();
+              await labelsCubit.refresh();
             }
           },
           onLongPress: () async {
@@ -66,10 +68,10 @@ class _NoteCardState extends State<NoteCard> {
                         width: 20,
                         secondaryButtonElevation: 1,
                         secondaryButtonText: 'Stop',
-                        primaryButtonText: 'Do it',
+                        primaryButtonText: 'Delete it',
                         showSecondary: true,
                         primaryButtonOnPressed: () async {
-                          await api.notes.deleteNote(widget.note.id!);
+                          await api.notes.deleteNote(note.id!);
 
                           Navigator.pop(context, true);
                         },
@@ -83,12 +85,16 @@ class _NoteCardState extends State<NoteCard> {
 
             if (confirm == true) {
               context.read<AwaitCubit<List<Note>>>().refresh();
-              await widget.labelsCubit.refresh();
+              await labelsCubit.refresh();
             }
           },
           child: Container(
+            width: double.infinity,
             decoration: BoxDecoration(
-              color: bgColor,
+              color: noteColor,
+              //  border: noteColor != null 
+              //     ? Border.all(color: noteColor.withOpacity(0.3), width: 1)
+              //     : null,
               borderRadius: BorderRadius.circular(30),
             ),
             padding: const EdgeInsets.all(25),
@@ -96,34 +102,36 @@ class _NoteCardState extends State<NoteCard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  widget.note.updatedAt != null
-                      ? DateFormat('dd MMM').format(widget.note.updatedAt!)
-                      : DateFormat('dd MMM').format(widget.note.createdAt),
+                  note.updatedAt != null
+                      ? DateFormat('dd MMM').format(note.updatedAt!)
+                      : DateFormat('dd MMM').format(note.createdAt),
+                      style: TextStyle(color: textColor),
                 ),
                 const SizedBox(height: 8),
-                Text(widget.note.title ?? '',
-                    style: TextStyle(color: textColor, fontSize: 24)),
+                Text(note.title ?? '',
+                    style:  TextStyle( fontSize: 24, color: textColor)),
                 const SizedBox(height: 6),
                 Text(
-                  widget.note.details ?? '',
-                  style: const TextStyle(),
+                  note.details ?? '',
+                  style:  TextStyle(
+                    color: textColor
+                  ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 40),
                 Wrap(
                   spacing: 6,
                   runSpacing: 3,
-                  children: widget.allLabels
-                      .where((label) => widget.note.labelIds
-                          .contains(label.id)) // Find relevant labels
+                  children: allLabels
+                      .where((label) => note.labelIds
+                          .contains(label.id)) 
                       .map((label) => Chip(
                             label: Text(label.name),
                             backgroundColor: Colors.grey.shade200,
                           ))
                       .toList(),
                 ),
-                const SizedBox(height: 20),
               ],
             ),
           ),
