@@ -128,7 +128,7 @@ class _HomeViewState extends State<HomeView> {
                     child: Text('No Data found'),
                   );
                 }
-                 final currentLabels = labelsCubit.state.data ?? [];
+                final currentLabels = labelsCubit.state.data ?? [];
                 return ListView.builder(
                   padding: const EdgeInsets.all(16),
                   itemCount: state.data!.length,
@@ -136,7 +136,13 @@ class _HomeViewState extends State<HomeView> {
                     final note = state.data![index];
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 12),
-                      child: NoteCard(note: note, getLabels: widget.getLabels,allLabels: currentLabels, labelsCubit: labelsCubit,),
+                      child: NoteCard(
+                        note: note,
+                        getLabels: widget.getLabels,
+                        allLabels: currentLabels,
+                        labelsCubit: labelsCubit,
+                        notesCubit: notesCubit,
+                      ),
                     );
                   },
                 );
@@ -159,9 +165,9 @@ class _HomeViewState extends State<HomeView> {
               ),
             );
 
-            if (result != null){
-            await  notesCubit.refresh();
-             await labelsCubit.refresh();
+            if (result != null) {
+              await notesCubit.refresh();
+              await labelsCubit.refresh();
             }
           }),
     );

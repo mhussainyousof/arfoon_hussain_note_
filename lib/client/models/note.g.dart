@@ -32,18 +32,23 @@ const NoteSchema = CollectionSchema(
       name: r'details',
       type: IsarType.string,
     ),
-    r'labelIds': PropertySchema(
+    r'isPinned': PropertySchema(
       id: 3,
+      name: r'isPinned',
+      type: IsarType.bool,
+    ),
+    r'labelIds': PropertySchema(
+      id: 4,
       name: r'labelIds',
       type: IsarType.longList,
     ),
     r'title': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'title',
       type: IsarType.string,
     ),
     r'updatedAt': PropertySchema(
-      id: 5,
+      id: 6,
       name: r'updatedAt',
       type: IsarType.dateTime,
     )
@@ -93,9 +98,10 @@ void _noteSerialize(
   writer.writeLong(offsets[0], object.colorId);
   writer.writeDateTime(offsets[1], object.createdAt);
   writer.writeString(offsets[2], object.details);
-  writer.writeLongList(offsets[3], object.labelIds);
-  writer.writeString(offsets[4], object.title);
-  writer.writeDateTime(offsets[5], object.updatedAt);
+  writer.writeBool(offsets[3], object.isPinned);
+  writer.writeLongList(offsets[4], object.labelIds);
+  writer.writeString(offsets[5], object.title);
+  writer.writeDateTime(offsets[6], object.updatedAt);
 }
 
 Note _noteDeserialize(
@@ -109,9 +115,10 @@ Note _noteDeserialize(
     createdAt: reader.readDateTime(offsets[1]),
     details: reader.readStringOrNull(offsets[2]),
     id: id,
-    labelIds: reader.readLongList(offsets[3]) ?? [],
-    title: reader.readStringOrNull(offsets[4]),
-    updatedAt: reader.readDateTimeOrNull(offsets[5]),
+    isPinned: reader.readBoolOrNull(offsets[3]) ?? false,
+    labelIds: reader.readLongList(offsets[4]) ?? [],
+    title: reader.readStringOrNull(offsets[5]),
+    updatedAt: reader.readDateTimeOrNull(offsets[6]),
   );
   return object;
 }
@@ -130,10 +137,12 @@ P _noteDeserializeProp<P>(
     case 2:
       return (reader.readStringOrNull(offset)) as P;
     case 3:
-      return (reader.readLongList(offset) ?? []) as P;
+      return (reader.readBoolOrNull(offset) ?? false) as P;
     case 4:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readLongList(offset) ?? []) as P;
     case 5:
+      return (reader.readStringOrNull(offset)) as P;
+    case 6:
       return (reader.readDateTimeOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -561,6 +570,15 @@ extension NoteQueryFilter on QueryBuilder<Note, Note, QFilterCondition> {
     });
   }
 
+  QueryBuilder<Note, Note, QAfterFilterCondition> isPinnedEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'isPinned',
+        value: value,
+      ));
+    });
+  }
+
   QueryBuilder<Note, Note, QAfterFilterCondition> labelIdsElementEqualTo(
       int value) {
     return QueryBuilder.apply(this, (query) {
@@ -953,6 +971,18 @@ extension NoteQuerySortBy on QueryBuilder<Note, Note, QSortBy> {
     });
   }
 
+  QueryBuilder<Note, Note, QAfterSortBy> sortByIsPinned() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isPinned', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Note, Note, QAfterSortBy> sortByIsPinnedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isPinned', Sort.desc);
+    });
+  }
+
   QueryBuilder<Note, Note, QAfterSortBy> sortByTitle() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'title', Sort.asc);
@@ -1027,6 +1057,18 @@ extension NoteQuerySortThenBy on QueryBuilder<Note, Note, QSortThenBy> {
     });
   }
 
+  QueryBuilder<Note, Note, QAfterSortBy> thenByIsPinned() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isPinned', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Note, Note, QAfterSortBy> thenByIsPinnedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isPinned', Sort.desc);
+    });
+  }
+
   QueryBuilder<Note, Note, QAfterSortBy> thenByTitle() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'title', Sort.asc);
@@ -1072,6 +1114,12 @@ extension NoteQueryWhereDistinct on QueryBuilder<Note, Note, QDistinct> {
     });
   }
 
+  QueryBuilder<Note, Note, QDistinct> distinctByIsPinned() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'isPinned');
+    });
+  }
+
   QueryBuilder<Note, Note, QDistinct> distinctByLabelIds() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'labelIds');
@@ -1114,6 +1162,12 @@ extension NoteQueryProperty on QueryBuilder<Note, Note, QQueryProperty> {
   QueryBuilder<Note, String?, QQueryOperations> detailsProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'details');
+    });
+  }
+
+  QueryBuilder<Note, bool, QQueryOperations> isPinnedProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'isPinned');
     });
   }
 

@@ -13,28 +13,39 @@ class Notes {
   }
 
   Future<List<Note>> list([Filter? filter]) async {
+     List<Note> notes;
+
     if ((filter?.search ?? '').isNotEmpty) {
       var s = filter!.search!;
-      return await isar.notes.filter().group((q)=> q
+      notes =  await isar.notes.filter().group((q)=> q
       .titleContains(s, caseSensitive: false)
       .or()
       .detailsContains(s, caseSensitive: false)
       ).findAll();
     }
 
-    if(filter?.label != null){
-      return await isar.notes.filter().labelIdsElementEqualTo (filter!.label!.id!).findAll();
+     else if(filter?.label != null){
+      notes =  await isar.notes.filter().labelIdsElementEqualTo (filter!.label!.id!).findAll();
     }
     
-    if (filter?.pagination != null) {
-      return await isar.notes
+    else if (filter?.pagination != null) {
+      notes =  await isar.notes
           .where()
           .offset(filter!.pagination!.offset)
           .limit(filter.pagination!.limit)
           .findAll();
+    }else {
+      notes = await isar.notes.where().findAll();
     }
 
-    return isar.notes.where().sortByCreatedAtDesc().findAll();
+    notes.sort((a,b){
+      if(a.isPinned != b.isPinned){
+        return a.isPinned ? -1 : 1;
+      }
+      return b.createdAt.compareTo(a.createdAt);
+    });
+
+    return notes;
   }
 
   Future<Note?> get(int id) async {

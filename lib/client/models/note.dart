@@ -11,6 +11,7 @@ class Note {
   List<int> labelIds;
   DateTime createdAt;
   DateTime? updatedAt;
+  bool isPinned;
 
   Note({
     this.id,
@@ -20,6 +21,7 @@ class Note {
     required this.labelIds,
     required this.createdAt,
     this.updatedAt,
+    this.isPinned = false
   });
 
   Note copyWith(
@@ -29,7 +31,11 @@ class Note {
       int? colorId,
       List<int>? labelIds,
       DateTime? createdAt,
-      DateTime? updatedAt}) {
+
+      DateTime? updatedAt,
+      bool? isPinned
+      
+      }) {
     return Note(
         id: id ?? this.id,
         title: title ?? this.title,
@@ -37,6 +43,8 @@ class Note {
         colorId: colorId ?? this.colorId,
         labelIds: labelIds ?? this.labelIds,
         createdAt: createdAt ?? this.createdAt,
-        updatedAt: updatedAt ?? this.updatedAt);
+        updatedAt: updatedAt ?? this.updatedAt,
+        isPinned: isPinned  ?? this.isPinned
+        );
   }
 }

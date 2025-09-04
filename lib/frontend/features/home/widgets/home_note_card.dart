@@ -13,11 +13,13 @@ class NoteCard extends StatelessWidget {
   final Future<List<Label>> Function(Filter?) getLabels;
   final List<Label> allLabels; // All available labels for filtering
   final AwaitCubit<List<Label>> labelsCubit;
+  final AwaitCubit<List<Note>> notesCubit;
   const NoteCard(
       {super.key,
       required this.note,
       required this.getLabels,
       required this.allLabels,
+      required this.notesCubit,
       required this.labelsCubit});
 
   @override
@@ -27,6 +29,7 @@ class NoteCard extends StatelessWidget {
     Color? noteColor = note.colorId != null ? AppColors.noteColors[note.colorId!] : null;
     Color textColor = noteColor != null ? Colors.white : Colors.black;
     Color dateColor = noteColor != null ? Colors.white : Colors.grey;
+     Color isPinnedBGColor = note.isPinned  ? Colors.black : Colors.white; 
 
     return Stack(
       children: [
@@ -45,8 +48,6 @@ class NoteCard extends StatelessWidget {
                         note: note,  // Pass current note for editing
                       )),
             );
-
-
               // If note was updated, refresh both notes and labels
             if (updateNote != null) {
               final notesCubit = context.read<AwaitCubit<List<Note>>>();
@@ -54,7 +55,6 @@ class NoteCard extends StatelessWidget {
               await labelsCubit.refresh();
             }
           },
-
 
           //!
           //Delete Note
@@ -103,7 +103,33 @@ class NoteCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-
+                Align(
+                alignment: Alignment.topRight,
+                child: GestureDetector(
+                  onTap: () => _togglePinStatus(context),
+                  child: Container(
+                    
+                    width: 31,
+                    height: 31,
+                    padding: const EdgeInsets.all(3),
+                   decoration: BoxDecoration(
+                    boxShadow: const [
+                      BoxShadow(blurRadius: 3, color: Colors.black26)
+                    ],
+                    color: isPinnedBGColor,
+                    borderRadius: BorderRadius.circular(5)
+                   ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(6),
+                      child: Image.asset(
+                        note.isPinned 
+                          ? 'assets/images/card_pin_tag.png' // Pinned icon
+                          : 'assets/images/card_pin.png',    // Unpinned icon
+                      ),
+                    ),
+                  ),
+                ),
+              ),
                 //!
                 //Note Date
                 Text(
@@ -157,4 +183,37 @@ class NoteCard extends StatelessWidget {
       ],
     );
   }
+
+
+  Future<void> _togglePinStatus(BuildContext context) async {
+  try {
+    // Toggle the pin status
+    final updatedNote = note.copyWith(
+      isPinned: !note.isPinned,
+    );
+    
+    // Update the note in the database
+    await api.notes.updateNote(updatedNote);
+    
+    // Refresh the notes list to show the new order
+    notesCubit.refresh(filter: notesCubit.state.filter);
+    
+    // Show feedback to the user
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(updatedNote.isPinned 
+          ? 'Note pinned to top' 
+          : 'Note unpinned'),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Failed to update pin status'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+}
 }
