@@ -2,13 +2,11 @@ import 'package:arfoon_note/client/models/models.dart';
 import 'package:arfoon_note/frontend/frontend.dart';
 import 'package:arfoon_note/frontend/theme/context_ext.dart';
 import 'package:arfoon_note/integration/integration.dart';
-import 'package:arfoon_note/main.dart';
+import 'package:arfoon_note/server/local_storage_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 class CustomDrawer extends StatefulWidget {
-  final String userName;
-  final String userGreeting;
   final Future<List<Label>> Function(Filter?) getLabels;
   final Future<Label?> Function(Label) updateLabel;
   final Future<void> Function(int) deleteLabel;
@@ -17,11 +15,11 @@ class CustomDrawer extends StatefulWidget {
   final void Function(Label label)? onLabelAdded;
   final void Function(Label label)? onLabelUpdated;
   final void Function(int id)? onLabelDeleted;
+   final VoidCallback onProfileTap;
 
   const CustomDrawer(
       {super.key,
-      required this.userName,
-      required this.userGreeting,
+
       required this.deleteLabel,
       required this.updateLabel,
       required this.getLabels,
@@ -29,7 +27,7 @@ class CustomDrawer extends StatefulWidget {
       required this.onLabelSelected,
       this.onLabelAdded,
       this.onLabelUpdated,
-      this.onLabelDeleted});
+      this.onLabelDeleted, required this.onProfileTap});
 
   @override
   State<CustomDrawer> createState() => _CustomDrawerState();
@@ -38,15 +36,44 @@ class CustomDrawer extends StatefulWidget {
 class _CustomDrawerState extends State<CustomDrawer> {
   late final AwaitCubit<List<Label>> awaitCubit;
 
+  String userName = 'Guest';
+  String userGreeting = 'Welcome';
+
   @override
   void initState() {
     super.initState();
     awaitCubit = AwaitCubit<List<Label>>();
-    awaitCubit.load(api.labels.list, null);
+    awaitCubit.load(widget.getLabels, null);
+
+    _loadUserName();
+  }
+
+
+Future<void> _loadUserName() async {
+    final savedName = await LocalStorageService.getUserName();
+    setState(() {
+      userName = savedName ?? 'Guest';
+      userGreeting = _getGreeting();
+    });
+  }
+
+   void _onDrawerOpened() {
+    _loadUserName(); 
+  }
+
+
+  String _getGreeting() {
+    final hour = DateTime.now().hour;
+    if (hour < 12) return 'Good Morning';
+    if (hour < 17) return 'Good Afternoon';
+    return 'Good Evening';
   }
 
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _onDrawerOpened();
+    });
     return Drawer(
       backgroundColor: Colors.white,
       //! SafeArea to avoid system UI overlaps
@@ -349,8 +376,8 @@ class _CustomDrawerState extends State<CustomDrawer> {
                         color: Colors.black,
                         borderRadius: BorderRadius.circular(10)),
                     child: Text(
-                      widget.userName.trim().isNotEmpty
-                          ? widget.userName
+                      userName.trim().isNotEmpty
+                          ?userName
                               .trim()
                               .split(' ')
                               .where((part) => part.isNotEmpty)
@@ -362,28 +389,30 @@ class _CustomDrawerState extends State<CustomDrawer> {
                     ),
                   ),
                   const SizedBox(width: 12),
-
+              
                   //! User name and greeting text
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        widget.userName,
+                        userName,
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       Text(
-                        widget.userGreeting,
+                        userGreeting,
                         style:
                             const TextStyle(color: Colors.grey, fontSize: 12),
                       ),
                     ],
                   ),
                   const Spacer(),
-
                   //! Icon button for expanding additional options (functionality TBD)
                   IconButton(
                     icon: const Icon(Icons.unfold_more),
-                    onPressed: () {},
+                     onPressed:(){
+                      widget.onProfileTap();
+                      _loadUserName();
+                     }
                   ),
                 ],
               ),

@@ -1,3 +1,4 @@
+import 'package:arfoon_note/frontend/features/home/home.dart';
 import 'package:arfoon_note/integration/integration.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -5,7 +6,6 @@ import '../../../client/models/models.dart';
 import '../../theme/theme.dart';
 import '../../widgets/widget.dart';
 import '../features.dart';
-import 'widgets/home_widgets.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({
@@ -13,10 +13,12 @@ class HomeView extends StatefulWidget {
     required this.getNotes,
     required this.addNote,
     required this.getLabels,
+    required this.onProfileTap,
   });
   final Future<List<Note>> Function(Filter?) getNotes;
   final Future<List<Label>> Function(Filter?) getLabels;
   final Future<Note> Function(Note) addNote;
+  final VoidCallback onProfileTap;
 
   @override
   State<HomeView> createState() => _HomeViewState();
@@ -70,6 +72,7 @@ class _HomeViewState extends State<HomeView> {
           labelsCubit.refresh();
           notesCubit.refresh(filter: notesCubit.state.filter);
         },
+        onProfileTap: widget.onProfileTap,
       ),
       backgroundColor: AppColors.background,
       appBar: HomeAppBar(
