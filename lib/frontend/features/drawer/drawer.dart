@@ -1,9 +1,11 @@
 import 'package:arfoon_note/client/models/models.dart';
 import 'package:arfoon_note/frontend/frontend.dart';
 import 'package:arfoon_note/frontend/theme/context_ext.dart';
+import 'package:arfoon_note/integration/cubit/theme_cubit.dart';
 import 'package:arfoon_note/integration/integration.dart';
 import 'package:arfoon_note/server/local_storage_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
 class CustomDrawer extends StatefulWidget {
@@ -15,11 +17,10 @@ class CustomDrawer extends StatefulWidget {
   final void Function(Label label)? onLabelAdded;
   final void Function(Label label)? onLabelUpdated;
   final void Function(int id)? onLabelDeleted;
-   final VoidCallback onProfileTap;
+  final VoidCallback onProfileTap;
 
   const CustomDrawer(
       {super.key,
-
       required this.deleteLabel,
       required this.updateLabel,
       required this.getLabels,
@@ -27,7 +28,8 @@ class CustomDrawer extends StatefulWidget {
       required this.onLabelSelected,
       this.onLabelAdded,
       this.onLabelUpdated,
-      this.onLabelDeleted, required this.onProfileTap});
+      this.onLabelDeleted,
+      required this.onProfileTap});
 
   @override
   State<CustomDrawer> createState() => _CustomDrawerState();
@@ -48,8 +50,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
     _loadUserName();
   }
 
-
-Future<void> _loadUserName() async {
+  Future<void> _loadUserName() async {
     final savedName = await LocalStorageService.getUserName();
     setState(() {
       userName = savedName ?? 'Guest';
@@ -57,10 +58,9 @@ Future<void> _loadUserName() async {
     });
   }
 
-   void _onDrawerOpened() {
-    _loadUserName(); 
+  void _onDrawerOpened() {
+    _loadUserName();
   }
-
 
   String _getGreeting() {
     final hour = DateTime.now().hour;
@@ -75,7 +75,6 @@ Future<void> _loadUserName() async {
       _onDrawerOpened();
     });
     return Drawer(
-      backgroundColor: Colors.white,
       //! SafeArea to avoid system UI overlaps
       child: SafeArea(
         child: Column(
@@ -344,23 +343,22 @@ Future<void> _loadUserName() async {
                           });
                     },
                   ),
-
                   //! Settings button - opens settings dialog
                   ListTile(
-                    horizontalTitleGap: 6,
-                    leading: const Icon(
-                      Icons.settings_outlined,
-                      color: Colors.black,
-                    ),
-                    title:
-                        const Text('Settings', style: TextStyle(fontSize: 14)),
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) => const SettingDialog(),
-                      );
-                    },
-                  ),
+                          horizontalTitleGap: 6,
+                          leading: const Icon(
+                            Icons.settings_outlined,
+                            color: Colors.black,
+                          ),
+                          title: const Text('Settings',
+                              style: TextStyle(fontSize: 14)),
+                          onTap: ()async {
+                           await showDialog(
+                              context: context,
+                              builder: (context) => const SettingDialog(),
+                            );
+                          },
+                        )
                 ],
               ),
             ),
@@ -377,7 +375,7 @@ Future<void> _loadUserName() async {
                         borderRadius: BorderRadius.circular(10)),
                     child: Text(
                       userName.trim().isNotEmpty
-                          ?userName
+                          ? userName
                               .trim()
                               .split(' ')
                               .where((part) => part.isNotEmpty)
@@ -389,7 +387,7 @@ Future<void> _loadUserName() async {
                     ),
                   ),
                   const SizedBox(width: 12),
-              
+
                   //! User name and greeting text
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -408,12 +406,11 @@ Future<void> _loadUserName() async {
                   const Spacer(),
                   //! Icon button for expanding additional options (functionality TBD)
                   IconButton(
-                    icon: const Icon(Icons.unfold_more),
-                     onPressed:(){
-                      widget.onProfileTap();
-                      _loadUserName();
-                     }
-                  ),
+                      icon: const Icon(Icons.unfold_more),
+                      onPressed: () {
+                        widget.onProfileTap();
+                        _loadUserName();
+                      }),
                 ],
               ),
             ),

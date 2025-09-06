@@ -2,9 +2,10 @@
 import 'package:arfoon_note/frontend/features/home/home_example.dart';
 import 'package:arfoon_note/integration/main_app.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ExamplePage extends StatefulWidget {
-  const ExamplePage({super.key});
+  const ExamplePage({super.key,});
 
   @override
   State<ExamplePage> createState() => _MyHomePageState();
@@ -20,7 +21,7 @@ class _MyHomePageState extends State<ExamplePage> {
             'Examples',
             style: TextStyle(color: Colors.white),
           )),
-      body: const Column(
+      body:  const Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           ExampleButton(

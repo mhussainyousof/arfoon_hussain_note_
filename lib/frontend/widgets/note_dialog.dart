@@ -23,7 +23,6 @@ class NoteDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      backgroundColor: Colors.white,
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadiusGeometry.circular(10)),
       child: Padding(

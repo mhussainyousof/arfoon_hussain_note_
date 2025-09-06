@@ -146,12 +146,20 @@ class NoteCard extends StatelessWidget {
                   runSpacing: 3,
                   children: allLabels
                       .where((label) => note.labelIds.contains(label.id))
-                      .map((label) => NoteChip(
-                            text: label.name,
-                            labelStyle: const TextStyle(fontSize: 11),
-                            backgroundColor: Colors.grey.shade200,
-                            borderRadius: BorderRadius.circular(8),
-                          ))
+                      .map((label) =>
+                      
+                      Container(
+                        padding: const EdgeInsets.all(4),
+
+                        decoration:  BoxDecoration(
+                          color: Colors.grey[300]!,
+                          
+                          borderRadius: BorderRadius.circular(6)
+
+                        ),
+                        child: Text(label.name, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),),)
+                     
+                          )
                       .toList(),
                 ),
               ],

@@ -169,7 +169,6 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
     return Scaffold(
       // keyboard pushes up content instead of overlapping it
       resizeToAvoidBottomInset: true,
-      backgroundColor: AppColors.background,
 
       appBar: HomeAppBar(
         title: '',

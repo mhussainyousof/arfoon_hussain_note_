@@ -20,8 +20,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: Colors.white,
-      surfaceTintColor: Colors.transparent,
+   
       title: InkWell(
         onTap: () {
           if (kDebugMode) {

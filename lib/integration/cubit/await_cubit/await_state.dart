@@ -1,4 +1,4 @@
-import '../../client/models/models.dart';
+import '../../../client/models/models.dart';
 
 enum AwaitStatus {
   loading,

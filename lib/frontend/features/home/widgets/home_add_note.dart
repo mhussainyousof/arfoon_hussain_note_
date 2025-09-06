@@ -11,7 +11,6 @@ class AddNoteButton extends StatelessWidget {
     return FloatingActionButton(
       elevation: 0,
       onPressed: onPressed,
-      backgroundColor: Colors.black,
       child: child
     );
   }

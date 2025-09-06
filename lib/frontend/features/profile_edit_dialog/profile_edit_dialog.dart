@@ -81,10 +81,7 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
               widget.currentName.isEmpty ? 'Continue' : 'Save Changes',
           secondaryButtonOnPressed: () => Navigator.pop(context),
         ),
-
-
-
-
+        
         if (widget.currentName.isEmpty) const SizedBox(height: 20),
 
 

@@ -1,6 +1,6 @@
 import 'package:arfoon_note/client/models/models.dart';
 import 'package:arfoon_note/frontend/features/drawer/drawer.dart';
-import 'package:arfoon_note/integration/await_cubit/await_cubit.dart';
+import 'package:arfoon_note/integration/cubit/await_cubit/await_cubit.dart';
 import 'package:arfoon_note/main.dart';
 import 'package:flutter/material.dart';
 

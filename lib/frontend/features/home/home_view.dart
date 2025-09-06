@@ -3,7 +3,6 @@ import 'package:arfoon_note/integration/integration.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../../client/models/models.dart';
-import '../../theme/theme.dart';
 import '../../widgets/widget.dart';
 import '../features.dart';
 
@@ -57,6 +56,8 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = MediaQuery.of(context).platformBrightness == Brightness.dark;
+     debugPrint('Theme is dark: $isDark');
     return Scaffold(
       drawer: DrawerPage(
         labelsCubit: labelsCubit,
@@ -74,7 +75,6 @@ class _HomeViewState extends State<HomeView> {
         },
         onProfileTap: widget.onProfileTap,
       ),
-      backgroundColor: AppColors.background,
       appBar: HomeAppBar(
         leading: Builder(
           builder: (context) => GestureDetector(
@@ -85,6 +85,10 @@ class _HomeViewState extends State<HomeView> {
         title: 'Arfoon Note',
         textNaighbor: SvgPicture.asset(
           'assets/images/note_logo.svg',
+            colorFilter: ColorFilter.mode(
+            isDark ? Colors.white : Colors.black,
+            BlendMode.srcIn,
+          ),
           width: 24,
           height: 24,
         ),
@@ -155,7 +159,7 @@ class _HomeViewState extends State<HomeView> {
         ],
       ),
       floatingActionButton: AddNoteButton(
-          child: const Icon(Icons.add, color: Colors.white),
+          child: const Icon(Icons.add,),
           onPressed: () async {
             final result = await Navigator.push(
               context,

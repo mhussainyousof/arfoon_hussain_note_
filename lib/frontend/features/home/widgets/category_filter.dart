@@ -36,18 +36,9 @@ class CategoryFilterChips extends StatelessWidget {
             return Padding(
               padding: const EdgeInsets.only(right: 8),
               child: ChoiceChip(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 showCheckmark: false,
-                side: const BorderSide(color: Color(0XFFE4E4E7)),
-                backgroundColor: AppColors.background,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(100),
-                ),
                 label: Text(
                   label.name,
-                  style: TextStyle(
-                      fontSize: 13,
-                      color: selected ? Colors.white : const Color(0xFF71717A)),
                 ),
                 selected: selected,
                 selectedColor: AppColors.chipSelected,
