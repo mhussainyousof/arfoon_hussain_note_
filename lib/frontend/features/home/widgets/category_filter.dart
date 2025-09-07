@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:arfoon_note/client/models/models.dart';
-import 'package:arfoon_note/frontend/theme/theme.dart';
 
 class CategoryFilterChips extends StatelessWidget {
   final List<Label> labels;
@@ -16,10 +15,7 @@ class CategoryFilterChips extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     final chips = [Label(name: "All Notes", id: null),...labels];
-
-
     return SizedBox(
       height: 40,
       child: Container(
@@ -41,7 +37,6 @@ class CategoryFilterChips extends StatelessWidget {
                   label.name,
                 ),
                 selected: selected,
-                selectedColor: AppColors.chipSelected,
                 onSelected: (_) => onSelectLabel(label)
               ),
             );

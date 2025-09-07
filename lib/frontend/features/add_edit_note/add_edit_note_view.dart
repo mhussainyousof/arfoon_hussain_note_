@@ -176,12 +176,11 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
           onPressed: _onSave,
           icon: const Icon(
             Icons.arrow_back_ios,
-            color: Color(0XFF646464),
           ),
         ),
         trailing: IconButton(
           onPressed: () {},
-          icon: const Icon(Icons.more_vert, color: Color(0XFF646464)),
+          icon: const Icon(Icons.more_vert),
         ),
       ),
 
@@ -210,6 +209,7 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
                     controller: _titleController,
                     hintText: 'Untitled',
                     hintSize: 36,
+                    
                     hasBorder: false,
                     fontWeight: FontWeight.bold,
                   ),

@@ -71,6 +71,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _onDrawerOpened();
     });
@@ -86,6 +87,10 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 children: [
                   SvgPicture.asset(
                     'assets/images/note_logo.svg',
+                    colorFilter: ColorFilter.mode(
+                      isDark ? Colors.white : Colors.black,
+                      BlendMode.srcIn,
+                    ),
                     width: 35,
                     height: 35,
                   ),
@@ -114,6 +119,10 @@ class _CustomDrawerState extends State<CustomDrawer> {
               horizontalTitleGap: 6,
               leading: SvgPicture.asset(
                 'assets/images/all_notes.svg',
+                colorFilter: ColorFilter.mode(
+                  isDark ? Colors.white : Colors.black,
+                  BlendMode.srcIn,
+                ),
                 width: 24,
                 height: 24,
               ),
@@ -345,20 +354,20 @@ class _CustomDrawerState extends State<CustomDrawer> {
                   ),
                   //! Settings button - opens settings dialog
                   ListTile(
-                          horizontalTitleGap: 6,
-                          leading: const Icon(
-                            Icons.settings_outlined,
-                            color: Colors.black,
-                          ),
-                          title: const Text('Settings',
-                              style: TextStyle(fontSize: 14)),
-                          onTap: ()async {
-                           await showDialog(
-                              context: context,
-                              builder: (context) => const SettingDialog(),
-                            );
-                          },
-                        )
+                    horizontalTitleGap: 6,
+                    leading: const Icon(
+                      Icons.settings_outlined,
+                      color: Colors.black,
+                    ),
+                    title:
+                        const Text('Settings', style: TextStyle(fontSize: 14)),
+                    onTap: () async {
+                      await showDialog(
+                        context: context,
+                        builder: (context) => const SettingDialog(),
+                      );
+                    },
+                  )
                 ],
               ),
             ),

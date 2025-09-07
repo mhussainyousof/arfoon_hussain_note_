@@ -2,7 +2,6 @@
 import 'package:arfoon_note/frontend/features/home/home_example.dart';
 import 'package:arfoon_note/integration/main_app.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class ExamplePage extends StatefulWidget {
   const ExamplePage({super.key,});
@@ -32,22 +31,6 @@ class _MyHomePageState extends State<ExamplePage> {
             text: 'Main App',
             route: MainApp(),
           ),
-          // ExampleButton(
-          //   text: 'add App',
-          //   route: CustomDrawer(
-          //     userName: 'sdf',
-          //     userGreeting: 'asdf',
-          //     getLabels: () async {
-          //       return [];
-          //     },
-          //     deleteLabel: (l) async {
-          //       return Label(name: '');
-          //     },
-          //     updateLabel: (l) async {
-          //       return l;
-          //     },
-          //   ),
-          // ),
         ],
       ),
     );

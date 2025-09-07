@@ -12,6 +12,7 @@ class FrontendApp extends StatelessWidget {
     return BlocBuilder<ThemeCubit, ThemeState>(
       builder: (context, themeState) {
         return MaterialApp(
+          debugShowCheckedModeBanner: false,
     title: 'Arfoon Note',
     theme: AppTheme.lightTheme(),
     

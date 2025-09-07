@@ -23,10 +23,11 @@ class NoteChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Chip(
+      labelPadding: const EdgeInsets.symmetric(horizontal: 7,),
       label: Text(text),
       backgroundColor: backgroundColor,
       elevation: 0,
-      padding: const EdgeInsets.all(1),
+      padding: const EdgeInsets.all(0),
       side: BorderSide.none,
       shape: borderRadius != null
           ? RoundedRectangleBorder(borderRadius: borderRadius!)

@@ -12,6 +12,7 @@ import 'package:isar/isar.dart';
 
 late NoteServer api;
 void main() async {
+  
   WidgetsFlutterBinding.ensureInitialized();
   await Isar.initializeIsarCore();
   final dir = await getApplicationDocumentsDirectory();

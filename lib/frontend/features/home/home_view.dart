@@ -56,7 +56,7 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = MediaQuery.of(context).platformBrightness == Brightness.dark;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
      debugPrint('Theme is dark: $isDark');
     return Scaffold(
       drawer: DrawerPage(

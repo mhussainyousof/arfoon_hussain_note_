@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  static const primaryBlue = Color(0xFF0081C8);
   static const background = Colors.white;
   static const greyText = Color(0xFFA2A2A2);
-  static const chipSelected = Colors.black;
-  static const chipUnselected = Color(0xFFE0E0E0);
+   static const textLight = Colors.black;
+    static const textDark = Colors.white;
 
   static const List<Color> noteColors = [
     Color(0XFF00A894),
@@ -17,30 +16,33 @@ class AppColors {
 class AppTheme {
   static ThemeData lightTheme() {
     return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.light,
         scaffoldBackgroundColor: Colors.white,
         drawerTheme: const DrawerThemeData(backgroundColor: Colors.white),
 
-        //
+      //
         appBarTheme: const AppBarTheme(
           backgroundColor: Colors.white,
         ),
 
-        //
+      //
         dialogTheme: const DialogThemeData(backgroundColor: Colors.white),
 
-        //
+      //
         elevatedButtonTheme: ElevatedButtonThemeData(
             style: ButtonStyle(
+              foregroundColor: WidgetStateProperty.all(Colors.white),
                 backgroundColor: WidgetStateProperty.all(Colors.black))),
 
-        //
+      //
         floatingActionButtonTheme: const FloatingActionButtonThemeData(
             backgroundColor: Colors.black, foregroundColor: Colors.white),
         
-        //
+      //
         chipTheme: ChipThemeData(
         backgroundColor: Colors.white, 
-        selectedColor: AppColors.chipSelected, 
+        selectedColor: Colors.black, 
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4), 
         labelStyle: const TextStyle(
           fontSize: 13,
@@ -60,28 +62,56 @@ class AppTheme {
         shadowColor: Colors.transparent,
         checkmarkColor: Colors.white, 
       ),
+
+        iconButtonTheme: const IconButtonThemeData(
+          style: ButtonStyle(iconColor:WidgetStatePropertyAll(Colors.black54))
+        ),
+
+      //
+        cardTheme: const CardThemeData(
+        color: Colors.white,
+        shadowColor: Colors.black,
+        elevation: 2
+        ),
+        
+        //
+          textTheme: const TextTheme(
+        bodyLarge: TextStyle(color: AppColors.textLight),
+        bodyMedium: TextStyle(color: AppColors.textLight),
+        titleLarge: TextStyle(color: AppColors.textLight),
+        titleMedium: TextStyle(color: AppColors.textLight),
+      ),
         );
   }
 
   static ThemeData darkTheme() {
     return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.dark,
       scaffoldBackgroundColor: Colors.black,
       drawerTheme: const DrawerThemeData(backgroundColor: Colors.black),
       appBarTheme: const AppBarTheme(
         backgroundColor: Colors.black,
       ),
+
+    //
       dialogTheme: const DialogThemeData(backgroundColor: Colors.black),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style:
-            ButtonStyle(backgroundColor: WidgetStateProperty.all(Colors.white)),
+            ButtonStyle(
+              foregroundColor: WidgetStateProperty.all(Colors.black),
+              backgroundColor: WidgetStateProperty.all(Colors.white)),
       ),
+
+    //
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
           backgroundColor: Colors.white, foregroundColor: Colors.black
           ),
 
+    //
            chipTheme: ChipThemeData(
       backgroundColor: Colors.grey[800]!,
-      selectedColor: AppColors.chipSelected, 
+      selectedColor: Colors.black, 
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       labelStyle:  TextStyle(
         fontSize: 13,
@@ -101,6 +131,27 @@ class AppTheme {
       shadowColor: Colors.transparent,
       checkmarkColor: Colors.white,
     ),
+    
+    //
+     iconButtonTheme:  IconButtonThemeData(
+          style: ButtonStyle(
+            iconColor:WidgetStateProperty.all(Colors.white54))
+        ),
+
+    //
+      cardTheme:  const CardThemeData(
+        color: Colors.black,
+        shadowColor: Colors.white60,
+        elevation: 2,
+      ),
+
+    //
+     textTheme: const TextTheme(
+        bodyLarge: TextStyle(color: AppColors.textDark),
+        bodyMedium: TextStyle(color: AppColors.textDark),
+        titleLarge: TextStyle(color: AppColors.textDark),
+        titleMedium: TextStyle(color: AppColors.textDark),
+      ),
     );
   }
 }
