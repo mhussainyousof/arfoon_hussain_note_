@@ -75,7 +75,7 @@ class AppTheme {
         ),
         
         //
-          textTheme: const TextTheme(
+        textTheme: const TextTheme(
         bodyLarge: TextStyle(color: AppColors.textLight),
         bodyMedium: TextStyle(color: AppColors.textLight),
         titleLarge: TextStyle(color: AppColors.textLight),

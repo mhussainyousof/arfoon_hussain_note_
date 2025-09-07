@@ -1,11 +1,9 @@
 import 'package:arfoon_note/client/models/models.dart';
 import 'package:arfoon_note/frontend/frontend.dart';
 import 'package:arfoon_note/frontend/theme/context_ext.dart';
-import 'package:arfoon_note/integration/cubit/theme_cubit.dart';
 import 'package:arfoon_note/integration/integration.dart';
 import 'package:arfoon_note/server/local_storage_service.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
 class CustomDrawer extends StatefulWidget {
