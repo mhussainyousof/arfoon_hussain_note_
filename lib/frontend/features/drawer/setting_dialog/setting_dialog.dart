@@ -7,8 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SettingDialog extends StatefulWidget {
-  final Future<AppTheme> Function(Filter? filter) getTheme;
-  final Future<void> Function(AppTheme) saveTheme;
+  final Future<NoteTheme> Function(Filter? filter) getTheme;
+  final Future<void> Function(NoteTheme) saveTheme;
 
   const SettingDialog({super.key, required this.getTheme, required this.saveTheme});
 
@@ -17,23 +17,23 @@ class SettingDialog extends StatefulWidget {
 }
 
 class _SettingDialogState extends State<SettingDialog> {
-late final AwaitCubit<AppTheme> themeCubit;
+late final AwaitCubit<NoteTheme> themeCubit;
 
   @override
   void initState() {
     super.initState();
-    themeCubit = context.read<AwaitCubit<AppTheme>>();
+    themeCubit = context.read<AwaitCubit<NoteTheme>>();
 
   }
   @override
   Widget build(BuildContext context) {
     
     
-    return AwaitBuilder<AppTheme>(
+    return AwaitBuilder<NoteTheme>(
       cubit: themeCubit,
       getData: widget.getTheme,
       builder: (context, themeState) {
-        final currentTheme = themeState.data ?? AppTheme.system;
+        final currentTheme = themeState.data ?? NoteTheme.system;
         
         return NoteDialog(children: [
           const Icon(
@@ -63,7 +63,7 @@ late final AwaitCubit<AppTheme> themeCubit;
                     SimpleDialogOption(
                       child: const Text("System Theme"),
                       onPressed: () async {
-                       await  widget.saveTheme(AppTheme.system);
+                       await  widget.saveTheme(NoteTheme.system);
                         await themeCubit.refresh();
                         Navigator.pop(context);
                       },
@@ -71,7 +71,7 @@ late final AwaitCubit<AppTheme> themeCubit;
                     SimpleDialogOption(
                       child: const Text("Light"),
                       onPressed: () async {
-                        widget.saveTheme(AppTheme.light);
+                        widget.saveTheme(NoteTheme.light);
                          themeCubit.refresh();
                         Navigator.pop(context);
                       },
@@ -79,7 +79,7 @@ late final AwaitCubit<AppTheme> themeCubit;
                     SimpleDialogOption(
                       child: const Text("Dark"),
                       onPressed: () async {
-                        widget.saveTheme(AppTheme.dark);
+                        widget.saveTheme(NoteTheme.dark);
                          themeCubit.refresh();
                         Navigator.pop(context);
                       },

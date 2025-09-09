@@ -22,12 +22,12 @@ class _FrontendAppState extends State<FrontendApp> {
   
     @override
     Widget build(BuildContext context) {
-      final themeCubit = context.read<AwaitCubit<AppTheme>>();
-      return AwaitBuilder<AppTheme>(
+      final themeCubit = context.read<AwaitCubit<NoteTheme>>();
+      return AwaitBuilder<NoteTheme>(
         getData: api.themeRepository.loadTheme,
         cubit:themeCubit,
         builder: (context, themeState) {
-          final theme = themeState.data ?? AppTheme.system;
+          final theme = themeState.data ?? NoteTheme.system;
           return MaterialApp(
             debugShowCheckedModeBanner: false,
             title: 'Arfoon Note',
@@ -40,13 +40,13 @@ class _FrontendAppState extends State<FrontendApp> {
       );
     }
 
-    ThemeMode _getThemeMode(AppTheme themeState) {
+    ThemeMode _getThemeMode(NoteTheme themeState) {
       switch (themeState) {
-        case AppTheme.system:
+        case NoteTheme.system:
           return ThemeMode.system;
-        case AppTheme.dark:
+        case NoteTheme.dark:
           return ThemeMode.dark;
-        case AppTheme.light:
+        case NoteTheme.light:
           return ThemeMode.light;
       }
     }

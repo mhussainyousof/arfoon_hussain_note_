@@ -18,7 +18,7 @@ void main() async {
   api =   await AppService.init();
 
   // init theme
-  final themeCubit = AwaitCubit<AppTheme>();
+  final themeCubit = AwaitCubit<NoteTheme>();
   await themeCubit.load((_)=> api.themeRepository.loadTheme(), null,);
 
 

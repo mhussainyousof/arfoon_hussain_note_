@@ -18,8 +18,8 @@ class CustomDrawer extends StatefulWidget {
   final void Function(int id)? onLabelDeleted;
   final VoidCallback onProfileTap;
   final Future<String?> Function(Filter?) userSavedName;
-  final Future<AppTheme> Function(Filter? filter) getTheme;
-  final Future<void> Function(AppTheme) saveTheme;
+  final Future<NoteTheme> Function(Filter? filter) getTheme;
+  final Future<void> Function(NoteTheme) saveTheme;
 
   const CustomDrawer(
       {super.key,
@@ -79,7 +79,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
 
   @override
   Widget build(BuildContext context) {
-     final themeCubit = context.read<AwaitCubit<AppTheme>>();
+     final themeCubit = context.read<AwaitCubit<NoteTheme>>();
     final isDark = Theme.of(context).brightness == Brightness.dark;
     // WidgetsBinding.instance.addPostFrameCallback((_) {
     //   _onDrawerOpened();
