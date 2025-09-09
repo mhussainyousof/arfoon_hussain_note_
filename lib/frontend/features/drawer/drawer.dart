@@ -2,8 +2,9 @@ import 'package:arfoon_note/client/models/models.dart';
 import 'package:arfoon_note/frontend/frontend.dart';
 import 'package:arfoon_note/frontend/theme/context_ext.dart';
 import 'package:arfoon_note/integration/integration.dart';
-import 'package:arfoon_note/server/local_storage_service.dart';
+import 'package:arfoon_note/server/server.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
 class CustomDrawer extends StatefulWidget {
@@ -16,6 +17,9 @@ class CustomDrawer extends StatefulWidget {
   final void Function(Label label)? onLabelUpdated;
   final void Function(int id)? onLabelDeleted;
   final VoidCallback onProfileTap;
+  final Future<String?> Function(Filter?) userSavedName;
+  final Future<AppTheme> Function(Filter? filter) getTheme;
+  final Future<void> Function(AppTheme) saveTheme;
 
   const CustomDrawer(
       {super.key,
@@ -27,7 +31,10 @@ class CustomDrawer extends StatefulWidget {
       this.onLabelAdded,
       this.onLabelUpdated,
       this.onLabelDeleted,
-      required this.onProfileTap});
+      required this.onProfileTap,
+      required this.userSavedName,
+      required this.getTheme,
+      required this.saveTheme});
 
   @override
   State<CustomDrawer> createState() => _CustomDrawerState();
@@ -35,30 +42,33 @@ class CustomDrawer extends StatefulWidget {
 
 class _CustomDrawerState extends State<CustomDrawer> {
   late final AwaitCubit<List<Label>> awaitCubit;
+  late final AwaitCubit<String?> userNameCubit;
+  // late final AwaitCubit<ThemeState> themeCubit;
 
-  String userName = 'Guest';
   String userGreeting = 'Welcome';
 
   @override
   void initState() {
     super.initState();
     awaitCubit = AwaitCubit<List<Label>>();
+    userNameCubit = AwaitCubit<String?>();
+    // themeCubit = AwaitCubit<ThemeState>();
     awaitCubit.load(widget.getLabels, null);
+    userNameCubit.load(widget.userSavedName, null);
+    // themeCubit.load(widget.getTheme, null);
 
     _loadUserName();
   }
 
   Future<void> _loadUserName() async {
-    final savedName = await LocalStorageService.getUserName();
     setState(() {
-      userName = savedName ?? 'Guest';
       userGreeting = _getGreeting();
     });
   }
 
-  void _onDrawerOpened() {
-    _loadUserName();
-  }
+  // void _onDrawerOpened() {
+  //   _loadUserName();
+  // }
 
   String _getGreeting() {
     final hour = DateTime.now().hour;
@@ -69,10 +79,11 @@ class _CustomDrawerState extends State<CustomDrawer> {
 
   @override
   Widget build(BuildContext context) {
+     final themeCubit = context.read<AwaitCubit<AppTheme>>();
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _onDrawerOpened();
-    });
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   _onDrawerOpened();
+    // });
     return Drawer(
       //! SafeArea to avoid system UI overlaps
       child: SafeArea(
@@ -300,7 +311,12 @@ class _CustomDrawerState extends State<CustomDrawer> {
                   ListTile(
                     horizontalTitleGap: 6,
                     leading: SvgPicture.asset('assets/images/Vector.svg',
-                        width: 24, height: 24),
+                        colorFilter: ColorFilter.mode(
+                          isDark ? Colors.white : Colors.black,
+                          BlendMode.srcIn,
+                        ),
+                        width: 24,
+                        height: 24),
                     title:
                         const Text('Add Label', style: TextStyle(fontSize: 14)),
                     onTap: () {
@@ -351,76 +367,94 @@ class _CustomDrawerState extends State<CustomDrawer> {
                     },
                   ),
                   //! Settings button - opens settings dialog
-                  ListTile(
-                    horizontalTitleGap: 6,
-                    leading: const Icon(
-                      Icons.settings_outlined,
-                      color: Colors.black,
-                    ),
-                    title:
-                        const Text('Settings', style: TextStyle(fontSize: 14)),
-                    onTap: () async {
-                      await showDialog(
-                        context: context,
-                        builder: (context) => const SettingDialog(),
-                      );
-                    },
-                  )
+                  AwaitBuilder(
+                      cubit:themeCubit ,
+                      getData: widget.getTheme,
+                      builder: (context, themeState) {
+                        return ListTile(
+                            horizontalTitleGap: 6,
+                            leading: const Icon(
+                              Icons.settings_outlined,
+                            ),
+                            title: const Text('Settings',
+                                style: TextStyle(fontSize: 14)),
+                            onTap: () async{
+                              showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return SettingDialog(
+                                      getTheme:  widget.getTheme,
+                                      saveTheme: widget.saveTheme);
+                                },
+                              
+                              );
+                                if(themeState.data != null){
+                                 await themeCubit.refresh();
+                                }
+                            });
+                      })
                 ],
               ),
             ),
 
             //! User info footer with initials, name, greeting, and a menu icon
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                        color: Colors.black,
-                        borderRadius: BorderRadius.circular(10)),
-                    child: Text(
-                      userName.trim().isNotEmpty
-                          ? userName
-                              .trim()
-                              .split(' ')
-                              .where((part) => part.isNotEmpty)
-                              .map((part) => part[0].toUpperCase())
-                              .take(2)
-                              .join('')
-                          : '?',
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+                child: AwaitBuilder<String?>(
+                    cubit: userNameCubit,
+                    getData: widget.userSavedName,
+                    builder: (context, state) {
+                      final name = state.data ?? 'Guest';
+                      return Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                                color: Colors.black,
+                                borderRadius: BorderRadius.circular(10)),
+                            child: Text(
+                              name.trim().isNotEmpty
+                                  ? name
+                                      .trim()
+                                      .split(' ')
+                                      .where((part) => part.isNotEmpty)
+                                      .map((part) => part[0].toUpperCase())
+                                      .take(2)
+                                      .join('')
+                                  : '?',
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
 
-                  //! User name and greeting text
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        userName,
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      Text(
-                        userGreeting,
-                        style:
-                            const TextStyle(color: Colors.grey, fontSize: 12),
-                      ),
-                    ],
-                  ),
-                  const Spacer(),
-                  //! Icon button for expanding additional options (functionality TBD)
-                  IconButton(
-                      icon: const Icon(Icons.unfold_more),
-                      onPressed: () {
-                        widget.onProfileTap();
-                        _loadUserName();
-                      }),
-                ],
-              ),
-            ),
+                          //! User name and greeting text
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                name,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              Text(
+                                userGreeting,
+                                style: const TextStyle(
+                                    color: Colors.grey, fontSize: 12),
+                              ),
+                            ],
+                          ),
+                          const Spacer(),
+                          //! Icon button for expanding additional options (functionality TBD)
+                          IconButton(
+                              icon: const Icon(Icons.unfold_more),
+                              onPressed: () async {
+                                widget.onProfileTap();
+                                Navigator.pop(context);
+                              }),
+                        ],
+                      );
+                    })),
           ],
         ),
       ),

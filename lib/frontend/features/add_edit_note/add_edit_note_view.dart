@@ -1,5 +1,4 @@
 import 'package:arfoon_note/frontend/features/home/widgets/home_appbar.dart';
-import 'package:arfoon_note/frontend/widgets/custom_chip.dart';
 import 'package:arfoon_note/frontend/widgets/widget.dart';
 import 'package:arfoon_note/integration/integration.dart';
 import 'package:arfoon_note/main.dart';
@@ -124,13 +123,13 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
     if (text.isEmpty) return;
 
     // Check if label already exists
-    final allLabels = await api.labels.list(null);
+    final allLabels = await api.noteServer.labels.list(null);
     final exists =
         allLabels.any((l) => l.name.toLowerCase() == text.toLowerCase());
 
     // Create new label if it doesn't exist
     if (!exists) {
-      final newLabel = await api.labels.insert(Label(name: text));
+      final newLabel = await api.noteServer.labels.insert(Label(name: text));
       if (newLabel.id != null && !_selectedLabelIds.contains(newLabel.id)) {
         _selectedLabelIds.add(newLabel.id!);
       }
@@ -292,7 +291,7 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
                               return const Iterable<Label>.empty();
                             }
 
-                            final labels = await api.labels.list(null);
+                            final labels = await api.noteServer.labels.list(null);
                             final query = value.text.toLowerCase();
 
                             return labels.where(

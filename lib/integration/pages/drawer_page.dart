@@ -22,14 +22,19 @@ class DrawerPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CustomDrawer(
-      getLabels: api.labels.list,
-      addLabel: api.labels.insert,
-      deleteLabel: api.labels.deleteLabel,
-      updateLabel: api.labels.updateLabel,
+      onProfileTap: onProfileTap,
+      getLabels: api.noteServer.labels.list,
+      addLabel: api.noteServer.labels.insert,
+      deleteLabel: api.noteServer.labels.deleteLabel,
+      updateLabel: api.noteServer.labels.updateLabel,
       onLabelSelected: onLabelSelected,
       onLabelAdded: onLabelAdded,
       onLabelDeleted: onLabelDelete,
-      onLabelUpdated: onLabelUpdate, onProfileTap: onProfileTap,
+      onLabelUpdated: onLabelUpdate, 
+      userSavedName: api.localStorageService.getUserName,
+      getTheme: api.themeRepository.loadTheme,
+      saveTheme: api.themeRepository.saveTheme,
     );
+
   }
 }

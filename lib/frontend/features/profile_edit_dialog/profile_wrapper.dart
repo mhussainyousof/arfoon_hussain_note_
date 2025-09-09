@@ -1,6 +1,6 @@
 import 'package:arfoon_note/frontend/features/profile_edit_dialog/profile_edit_dialog.dart';
 import 'package:arfoon_note/integration/pages/home_page.dart';
-import 'package:arfoon_note/server/local_storage_service.dart';
+import 'package:arfoon_note/main.dart';
 import 'package:flutter/material.dart';
 
 class WelcomeWrapper extends StatefulWidget {
@@ -24,12 +24,12 @@ class _WelcomeWrapperState extends State<WelcomeWrapper> {
       context: context,
       barrierDismissible: false,
       builder: (context) => ProfileEditDialog(
-        currentName: '', // Empty for first time
+        currentName: '', 
         onNameSaved: (name) async {
-          await LocalStorageService.saveUserName(name);
+          await api.localStorageService.saveUserName(name);
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) =>  HomePage()),
+            MaterialPageRoute(builder: (context) =>  const HomePage()),
           );
         },
       ),

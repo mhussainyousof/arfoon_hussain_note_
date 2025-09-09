@@ -57,7 +57,6 @@ class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-     debugPrint('Theme is dark: $isDark');
     return Scaffold(
       drawer: DrawerPage(
         labelsCubit: labelsCubit,
@@ -73,7 +72,10 @@ class _HomeViewState extends State<HomeView> {
           labelsCubit.refresh();
           notesCubit.refresh(filter: notesCubit.state.filter);
         },
-        onProfileTap: widget.onProfileTap,
+        onProfileTap: 
+          widget.onProfileTap
+        
+
       ),
       appBar: HomeAppBar(
         leading: Builder(

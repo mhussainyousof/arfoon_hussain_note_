@@ -1,30 +1,29 @@
-import 'package:arfoon_note/client/open_isar.dart';
 import 'package:arfoon_note/frontend/frontend.dart';
-import 'package:arfoon_note/integration/cubit/theme_cubit.dart';
-import 'package:arfoon_note/integration/integration.dart';
+import 'package:arfoon_note/integration/cubit/await_cubit/await_cubit.dart';
 import 'package:arfoon_note/integration/main_app.dart';
+import 'package:arfoon_note/server/app_service.dart';
+import 'package:arfoon_note/server/theme.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:isar/isar.dart';
 
-
-late NoteServer api;
+late AppService api;
 void main() async {
-  
+
   WidgetsFlutterBinding.ensureInitialized();
   await Isar.initializeIsarCore();
-  final dir = await getApplicationDocumentsDirectory();
-  final isar = await openIsar(dir.path);
-  api = NoteServer.instance(isar);
 
-final themeCubit = await ThemeCubit.loadThemePreference();
+  // init all services
+  api =   await AppService.init();
+
+  // init theme
+  final themeCubit = AwaitCubit<AppTheme>();
+  await themeCubit.load((_)=> api.themeRepository.loadTheme(), null,);
+
+
   runApp(BlocProvider(
       create: (_) => themeCubit,
-      child: const FrontendApp(
-          home: kReleaseMode
-              ? MainApp()
-              : ExamplePage()
-          )));
+      child:
+          const FrontendApp(home: kReleaseMode ? MainApp() : ExamplePage())));
 }

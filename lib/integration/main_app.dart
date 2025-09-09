@@ -1,7 +1,7 @@
 import 'package:arfoon_note/frontend/features/profile_edit_dialog/profile_wrapper.dart';
 import 'package:arfoon_note/frontend/frontend.dart';
 import 'package:arfoon_note/integration/pages/home_page.dart';
-import 'package:arfoon_note/server/local_storage_service.dart';
+import 'package:arfoon_note/server/user_profile.dart';
 import 'package:flutter/material.dart';
 
 class MainApp extends StatefulWidget {
@@ -24,7 +24,7 @@ class _MainAppState extends State<MainApp> {
   }
 
   Future<void> _checkFirstTime() async {
-    final isFirstTime = await LocalStorageService.isFirstTime();
+    final isFirstTime = await UserInfo.isFirstTime();
     setState(() {
       showWelcome = isFirstTime;
       isLoading = false;

@@ -43,7 +43,7 @@ class NoteCard extends StatelessWidget {
               MaterialPageRoute(
                   builder: (_) => AddEditNoteView(
                         onSave: (note) async {
-                          await api.notes.updateNote(note);
+                          await api.noteServer.notes.updateNote(note);
                           return note;
                         },
                         getLabels: getLabels,
@@ -78,7 +78,7 @@ class NoteCard extends StatelessWidget {
                         primaryButtonText: 'Delete it',
                         showSecondary: true,
                         primaryButtonOnPressed: () async {
-                          await api.notes.deleteNote(note.id!);
+                          await api.noteServer.notes.deleteNote(note.id!);
 
                           Navigator.pop(context, true);
                         },
@@ -198,7 +198,7 @@ class NoteCard extends StatelessWidget {
       );
 
       // Update the note in the database
-      await api.notes.updateNote(updatedNote);
+      await api.noteServer.notes.updateNote(updatedNote);
 
       // Refresh the notes list to show the new order
       notesCubit.refresh(filter: notesCubit.state.filter);

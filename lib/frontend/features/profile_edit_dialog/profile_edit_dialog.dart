@@ -1,4 +1,5 @@
 import 'package:arfoon_note/frontend/frontend.dart';
+import 'package:arfoon_note/integration/cubit/await_cubit/await_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -14,6 +15,7 @@ class ProfileEditDialog extends StatefulWidget {
 
 class _ProfileEditDialogState extends State<ProfileEditDialog> {
   final TextEditingController _nameController = TextEditingController();
+  final userNameCubit = AwaitCubit<String?>();
 
   @override
   void initState() {
@@ -73,12 +75,13 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
             final name = _nameController.text.trim();
             if (name.isNotEmpty) {
               widget.onNameSaved(name);
+              
             }
           },
           showSecondary: widget.currentName.isNotEmpty,
           secondaryButtonText: 'Cancel',
           primaryButtonText:
-              widget.currentName.isEmpty ? 'Continue' : 'Save Changes',
+              widget.currentName.isEmpty ? 'Continue' : 'Save',
           secondaryButtonOnPressed: () => Navigator.pop(context),
         ),
         

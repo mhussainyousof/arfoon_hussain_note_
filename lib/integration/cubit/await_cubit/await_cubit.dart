@@ -14,7 +14,7 @@ class AwaitCubit<T> extends Cubit<AwaitState<T>> {
       initalGetData = getData;
       initalFilter = filter;
     }
-
+    
     try {
       emit(state.copyWith(status: AwaitStatus.loading, filter: filter));
       var data = await getData(filter);
@@ -25,6 +25,7 @@ class AwaitCubit<T> extends Cubit<AwaitState<T>> {
   }
 
   filter(Filter filter) {
+    
       load(initalGetData!, filter);
     
   }
