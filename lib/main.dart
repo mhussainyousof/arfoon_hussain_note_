@@ -6,24 +6,26 @@ import 'package:arfoon_note/server/theme.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_locales/flutter_locales.dart';
 import 'package:isar/isar.dart';
 
 late AppService api;
 void main() async {
-
   WidgetsFlutterBinding.ensureInitialized();
   await Isar.initializeIsarCore();
 
+  // init Language
+  await Locales.init(['en', 'fa', 'ps']);
+
   // init all services
-  api =   await AppService.init();
+  api = await AppService.init();
 
   // init theme
-  final themeCubit = AwaitCubit<NoteTheme>();
-  await themeCubit.load((_)=> api.themeRepository.loadTheme(), null,);
+  final themeCubit = AwaitCubit<ThemeState>();
 
-
-  runApp(BlocProvider(
-      create: (_) => themeCubit,
+  runApp(
+    BlocProvider.value(
+      value: themeCubit,
       child:
           const FrontendApp(home: kReleaseMode ? MainApp() : ExamplePage())));
 }

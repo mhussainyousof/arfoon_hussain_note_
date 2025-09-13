@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_locales/flutter_locales.dart';
 
 class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Widget? textNaighbor;
@@ -34,7 +35,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
               textNaighbor!,
               const SizedBox(width: 4),
             ],
-            Text(title, style: const TextStyle(fontSize: 16)),
+            LocaleText(title, style: const TextStyle(fontSize: 16)),
           ],
         ),
       ),

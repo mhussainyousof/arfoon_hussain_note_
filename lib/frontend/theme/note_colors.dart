@@ -88,14 +88,16 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
-      scaffoldBackgroundColor: Colors.black,
-      drawerTheme: const DrawerThemeData(backgroundColor: Colors.black),
+      scaffoldBackgroundColor: const Color.fromARGB(255, 13, 13, 13) ,
+      drawerTheme:  const DrawerThemeData(
+  
+      backgroundColor: Color.fromARGB(255, 22, 22, 22)),
       appBarTheme: const AppBarTheme(
-        backgroundColor: Colors.black,
+        backgroundColor:  Color.fromARGB(255, 13, 13, 13)
       ),
 
     //
-      dialogTheme: const DialogThemeData(backgroundColor: Colors.black),
+      dialogTheme:  DialogThemeData(backgroundColor: Colors.grey[2000]),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style:
             ButtonStyle(

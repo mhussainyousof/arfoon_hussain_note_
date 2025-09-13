@@ -1,10 +1,9 @@
 import 'package:arfoon_note/client/models/models.dart';
 import 'package:arfoon_note/frontend/frontend.dart';
-import 'package:arfoon_note/frontend/theme/context_ext.dart';
 import 'package:arfoon_note/integration/integration.dart';
 import 'package:arfoon_note/server/server.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_locales/flutter_locales.dart';
 import 'package:flutter_svg/svg.dart';
 
 class CustomDrawer extends StatefulWidget {
@@ -17,9 +16,10 @@ class CustomDrawer extends StatefulWidget {
   final void Function(Label label)? onLabelUpdated;
   final void Function(int id)? onLabelDeleted;
   final VoidCallback onProfileTap;
+  final VoidCallback onSettingTap;
   final Future<String?> Function(Filter?) userSavedName;
-  final Future<NoteTheme> Function(Filter? filter) getTheme;
-  final Future<void> Function(NoteTheme) saveTheme;
+  final Future<ThemeState> Function(Filter? filter) getTheme;
+  final Future<void> Function(ThemeState) saveTheme;
 
   const CustomDrawer(
       {super.key,
@@ -34,7 +34,7 @@ class CustomDrawer extends StatefulWidget {
       required this.onProfileTap,
       required this.userSavedName,
       required this.getTheme,
-      required this.saveTheme});
+      required this.saveTheme, required this.onSettingTap});
 
   @override
   State<CustomDrawer> createState() => _CustomDrawerState();
@@ -43,48 +43,41 @@ class CustomDrawer extends StatefulWidget {
 class _CustomDrawerState extends State<CustomDrawer> {
   late final AwaitCubit<List<Label>> awaitCubit;
   late final AwaitCubit<String?> userNameCubit;
-  // late final AwaitCubit<ThemeState> themeCubit;
 
-  String userGreeting = 'Welcome';
+  String userGreeting = 'welcome';
 
   @override
   void initState() {
     super.initState();
     awaitCubit = AwaitCubit<List<Label>>();
     userNameCubit = AwaitCubit<String?>();
-    // themeCubit = AwaitCubit<ThemeState>();
     awaitCubit.load(widget.getLabels, null);
     userNameCubit.load(widget.userSavedName, null);
-    // themeCubit.load(widget.getTheme, null);
-
     _loadUserName();
   }
 
   Future<void> _loadUserName() async {
     setState(() {
+      
       userGreeting = _getGreeting();
     });
   }
 
-  // void _onDrawerOpened() {
-  //   _loadUserName();
-  // }
 
   String _getGreeting() {
     final hour = DateTime.now().hour;
-    if (hour < 12) return 'Good Morning';
-    if (hour < 17) return 'Good Afternoon';
-    return 'Good Evening';
+    if (hour < 12) return 'good_morning';
+    if (hour < 17) return 'good_afternoon';
+    return 'good_evening';
   }
 
   @override
   Widget build(BuildContext context) {
-     final themeCubit = context.read<AwaitCubit<NoteTheme>>();
+
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-    //   _onDrawerOpened();
-    // });
+
     return Drawer(
+
       //! SafeArea to avoid system UI overlaps
       child: SafeArea(
         child: Column(
@@ -104,16 +97,16 @@ class _CustomDrawerState extends State<CustomDrawer> {
                     height: 35,
                   ),
                   const SizedBox(width: 8),
-                  Column(
+                  const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        context.isMobile ? 'Mobile Note' : 'Desktop Note',
-                        style: const TextStyle(
-                            fontSize: 14, fontWeight: FontWeight.bold),
-                      ),
-                      const Text(
-                        'Think. Note. Achieve.',
+                      // LocaleText(
+                      //   context.isMobile ? 'arfoon_note' : 'Desktop Note',
+                      //   style: const TextStyle(
+                      //       fontSize: 14, fontWeight: FontWeight.bold),
+                      // ),
+                    LocaleText(
+                        'think_note_achieve',
                         style:
                             TextStyle(fontSize: 12, color: Color(0XFF71717A)),
                       ),
@@ -135,8 +128,8 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 width: 24,
                 height: 24,
               ),
-              title: const Text(
-                'All Notes',
+              title: const LocaleText(
+                'all_notes',
                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
               ),
               trailing: const Icon(Icons.chevron_right),
@@ -147,12 +140,13 @@ class _CustomDrawerState extends State<CustomDrawer> {
             ),
 
             //! Section title for labels
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+             Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Labels',
+
+                alignment: isRTL(context) ? Alignment.centerRight : Alignment.centerLeft,
+                child:const LocaleText(
+                  'labels',
                   style: TextStyle(
                     fontSize: 12,
                     color: Color(0XFF71717A),
@@ -179,7 +173,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                   final labels = state.data ?? [];
                   if (labels.isEmpty) {
                     return const Center(
-                      child: Text('There is no label.'),
+                      child: LocaleText('no_label'),
                     );
                   }
                   return ListView.builder(
@@ -205,31 +199,33 @@ class _CustomDrawerState extends State<CustomDrawer> {
 
                             showDialog(
                               context: context,
+                              useRootNavigator: false,
                               builder: (context) {
                                 return NoteDialog(
-                                  title: 'Edit Label',
+                                  title: 'edit_label',
                                   fontWeight: FontWeight.bold,
                                   crossAxisAlignment: CrossAxisAlignment.start,
-                                  details: 'Label Name',
+                                  details: 'label_name',
                                   children: [
                                     const SizedBox(height: 8),
                                     CustomeTextField(
                                       controller: controller,
-                                      hintText: 'Enter label name',
+                                      hintText: 'enter_label_name',
                                     ),
                                     const SizedBox(height: 40),
                                     DialogButtons(
                                       showSecondary: true,
-                                      secondaryButtonText: 'Delete',
-                                      primaryButtonText: 'Update',
+                                      secondaryButtonText: 'delete',
+                                      primaryButtonText: 'update',
                                       secondaryButtonOnPressed: () {
                                         showDialog(
+                                         useRootNavigator: false,
                                           context: context,
                                           builder: (context) => NoteDialog(
                                             title:
-                                                'Are you sure want to Delete?',
+                                                'confirm_delete',
                                             details:
-                                                'Once Deleted a label cannot be undo, are you sure want to Delete?',
+                                                'delete_warning',
                                             children: [
                                               const SizedBox(height: 15),
                                               //! Cancel and Delete buttons in confirmation dialog
@@ -258,9 +254,9 @@ class _CustomDrawerState extends State<CustomDrawer> {
                                                   secondaryButtonOnPressed: () {
                                                     Navigator.pop(context);
                                                   },
-                                                  secondaryButtonText: 'Cancel',
+                                                  secondaryButtonText: 'cancel',
                                                   primaryButtonText:
-                                                      'Delete It.')
+                                                      'delete')
                                             ],
                                           ),
                                         );
@@ -270,15 +266,14 @@ class _CustomDrawerState extends State<CustomDrawer> {
                                       primaryButtonOnPressed: () async {
                                         final newName = controller.text.trim();
                                         if (newName.isNotEmpty) {
-                                          final updatedLabel =
-                                              label.copyWith(name: newName);
+                                         
                                           await widget
-                                              .updateLabel(updatedLabel);
+                                              .updateLabel(label.copyWith(name: newName));
                                           awaitCubit.refresh();
 
                                           if (widget.onLabelUpdated != null) {
                                             widget
-                                                .onLabelUpdated!(updatedLabel);
+                                                .onLabelUpdated!(label.copyWith(name: newName));
                                           }
                                           Navigator.pop(context);
                                         }
@@ -318,23 +313,24 @@ class _CustomDrawerState extends State<CustomDrawer> {
                         width: 24,
                         height: 24),
                     title:
-                        const Text('Add Label', style: TextStyle(fontSize: 14)),
+                        const LocaleText('add_label', style: TextStyle(fontSize: 14)),
                     onTap: () {
                       final TextEditingController labelController =
                           TextEditingController();
                       showDialog(
+                        useRootNavigator: false,
                           context: context,
                           builder: (context) {
                             return NoteDialog(
-                              title: 'New Label',
+                              title: 'new_label',
                               fontWeight: FontWeight.bold,
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              details: 'Label Name',
+                              details: 'label_name',
                               children: [
                                 const SizedBox(height: 8),
                                 CustomeTextField(
                                   controller: labelController,
-                                  hintText: 'A creative label name',
+                                  hintText: 'creative_label_name',
                                 ),
                                 const SizedBox(height: 40),
                                 DialogButtons(
@@ -348,15 +344,15 @@ class _CustomDrawerState extends State<CustomDrawer> {
                                       awaitCubit.refresh();
                                       if (Navigator.canPop(context)) {
                                         Navigator.pop(context);
-                                      }
+                                      } 
                                       if (widget.onLabelAdded != null) {
                                         widget.onLabelAdded!(
                                             Label(name: labeleName));
                                       }
                                     }
                                   },
-                                  secondaryButtonText: 'Cancel',
-                                  primaryButtonText: 'Save Label',
+                                  secondaryButtonText: 'cancel',
+                                  primaryButtonText: 'save_label',
                                   secondaryButtonOnPressed: () {
                                     Navigator.pop(context);
                                   },
@@ -367,32 +363,18 @@ class _CustomDrawerState extends State<CustomDrawer> {
                     },
                   ),
                   //! Settings button - opens settings dialog
-                  AwaitBuilder(
-                      cubit:themeCubit ,
-                      getData: widget.getTheme,
-                      builder: (context, themeState) {
-                        return ListTile(
+                
+                         ListTile(
                             horizontalTitleGap: 6,
                             leading: const Icon(
                               Icons.settings_outlined,
                             ),
-                            title: const Text('Settings',
+                            title: const LocaleText('settings',
                                 style: TextStyle(fontSize: 14)),
                             onTap: () async{
-                              showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return SettingDialog(
-                                      getTheme:  widget.getTheme,
-                                      saveTheme: widget.saveTheme);
-                                },
-                              
-                              );
-                                if(themeState.data != null){
-                                 await themeCubit.refresh();
-                                }
-                            });
-                      })
+                              widget.onSettingTap();
+                            })
+                      
                 ],
               ),
             ),
@@ -405,7 +387,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                     cubit: userNameCubit,
                     getData: widget.userSavedName,
                     builder: (context, state) {
-                      final name = state.data ?? 'Guest';
+                      final name = state.data ?? 'guest';
                       return Row(
                         children: [
                           Container(
@@ -437,7 +419,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                                 style: const TextStyle(
                                     fontWeight: FontWeight.bold),
                               ),
-                              Text(
+                              LocaleText(
                                 userGreeting,
                                 style: const TextStyle(
                                     color: Colors.grey, fontSize: 12),
@@ -450,7 +432,8 @@ class _CustomDrawerState extends State<CustomDrawer> {
                               icon: const Icon(Icons.unfold_more),
                               onPressed: () async {
                                 widget.onProfileTap();
-                                Navigator.pop(context);
+                                        Navigator.pop(context);
+
                               }),
                         ],
                       );

@@ -6,7 +6,7 @@ import 'package:path_provider/path_provider.dart';
 class AppService {
   final NoteServer noteServer;
   final UserInfo localStorageService;
-  final ThemeState themeRepository;
+  final ThemeRepo themeRepository;
 
   AppService._(
       {required this.noteServer,
@@ -20,6 +20,6 @@ class AppService {
     return AppService._(
         noteServer: NoteServer.instance(isar),
         localStorageService: UserInfo(),
-        themeRepository: ThemeState());
+        themeRepository: ThemeRepo());
   }
 }

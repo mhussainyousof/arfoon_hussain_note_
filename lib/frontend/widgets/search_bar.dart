@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_locales/flutter_locales.dart';
 
 class SearchNotesBar extends StatelessWidget {
   final String hintText;
@@ -30,7 +31,7 @@ class SearchNotesBar extends StatelessWidget {
             ),
           ),
           contentPadding: const EdgeInsets.all(10),
-          hintText: hintText,
+          hintText: Locales.string(context, hintText),
           hintStyle: const TextStyle(
             color: Color(0xFF71717A),
             fontSize: 16,

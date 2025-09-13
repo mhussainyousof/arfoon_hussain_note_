@@ -1,28 +1,30 @@
 import 'package:arfoon_note/client/client.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-enum NoteTheme { light, dark, system }
+enum ThemeState { light, dark, system }
 
-class ThemeState {
+class ThemeRepo {
   final String _key = 'themeMode';
 
-  Future<NoteTheme> loadTheme([Filter? filter]) async {
+  Future<ThemeState> loadTheme([Filter? filter]) async {
     final prefs = await SharedPreferences.getInstance();
     final storedTheme = prefs.getString(_key);
 
     switch (storedTheme) {
       case 'dark':
-        return NoteTheme.dark;
+        return ThemeState.dark;
       case 'light':
-        return NoteTheme.light;
+        return ThemeState.light;
       default:
-       return NoteTheme.system;
+       return ThemeState.system;
     }
   }
 
-  Future<void> saveTheme(NoteTheme themeState)async{
+  Future<void> saveTheme(ThemeState themeState)async{
     final prefs = await SharedPreferences.getInstance();
     prefs.setString(_key, themeState.name);
   }
+
+  
   
 }

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bidi_text/flutter_bidi_text.dart';
+import 'package:flutter_locales/flutter_locales.dart';
 
 class CustomeTextField extends StatelessWidget {
   final String? hintText;
@@ -34,6 +36,7 @@ class CustomeTextField extends StatelessWidget {
     this.suffixIcon, this.onChanged, this.fontWeight,
   });
 
+  
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -42,20 +45,19 @@ class CustomeTextField extends StatelessWidget {
         border: hasBorder ? Border.all(color: borderColor, width: borderWidth) : null,
         borderRadius: borderRadius ?? BorderRadius.circular(8),
       ),
-      child: TextField(
+      child: BidiTextField(
         onChanged:onChanged ,
         controller: controller,
-        focusNode: focusNode,
+        focusNode: focusNode, 
         maxLines: isMultiline ? maxLines : 1,
         decoration: InputDecoration(
-          hintText: hintText,
+          hintText: Locales.string(context, hintText!),
           hintStyle: TextStyle(fontSize: hintSize ?? 14, color: const Color.fromARGB(255, 150, 150, 158), fontWeight: fontWeight),
           border: InputBorder.none,
           prefixIcon: prefixIcon,
           suffixIcon: suffixIcon,
           isDense: true,
           contentPadding: EdgeInsets.zero,
-          
         ),
       ),
     );

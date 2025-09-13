@@ -1,15 +1,17 @@
 import 'package:arfoon_note/client/models/models.dart';
-import 'package:arfoon_note/frontend/features/add_edit_note/add_edit_note_view.dart';
+import 'package:arfoon_note/frontend/frontend.dart';
 import 'package:arfoon_note/frontend/theme/note_colors.dart';
-import 'package:arfoon_note/frontend/widgets/widget.dart';
 import 'package:arfoon_note/integration/integration.dart';
 import 'package:arfoon_note/main.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bidi_text/bidi_text.dart';
+import 'package:flutter_bidi_text/flutter_bidi_text.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_locales/flutter_locales.dart';
 import 'package:intl/intl.dart';
 
 class NoteCard extends StatelessWidget {
-  final Note note;
+  final Note? note;
   final Future<List<Label>> Function(Filter?) getLabels;
   final List<Label> allLabels; // All available labels for filtering
   final AwaitCubit<List<Label>> labelsCubit;
@@ -24,14 +26,15 @@ class NoteCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
-    Color? noteColor =
-        note.colorId != null ?
-        
-         AppColors.noteColors[note.colorId!] : null;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    Color? noteColor = note!.colorId != null
+        ? AppColors.noteColors[note!.colorId!]
+        : isDark
+            ? Colors.grey[900]
+            : null;
     Color textColor = noteColor != null ? Colors.white : Colors.black;
-    Color dateColor = noteColor != null ? Colors.white : Colors.grey;
-    Color isPinnedBGColor = note.isPinned ? Colors.black : Colors.white;
+    Color dateColor = Colors.white;
+    Color isPinnedBGColor = note!.isPinned ? Colors.black : Colors.white;
 
     return Stack(
       children: [
@@ -62,23 +65,24 @@ class NoteCard extends StatelessWidget {
           //Delete Note
           onLongPress: () async {
             final confirm = await showDialog(
+                useRootNavigator: false,
                 context: context,
                 builder: (context) {
                   return NoteDialog(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    title: 'Delete!',
-                    details: 'Are you sure you want to delete it?',
+                    title: 'delete',
+                    details: 'confirm_delete',
                     children: [
                       const SizedBox(height: 20),
                       DialogButtons(
                         mainAxisAlignment: MainAxisAlignment.end,
                         width: 20,
                         secondaryButtonElevation: 1,
-                        secondaryButtonText: 'Stop',
-                        primaryButtonText: 'Delete it',
+                        secondaryButtonText: 'cancel',
+                        primaryButtonText: 'delete',
                         showSecondary: true,
                         primaryButtonOnPressed: () async {
-                          await api.noteServer.notes.deleteNote(note.id!);
+                          await api.noteServer.notes.deleteNote(note!.id!);
 
                           Navigator.pop(context, true);
                         },
@@ -95,9 +99,7 @@ class NoteCard extends StatelessWidget {
               await labelsCubit.refresh();
             }
           },
-
           child: Card(
-            
             child: Container(
               width: double.infinity,
               decoration: BoxDecoration(
@@ -106,50 +108,63 @@ class NoteCard extends StatelessWidget {
               ),
               padding: const EdgeInsets.all(20),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   //!
                   //Note Date
-                  Text(
-                    note.updatedAt != null
-                        ? DateFormat('dd MMM').format(note.updatedAt!)
-                        : DateFormat('dd MMM').format(note.createdAt),
-                    style: TextStyle(color: dateColor, fontSize: 12),
+                  if(note?.createdAt != null)
+                  Builder(
+                    builder: (context) {
+                      final date = note!.updatedAt ?? note!.createdAt ;
+                      final local = Locales.currentLocale(context)!.languageCode;
+                      String formattedDate;
+                      if(local == 'fa' || local == 'ps'){
+                        formattedDate = DateFormat('d MMM', 'fa').format(date);
+                      }else{
+                        formattedDate = DateFormat('dd MMM').format(date);
+                      }
+                      return Text(
+                        formattedDate,
+                        style: TextStyle(color: dateColor, fontSize: 12),
+                      );
+                    }
                   ),
                   const SizedBox(height: 8),
-            
+
                   //!
                   // Note title
-                  Text(note.title ?? '',
+                  BidiText(
+                    sampleLength: null,
+
+                    note!.title ?? '',
                       style: TextStyle(
                           fontSize: 24,
                           color: textColor,
                           fontWeight: FontWeight.w600)),
                   const SizedBox(height: 6),
-            
+
                   //!
                   // Note Details
-                  Text(
-                    note.details ?? '',
-                    style: TextStyle(color: dateColor),
+                  BidiText(
+                    note!.details ?? '',
+                    style: TextStyle(color: textColor),
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 40),
-            
+
                   //!
                   // Row of Labels
                   Wrap(
                     spacing: 6,
                     runSpacing: 3,
                     children: allLabels
-                        .where((label) => note.labelIds.contains(label.id))
+                        .where((label) => note!.labelIds.contains(label.id))
                         .map((label) => NoteChip(
-                          borderRadius: BorderRadius.circular(8),
-                          text: label.name,
-                        labelStyle:  TextStyle(color: Colors.grey[900]!),
-                           )
-                            )
+                              borderRadius: BorderRadius.circular(8),
+                              text: label.name,
+                              labelStyle: TextStyle(color: Colors.grey[900]!),
+                            ))
                         .toList(),
                   ),
                 ],
@@ -163,7 +178,8 @@ class NoteCard extends StatelessWidget {
         // pin Part
         Positioned(
             top: 20,
-            right: 20,
+            right: isRTL(context) ? null : 20,
+            left: isRTL(context) ? 20 : null,
             child: GestureDetector(
               onTap: () => _togglePinStatus(context),
               child: Container(
@@ -179,7 +195,7 @@ class NoteCard extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.all(6),
                   child: Image.asset(
-                    note.isPinned
+                    note!.isPinned
                         ? 'assets/images/card_pin_tag.png' // Pinned icon
                         : 'assets/images/card_pin.png', // Unpinned icon
                   ),
@@ -193,8 +209,8 @@ class NoteCard extends StatelessWidget {
   Future<void> _togglePinStatus(BuildContext context) async {
     try {
       // Toggle the pin status
-      final updatedNote = note.copyWith(
-        isPinned: !note.isPinned,
+      final updatedNote = note!.copyWith(
+        isPinned: !note!.isPinned,
       );
 
       // Update the note in the database
@@ -202,15 +218,6 @@ class NoteCard extends StatelessWidget {
 
       // Refresh the notes list to show the new order
       notesCubit.refresh(filter: notesCubit.state.filter);
-
-      // Show feedback to the user
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-              updatedNote.isPinned ? 'Note pinned to top' : 'Note unpinned'),
-          duration: const Duration(seconds: 2),
-        ),
-      );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(

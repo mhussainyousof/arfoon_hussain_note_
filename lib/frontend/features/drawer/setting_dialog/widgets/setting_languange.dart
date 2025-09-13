@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_locales/flutter_locales.dart';
 
 class SettingLanguage extends StatelessWidget {
   final String text;
   final String containerText;
   final void Function()? onPressed;
+  final bool isLocaleText;
   const SettingLanguage({
     super.key,
     required this.text,
+     this.isLocaleText = true,
     required this.containerText, this.onPressed,
   });
 
@@ -33,7 +36,12 @@ class SettingLanguage extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(containerText,
+
+                isLocaleText ?
+                LocaleText(containerText,
+                    style: const TextStyle(
+                        fontSize: 14, fontWeight: FontWeight.bold))
+                    :  Text(containerText,
                     style: const TextStyle(
                         fontSize: 14, fontWeight: FontWeight.bold)),
                 InkWell(

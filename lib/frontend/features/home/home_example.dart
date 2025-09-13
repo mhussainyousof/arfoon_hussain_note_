@@ -20,7 +20,13 @@ class HomeExample extends StatelessWidget {
         showDialog(context: context, builder: (context)=> ProfileEditDialog(currentName: 'Test User', onNameSaved: (name){
           print('Name would be saved $name');
           Navigator.pop(context);
-        }));
+        }
+        )
+        );
+      },
+
+      onSettingTap: () {
+        
       },
     
     );

@@ -13,11 +13,13 @@ class HomeView extends StatefulWidget {
     required this.addNote,
     required this.getLabels,
     required this.onProfileTap,
+    required this.onSettingTap,
   });
   final Future<List<Note>> Function(Filter?) getNotes;
   final Future<List<Label>> Function(Filter?) getLabels;
   final Future<Note> Function(Note) addNote;
   final VoidCallback onProfileTap;
+  final VoidCallback onSettingTap;
 
   @override
   State<HomeView> createState() => _HomeViewState();
@@ -61,8 +63,8 @@ class _HomeViewState extends State<HomeView> {
       drawer: DrawerPage(
         labelsCubit: labelsCubit,
         onLabelSelected: applyFilter,
-        onLabelAdded: (newlable) async {
-          labelsCubit.refresh();
+        onLabelAdded: (newLabel) async {
+          await labelsCubit.refresh();
         },
         onLabelDelete: (id) async {
           labelsCubit.refresh();
@@ -72,10 +74,8 @@ class _HomeViewState extends State<HomeView> {
           labelsCubit.refresh();
           notesCubit.refresh(filter: notesCubit.state.filter);
         },
-        onProfileTap: 
-          widget.onProfileTap
-        
-
+        onProfileTap: widget.onProfileTap,
+        onSettingTap: widget.onSettingTap,
       ),
       appBar: HomeAppBar(
         leading: Builder(
@@ -84,10 +84,10 @@ class _HomeViewState extends State<HomeView> {
             child: const Icon(Icons.menu),
           ),
         ),
-        title: 'Arfoon Note',
+        title: 'arfoon_note',
         textNaighbor: SvgPicture.asset(
           'assets/images/note_logo.svg',
-            colorFilter: ColorFilter.mode(
+          colorFilter: ColorFilter.mode(
             isDark ? Colors.white : Colors.black,
             BlendMode.srcIn,
           ),
@@ -99,7 +99,7 @@ class _HomeViewState extends State<HomeView> {
         children: [
           SearchNotesBar(
             controller: searchController,
-            hintText: 'Search Notes',
+            hintText: 'search_notes',
             onChanged: (s) {
               notesCubit.filter(Filter(search: s));
             },
@@ -111,7 +111,6 @@ class _HomeViewState extends State<HomeView> {
               cubit: labelsCubit,
               builder: (context, state) {
                 final labels = state.data ?? [];
-
                 return CategoryFilterChips(
                   labels: labels,
                   selectedIndex: selectedChipIndex,
@@ -161,7 +160,9 @@ class _HomeViewState extends State<HomeView> {
         ],
       ),
       floatingActionButton: AddNoteButton(
-          child: const Icon(Icons.add,),
+          child: const Icon(
+            Icons.add,
+          ),
           onPressed: () async {
             final result = await Navigator.push(
               context,

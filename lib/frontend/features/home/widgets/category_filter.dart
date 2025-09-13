@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:arfoon_note/client/models/models.dart';
+import 'package:flutter_locales/flutter_locales.dart';
 
 class CategoryFilterChips extends StatelessWidget {
   final List<Label> labels;
@@ -15,7 +16,7 @@ class CategoryFilterChips extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final chips = [Label(name: "All Notes", id: null),...labels];
+    final chips = [Label(name: Locales.string(context, 'all_notes'), id: null),...labels];
     return SizedBox(
       height: 40,
       child: Container(
@@ -27,7 +28,7 @@ class CategoryFilterChips extends StatelessWidget {
           scrollDirection: Axis.horizontal,
           itemCount: chips.length,
           itemBuilder: (context, index) {
-            final selected = index == selectedIndex;
+            final selected = (index == selectedIndex ) ? true : false;
           final label = chips[index];
             return Padding(
               padding: const EdgeInsets.only(right: 8),

@@ -238,6 +238,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_bidi_text:
+    dependency: "direct main"
+    description:
+      name: flutter_bidi_text
+      sha256: "16f6132f438b9e5582ce319800ec9a5e1bb90491047022e462723aea74543c0e"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.2"
   flutter_bloc:
     dependency: "direct main"
     description:
@@ -254,6 +262,19 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.2"
+  flutter_locales:
+    dependency: "direct main"
+    description:
+      name: flutter_locales
+      sha256: "66577a89e60bb159f044ebff15335cc5eb59e171d625dfd449d048d0e5035e65"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.3"
+  flutter_localizations:
+    dependency: transitive
+    description: flutter
+    source: sdk
+    version: "0.0.0"
   flutter_svg:
     dependency: "direct main"
     description:

@@ -11,17 +11,19 @@ class DrawerPage extends StatelessWidget {
   final void Function(Label)? onLabelUpdate;
   final void Function(int id)? onLabelDelete;
    final VoidCallback onProfileTap;
+   final VoidCallback onSettingTap;
 
   const DrawerPage(
       {super.key,
       required this.onLabelSelected,
       this.onLabelAdded,
       this.onLabelUpdate,
-      this.onLabelDelete, required this.labelsCubit, required this.onProfileTap});
+      this.onLabelDelete, required this.labelsCubit, required this.onProfileTap, required this.onSettingTap});
 
   @override
   Widget build(BuildContext context) {
     return CustomDrawer(
+      onSettingTap:onSettingTap ,
       onProfileTap: onProfileTap,
       getLabels: api.noteServer.labels.list,
       addLabel: api.noteServer.labels.insert,
@@ -34,6 +36,7 @@ class DrawerPage extends StatelessWidget {
       userSavedName: api.localStorageService.getUserName,
       getTheme: api.themeRepository.loadTheme,
       saveTheme: api.themeRepository.saveTheme,
+      
     );
 
   }

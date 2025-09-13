@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_locales/flutter_locales.dart';
 
 class NoteDialog extends StatelessWidget {
   final CrossAxisAlignment? crossAxisAlignment;
@@ -23,6 +24,7 @@ class NoteDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
+      
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadiusGeometry.circular(10)),
       child: Padding(
@@ -32,7 +34,7 @@ class NoteDialog extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               if (title != null) ...[
-                Text(
+                LocaleText(
                   title!,
                   style:  TextStyle(
                     fontSize: titleSize ?? 20,
@@ -43,7 +45,7 @@ class NoteDialog extends StatelessWidget {
               ],
               
               if (details != null) ...[
-                Text(
+                LocaleText(
                   details!,
                   style: const TextStyle(
                     fontSize: 14,

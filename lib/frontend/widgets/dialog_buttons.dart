@@ -1,5 +1,6 @@
 import 'package:arfoon_note/frontend/widgets/widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_locales/flutter_locales.dart';
 
 class DialogButtons extends StatefulWidget {
   final double? secondaryButtonElevation;
@@ -46,7 +47,7 @@ class _DialogButtonsState extends State<DialogButtons> {
                   child: Padding(
                     padding:
                         const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                    child: Text(
+                    child: LocaleText(
                       widget.secondaryButtonText,
                       style: const TextStyle(
                         color: Color(0XFF646464),
@@ -100,7 +101,7 @@ class _DialogButtonsState extends State<DialogButtons> {
                     height: 18,
                     child: CircularProgressIndicator(),
                   )
-                : Text(
+                : LocaleText(
                     widget.primaryButtonText,
                     style: const TextStyle(fontSize: 14, color: Colors.white),
                   ))
