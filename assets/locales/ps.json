@@ -43,5 +43,13 @@
   "dark": "توره",
   "language" :"پښتو",
    "welcome_to_arfoon_note": "عرفون نوت ته ښه راغلست",
-  "edit_profile": "پروفایل سمول"
+  "edit_profile": "پروفایل سمول",
+  "change_language": "ژبه بدلون",
+  "change_theme": "تم بدلون",
+  "my_notes": "زما نوتونه",
+  "new" :"نوی",
+  "save_changes": "بدلونونه خوندي کړئ",
+  "create_note": "یادښت جوړ کړئ",
+  "no_note": "هیڅ یادښت نشته",
+  "examples": "بېلګې"
 }

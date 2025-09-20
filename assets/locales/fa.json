@@ -43,7 +43,15 @@
   "dark": "تیره",
   "language" :"فارسی",
   "welcome_to_arfoon_note": "به عرفون نوت خوش آمدید",
-  "edit_profile": "ویرایش پروفایل"
-  
+  "edit_profile": "ویرایش پروفایل",
+  "change_language": "تغییر زبان",
+  "change_theme": "تغییر تم",
+  "my_notes" : "یادداشت های من",
+  "new" :"جدید",
+  "save_changes": "ذخیره تغییرات",
+  "create_note": "ایجاد یادداشت",
+  "no_note": "یادداشتی وجود ندارد",
+   "examples": "مثال‌ها"
+
 
 }

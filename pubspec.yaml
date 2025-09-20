@@ -93,16 +93,15 @@ flutter:
   # example:
   # flutter:
   fonts:
-    - family: Geist
-      fonts:
-        - asset: assets/fonts/Geist-Regular.ttf
-          weight: 400
-        - asset: assets/fonts/Geist-Medium.ttf
-          weight: 500
-        - asset: assets/fonts/Geist-SemiBold.ttf
-          weight: 600
-        - asset: assets/fonts/Geist-Bold.ttf
-          weight: 700
+  - family: Geist
+    fonts:
+      - asset: assets/fonts/Geist-Regular.ttf
+
+
+  - family: Iranian Sans
+    fonts:
+      - asset: assets\fonts\Iranian Sans.ttf
+        
 
   #
   # For details regarding fonts from package dependencies,
