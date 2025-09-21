@@ -1,56 +1,34 @@
+import 'package:arfoon_note/frontend/theme/responsive.dart';
+import 'package:arfoon_note/frontend/widgets/widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_locales/flutter_locales.dart';
 
 class SearchNotesBar extends StatelessWidget {
   final String hintText;
   final ValueChanged<String> onChanged;
   final TextEditingController controller;
+  final EdgeInsetsGeometry? prefixIconPadding;
   const SearchNotesBar({
     required this.controller,
     super.key,
     required this.hintText,
-    required this.onChanged,
+    required this.onChanged, this.prefixIconPadding,
+    
   
   });
 
   @override
   Widget build(BuildContext context) {
+    final isDesktop = Responsive.isDesktop(context);
     return Padding(
-      padding: const EdgeInsets.all(16),
-      child: TextField(
-        onChanged: onChanged,
+      padding: const EdgeInsets.symmetric(horizontal: 2, ),
+      child: CustomeTextField(
+        padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 0),
         controller: controller,
-        decoration: InputDecoration(
-          prefixIcon: const Padding(
-            padding: EdgeInsets.only(
-              left: 8,
-            ),
-            child: Icon(
-              Icons.search,
-              color: Color(0XFF71717A),
-            ),
-          ),
-          contentPadding: const EdgeInsets.all(10),
-          hintText: Locales.string(context, hintText),
-          hintStyle: const TextStyle(
-            color: Color(0xFF71717A),
-            fontSize: 16,
-          ),
-          border: OutlineInputBorder(
-            borderSide: const BorderSide(color: Color(0xFFE4E4E7)),
-            borderRadius: BorderRadius.circular(30),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(30),
-            borderSide: const BorderSide(color: Color(0xFFE4E4E7)),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(30),
-            borderSide: const BorderSide(
-              color: Colors.grey,
-            ),
-          ),
-        ),
+        onChanged: onChanged,
+        prefixIcon: const Icon(Icons.search),
+        hintText: hintText,
+        
+        borderRadius: BorderRadius.circular(isDesktop ? 10 : 30),
       ),
     );
   }

@@ -12,20 +12,23 @@ class DrawerPage extends StatelessWidget {
   final void Function(int id)? onLabelDelete;
    final VoidCallback onProfileTap;
    final VoidCallback onSettingTap;
+   final AwaitCubit<String?> userNameCubit;
 
   const DrawerPage(
       {super.key,
       required this.onLabelSelected,
       this.onLabelAdded,
       this.onLabelUpdate,
-      this.onLabelDelete, required this.labelsCubit, required this.onProfileTap, required this.onSettingTap});
+      this.onLabelDelete, required this.labelsCubit, required this.onProfileTap, required this.onSettingTap, required this.userNameCubit});
 
   @override
   Widget build(BuildContext context) {
     return CustomDrawer(
+      userNameCubit: userNameCubit,
+      labelsCubit: labelsCubit,
       onSettingTap:onSettingTap ,
       onProfileTap: onProfileTap,
-      getLabels: api.noteServer.labels.list,
+    getLabels: api.noteServer.labels.list,
       addLabel: api.noteServer.labels.insert,
       deleteLabel: api.noteServer.labels.deleteLabel,
       updateLabel: api.noteServer.labels.updateLabel,

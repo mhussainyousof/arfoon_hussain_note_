@@ -77,7 +77,7 @@ class _SettingDialogState extends State<SettingDialog> {
       const SizedBox(height: 30),
       SettingLanguage(
         isLocaleText: false,
-        text: 'Change Language',
+        text: 'change_language',
         containerText: _getCurrentLanguageName(context),
         onPressed: () {
           showDialog(
@@ -114,7 +114,7 @@ class _SettingDialogState extends State<SettingDialog> {
       ),
       const SizedBox(height: 20),
       SettingLanguage(
-        text: 'Change Theme',
+        text: 'change_theme',
         containerText: _currentTheme?.name ?? 'Loading...',
         onPressed: () {
           showDialog(

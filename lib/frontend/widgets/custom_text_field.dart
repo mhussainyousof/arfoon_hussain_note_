@@ -18,6 +18,7 @@ class CustomeTextField extends StatelessWidget {
   final FontWeight? fontWeight;
   final Widget? suffixIcon;
   final void Function(String)? onChanged;
+  final  void Function(String)? onSubmitted;
 
   const CustomeTextField({
     super.key,
@@ -33,7 +34,7 @@ class CustomeTextField extends StatelessWidget {
     this.borderWidth = 1,
     this.hasBorder = true,
     this.prefixIcon,
-    this.suffixIcon, this.onChanged, this.fontWeight,
+    this.suffixIcon, this.onChanged, this.fontWeight, this.onSubmitted,
   });
 
   
@@ -46,18 +47,21 @@ class CustomeTextField extends StatelessWidget {
         borderRadius: borderRadius ?? BorderRadius.circular(8),
       ),
       child: BidiTextField(
+        onSubmitted: onSubmitted,
         onChanged:onChanged ,
         controller: controller,
         focusNode: focusNode, 
         maxLines: isMultiline ? maxLines : 1,
         decoration: InputDecoration(
           hintText: Locales.string(context, hintText!),
-          hintStyle: TextStyle(fontSize: hintSize ?? 14, color: const Color.fromARGB(255, 150, 150, 158), fontWeight: fontWeight),
+          hintStyle: TextStyle(
+          fontSize: hintSize ?? 14, color: const Color.fromARGB(255, 150, 150, 158), fontWeight: fontWeight),
           border: InputBorder.none,
           prefixIcon: prefixIcon,
           suffixIcon: suffixIcon,
           isDense: true,
-          contentPadding: EdgeInsets.zero,
+          contentPadding: const EdgeInsets.all(8)
+
         ),
       ),
     );

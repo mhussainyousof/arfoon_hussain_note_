@@ -14,8 +14,15 @@ class AppColors {
 }
 
 class AppTheme {
-  static ThemeData lightTheme() {
+static  bool _isPersion(Locale locale){
+     return locale.languageCode == 'fa' || locale.languageCode == 'ps';
+      
+    }
+  static ThemeData lightTheme(Locale locale) {
+   
     return ThemeData(
+
+      fontFamily: _isPersion(locale) ? 'Iranian Sans' : 'Geist',
       useMaterial3: true,
       brightness: Brightness.light,
         scaffoldBackgroundColor: Colors.white,
@@ -86,6 +93,7 @@ class AppTheme {
 
   static ThemeData darkTheme() {
     return ThemeData(
+      fontFamily: 'Geist',
       useMaterial3: true,
       brightness: Brightness.dark,
       scaffoldBackgroundColor: const Color.fromARGB(255, 13, 13, 13) ,

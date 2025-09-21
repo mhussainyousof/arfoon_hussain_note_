@@ -24,38 +24,41 @@ class NoteDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadiusGeometry.circular(10)),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 20),
-        child: Column(
-            crossAxisAlignment: crossAxisAlignment ?? CrossAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (title != null) ...[
-                LocaleText(
-                  title!,
-                  style:  TextStyle(
-                    fontSize: titleSize ?? 20,
-                    fontWeight: fontWeight ?? FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 15),
-              ],
-              
-              if (details != null) ...[
-                LocaleText(
-                  details!,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                //  SizedBox(height:  detailsHeight ??  0),
-              ],
-              ...children
-            ]),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 300,),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 20),
+          child: SingleChildScrollView(
+            child: Column(
+                crossAxisAlignment: crossAxisAlignment ?? CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (title != null) ...[
+                    LocaleText(
+                      title!,
+                      style:  TextStyle(
+                        fontSize: titleSize ?? 20,
+                        fontWeight: fontWeight ?? FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+                  ],
+                  
+                  if (details != null) ...[
+                    LocaleText(
+                      details!,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                  ...children
+                ]),
+          ),
+        ),
       ),
     );
   }

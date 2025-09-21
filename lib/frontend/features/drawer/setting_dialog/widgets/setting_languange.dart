@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bidi_text/flutter_bidi_text.dart';
 import 'package:flutter_locales/flutter_locales.dart';
 
 class SettingLanguage extends StatelessWidget {
@@ -9,8 +10,9 @@ class SettingLanguage extends StatelessWidget {
   const SettingLanguage({
     super.key,
     required this.text,
-     this.isLocaleText = true,
-    required this.containerText, this.onPressed,
+    this.isLocaleText = true,
+    required this.containerText,
+    this.onPressed,
   });
 
   @override
@@ -18,13 +20,11 @@ class SettingLanguage extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              text,
-              style: const TextStyle(fontSize: 13, color: Color(0xFF646464)),
-            ),
+          BidiText(
+            Locales.string(context, text),
+            style: const TextStyle(fontSize: 13, color: Color(0xFF646464)),
           ),
           const SizedBox(height: 7),
           Container(
@@ -36,20 +36,18 @@ class SettingLanguage extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-
-                isLocaleText ?
-                LocaleText(containerText,
-                    style: const TextStyle(
-                        fontSize: 14, fontWeight: FontWeight.bold))
-                    :  Text(containerText,
-                    style: const TextStyle(
-                        fontSize: 14, fontWeight: FontWeight.bold)),
+                isLocaleText
+                    ? LocaleText(containerText,
+                        style: const TextStyle(
+                            fontSize: 14, fontWeight: FontWeight.bold))
+                    : Text(containerText,
+                        style: const TextStyle(
+                            fontSize: 14, fontWeight: FontWeight.bold)),
                 InkWell(
-                  onTap:onPressed ,
+                  onTap: onPressed,
                   child: const Icon(
                     Icons.unfold_more,
                     color: Color(0xFF646464),
-               
                   ),
                 )
               ],

@@ -1,6 +1,8 @@
 import 'package:arfoon_note/client/models/models.dart';
 import 'package:arfoon_note/frontend/frontend.dart';
 import 'package:arfoon_note/frontend/theme/note_colors.dart';
+import 'package:arfoon_note/frontend/theme/responsive.dart';
+import 'package:arfoon_note/frontend/widgets/sure_dialog_widget.dart';
 import 'package:arfoon_note/integration/integration.dart';
 import 'package:arfoon_note/main.dart';
 import 'package:flutter/material.dart';
@@ -13,20 +15,24 @@ import 'package:intl/intl.dart';
 class NoteCard extends StatelessWidget {
   final Note? note;
   final Future<List<Label>> Function(Filter?) getLabels;
-  final List<Label> allLabels; // All available labels for filtering
+  final List<Label> allLabels;
   final AwaitCubit<List<Label>> labelsCubit;
   final AwaitCubit<List<Note>> notesCubit;
+  final VoidCallback? onTap;
   const NoteCard(
       {super.key,
       required this.note,
       required this.getLabels,
       required this.allLabels,
       required this.notesCubit,
-      required this.labelsCubit});
+      required this.labelsCubit,
+      this.onTap});
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDesktop = Responsive.isDesktop(context);
+
     Color? noteColor = note!.colorId != null
         ? AppColors.noteColors[note!.colorId!]
         : isDark
@@ -39,65 +45,43 @@ class NoteCard extends StatelessWidget {
     return Stack(
       children: [
         InkWell(
-          onTap: () async {
-            // Navigate to edit view when card is tapped
-            final updateNote = await Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (_) => AddEditNoteView(
-                        onSave: (note) async {
-                          await api.noteServer.notes.updateNote(note);
-                          return note;
-                        },
-                        getLabels: getLabels,
-                        note: note, // Pass current note for editing
-                      )),
-            );
-            // If note was updated, refresh both notes and labels
-            if (updateNote != null) {
-              final notesCubit = context.read<AwaitCubit<List<Note>>>();
-              notesCubit.refresh(filter: notesCubit.state.filter);
-              await labelsCubit.refresh();
-            }
-          },
+          onTap: isDesktop
+              ? onTap
+              : () async {
+                  // Navigate to edit view when card is tapped
+                  final updateNote = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => AddEditNoteView(
+                              onSave: (note) async {
+                                await api.noteServer.notes.updateNote(note);
+                                return note;
+                              },
+                              getLabels: getLabels,
+                              note: note, // Pass current note for editing
+                            )),
+                  );
+                  // If note was updated, refresh both notes and labels
+                  if (updateNote != null) {
+                    final notesCubit = context.read<AwaitCubit<List<Note>>>();
+                    notesCubit.refresh(filter: notesCubit.state.filter);
+                    await labelsCubit.refresh();
+                    context.read<AwaitCubit<List<Note>>>().refresh();
+                  }
+                },
 
           //!
           //Delete Note
           onLongPress: () async {
-            final confirm = await showDialog(
-                useRootNavigator: false,
-                context: context,
-                builder: (context) {
-                  return NoteDialog(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    title: 'delete',
-                    details: 'confirm_delete',
-                    children: [
-                      const SizedBox(height: 20),
-                      DialogButtons(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        width: 20,
-                        secondaryButtonElevation: 1,
-                        secondaryButtonText: 'cancel',
-                        primaryButtonText: 'delete',
-                        showSecondary: true,
-                        primaryButtonOnPressed: () async {
-                          await api.noteServer.notes.deleteNote(note!.id!);
-
-                          Navigator.pop(context, true);
-                        },
-                        secondaryButtonOnPressed: () {
-                          Navigator.pop(context, false);
-                        },
-                      )
-                    ],
-                  );
-                });
-
-            if (confirm == true) {
-              context.read<AwaitCubit<List<Note>>>().refresh();
-              await labelsCubit.refresh();
-            }
+          SureView(
+                title: 'delete',
+                subTitle: 'confirm_delete',
+                sureText: 'delete',
+                onSure: () async{
+                  await api.noteServer.notes.deleteNote(note!.id!);
+                  await labelsCubit.refresh();
+                  context.read<AwaitCubit<List<Note>>>().refresh();
+                }).show(context);
           },
           child: Card(
             child: Container(
@@ -112,31 +96,29 @@ class NoteCard extends StatelessWidget {
                 children: [
                   //!
                   //Note Date
-                  if(note?.createdAt != null)
-                  Builder(
-                    builder: (context) {
-                      final date = note!.updatedAt ?? note!.createdAt ;
-                      final local = Locales.currentLocale(context)!.languageCode;
+                  if (note?.createdAt != null)
+                    Builder(builder: (context) {
+                      final date = note!.updatedAt ?? note!.createdAt;
+                      final local =
+                          Locales.currentLocale(context)!.languageCode;
                       String formattedDate;
-                      if(local == 'fa' || local == 'ps'){
+                      if (local == 'fa' || local == 'ps') {
                         formattedDate = DateFormat('d MMM', 'fa').format(date);
-                      }else{
+                      } else {
                         formattedDate = DateFormat('dd MMM').format(date);
                       }
                       return Text(
                         formattedDate,
                         style: TextStyle(color: dateColor, fontSize: 12),
                       );
-                    }
-                  ),
+                    }),
                   const SizedBox(height: 8),
 
                   //!
                   // Note title
                   BidiText(
-                    sampleLength: null,
-
-                    note!.title ?? '',
+                      sampleLength: null,
+                      note!.title ?? '',
                       style: TextStyle(
                           fontSize: 24,
                           color: textColor,

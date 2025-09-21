@@ -1,4 +1,5 @@
 import 'package:arfoon_note/frontend/frontend.dart';
+import 'package:arfoon_note/frontend/features/profile_view/profile_view.dart';
 import 'package:flutter/material.dart';
 
 class HomeExample extends StatelessWidget {
@@ -17,12 +18,16 @@ class HomeExample extends StatelessWidget {
       },
 
       onProfileTap: (){
-        showDialog(context: context, builder: (context)=> ProfileEditDialog(currentName: 'Test User', onNameSaved: (name){
+       ProfileView(
+          submitText: '',
+          title: '',
+        
+          currentName: 'Test User', 
+          onSubmit: (name){
           print('Name would be saved $name');
           Navigator.pop(context);
         }
-        )
-        );
+        ).show(context);
       },
 
       onSettingTap: () {

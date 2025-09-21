@@ -1,6 +1,7 @@
-import 'package:arfoon_note/frontend/features/profile_edit_dialog/profile_wrapper.dart';
 import 'package:arfoon_note/frontend/frontend.dart';
 import 'package:arfoon_note/integration/pages/home_page.dart';
+import 'package:arfoon_note/frontend/features/profile_view/profile_view.dart';
+import 'package:arfoon_note/main.dart';
 import 'package:arfoon_note/server/user_profile.dart';
 import 'package:flutter/material.dart';
 
@@ -14,7 +15,7 @@ class MainApp extends StatefulWidget {
 }
 
 class _MainAppState extends State<MainApp> {
-  bool showWelcome = false;
+  bool _isFirstTime = false;
   bool isLoading = true;
 
   @override
@@ -26,7 +27,7 @@ class _MainAppState extends State<MainApp> {
   Future<void> _checkFirstTime() async {
     final isFirstTime = await UserInfo.isFirstTime();
     setState(() {
-      showWelcome = isFirstTime;
+      _isFirstTime = isFirstTime;
       isLoading = false;
     });
   }
@@ -39,7 +40,18 @@ class _MainAppState extends State<MainApp> {
     }
 
     return FrontendApp(
-      home: showWelcome ? const WelcomeWrapper() : const HomePage(),
+      home: _isFirstTime ?  _welcomeDialog() :  HomePage(),
     );
   }
+  
+  _welcomeDialog() {
+    ProfileView(title:'welcome_to_arfoon_note', submitText: 'continue', currentName: '', onSubmit: (newName) async {
+            await api.localStorageService.saveUserName(newName!);
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => HomePage()),
+            );
+          }, ).show(context);
+  }
 }
+

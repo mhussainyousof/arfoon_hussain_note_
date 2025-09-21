@@ -1,5 +1,7 @@
 import 'package:arfoon_note/client/models/models.dart';
 import 'package:arfoon_note/frontend/frontend.dart';
+import 'package:arfoon_note/frontend/theme/responsive.dart';
+import 'package:arfoon_note/frontend/widgets/sure_dialog_widget.dart';
 import 'package:arfoon_note/integration/integration.dart';
 import 'package:arfoon_note/server/server.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +22,8 @@ class CustomDrawer extends StatefulWidget {
   final Future<String?> Function(Filter?) userSavedName;
   final Future<ThemeState> Function(Filter? filter) getTheme;
   final Future<void> Function(ThemeState) saveTheme;
+  final AwaitCubit<List<Label>> labelsCubit;
+  final AwaitCubit<String?> userNameCubit;
 
   const CustomDrawer(
       {super.key,
@@ -34,35 +38,36 @@ class CustomDrawer extends StatefulWidget {
       required this.onProfileTap,
       required this.userSavedName,
       required this.getTheme,
-      required this.saveTheme, required this.onSettingTap});
+      required this.saveTheme,
+      required this.onSettingTap,
+      required this.labelsCubit,
+     required this.userNameCubit});
 
   @override
   State<CustomDrawer> createState() => _CustomDrawerState();
 }
 
 class _CustomDrawerState extends State<CustomDrawer> {
-  late final AwaitCubit<List<Label>> awaitCubit;
-  late final AwaitCubit<String?> userNameCubit;
 
   String userGreeting = 'welcome';
 
   @override
   void initState() {
     super.initState();
-    awaitCubit = AwaitCubit<List<Label>>();
-    userNameCubit = AwaitCubit<String?>();
-    awaitCubit.load(widget.getLabels, null);
-    userNameCubit.load(widget.userSavedName, null);
+
     _loadUserName();
+
+
   }
+
+
+ 
 
   Future<void> _loadUserName() async {
     setState(() {
-      
       userGreeting = _getGreeting();
     });
   }
-
 
   String _getGreeting() {
     final hour = DateTime.now().hour;
@@ -73,13 +78,11 @@ class _CustomDrawerState extends State<CustomDrawer> {
 
   @override
   Widget build(BuildContext context) {
-
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Drawer(
-
-      //! SafeArea to avoid system UI overlaps
-      child: SafeArea(
+    return SafeArea(
+      child: Drawer(
+        //! SafeArea to avoid system UI overlaps
         child: Column(
           children: [
             //! Header section with app logo and name
@@ -100,12 +103,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                   const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // LocaleText(
-                      //   context.isMobile ? 'arfoon_note' : 'Desktop Note',
-                      //   style: const TextStyle(
-                      //       fontSize: 14, fontWeight: FontWeight.bold),
-                      // ),
-                    LocaleText(
+                      LocaleText(
                         'think_note_achieve',
                         style:
                             TextStyle(fontSize: 12, color: Color(0XFF71717A)),
@@ -135,17 +133,18 @@ class _CustomDrawerState extends State<CustomDrawer> {
               trailing: const Icon(Icons.chevron_right),
               onTap: () {
                 widget.onLabelSelected(Label(name: '', id: null));
-                Navigator.pop(context);
+                Responsive.isDesktop(context) ? null : Navigator.pop(context);
               },
             ),
 
             //! Section title for labels
-             Padding(
+            Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Align(
-
-                alignment: isRTL(context) ? Alignment.centerRight : Alignment.centerLeft,
-                child:const LocaleText(
+                alignment: isRTL(context)
+                    ? Alignment.centerRight
+                    : Alignment.centerLeft,
+                child: const LocaleText(
                   'labels',
                   style: TextStyle(
                     fontSize: 12,
@@ -158,7 +157,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
             //! List of user-defined labels with edit and select functionality
             Expanded(
               child: AwaitBuilder<List<Label>>(
-                cubit: awaitCubit,
+                cubit: widget.labelsCubit,
                 getData: widget.getLabels,
                 builder: (context, state) {
                   if (state.status == AwaitStatus.loading) {
@@ -166,7 +165,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                       child: CircularProgressIndicator(),
                     );
                   }
-                  if (state.status == AwaitStatus.error) {
+                  if (state.status == AwaitStatus.error ) {
                     return Text('Error: ${state.error}');
                   }
 
@@ -201,85 +200,52 @@ class _CustomDrawerState extends State<CustomDrawer> {
                               context: context,
                               useRootNavigator: false,
                               builder: (context) {
-                                return NoteDialog(
-                                  title: 'edit_label',
-                                  fontWeight: FontWeight.bold,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  details: 'label_name',
-                                  children: [
-                                    const SizedBox(height: 8),
-                                    CustomeTextField(
-                                      controller: controller,
-                                      hintText: 'enter_label_name',
-                                    ),
-                                    const SizedBox(height: 40),
-                                    DialogButtons(
-                                      showSecondary: true,
-                                      secondaryButtonText: 'delete',
-                                      primaryButtonText: 'update',
-                                      secondaryButtonOnPressed: () {
-                                        showDialog(
-                                         useRootNavigator: false,
-                                          context: context,
-                                          builder: (context) => NoteDialog(
-                                            title:
-                                                'confirm_delete',
-                                            details:
-                                                'delete_warning',
-                                            children: [
-                                              const SizedBox(height: 15),
-                                              //! Cancel and Delete buttons in confirmation dialog
-                                              DialogButtons(
-                                                  showSecondary: true,
-                                                  secondaryButtonElevation: 0,
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.end,
-                                                  width: 15,
-                                                  primaryButtonOnPressed:
-                                                      () async {
-                                                    await widget
-                                                        .deleteLabel(label.id!);
+                                return SizedBox(
+                                  child: NoteDialog(
+                                    title: 'edit_label',
+                                    fontWeight: FontWeight.bold,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    details: 'label_name',
+                                    children: [
+                                      const SizedBox(height: 8),
+                                      CustomeTextField(
+                                        controller: controller,
+                                        hintText: 'enter_label_name',
+                                      ),
+                                      const SizedBox(height: 40), 
+                                      DialogButtons(
+                                        showTextButton: true,
+                                        secondaryButtonText: 'delete',
+                                        primaryButtonText: 'update',
+                                        secondaryButtonOnPressed: () {
+                                          SureView(title: 'delete', subTitle: 'delete_warning', sureText: 'delete', onSure: ()async{
+                                            await widget.deleteLabel(label.id!);
+                                            await widget.labelsCubit.refresh();
+                                            if(widget.onLabelDeleted != null) widget.onLabelDeleted!(label.id!);
+                                            Navigator.pop(context);
+                                          }).show(context);
+                                        },
 
-                                                    awaitCubit.refresh();
+                                        // Update Label Button
+                                        primaryButtonOnPressed: () async {
+                                          final newName =
+                                              controller.text.trim();
+                                          if (newName.isNotEmpty) {
+                                            await widget.updateLabel(
+                                                label.copyWith(name: newName));
+                                          await  widget.labelsCubit.refresh();
 
-                                                    //! Notifiy Home view
-                                                    if (widget.onLabelDeleted !=
-                                                        null) {
-                                                      widget.onLabelDeleted!(
-                                                          label.id!);
-                                                    }
-                                                    Navigator.pop(context);
-                                                    Navigator.pop(context);
-                                                  },
-                                                  secondaryButtonOnPressed: () {
-                                                    Navigator.pop(context);
-                                                  },
-                                                  secondaryButtonText: 'cancel',
-                                                  primaryButtonText:
-                                                      'delete')
-                                            ],
-                                          ),
-                                        );
-                                      },
-
-                                      // Update Label Button
-                                      primaryButtonOnPressed: () async {
-                                        final newName = controller.text.trim();
-                                        if (newName.isNotEmpty) {
-                                         
-                                          await widget
-                                              .updateLabel(label.copyWith(name: newName));
-                                          awaitCubit.refresh();
-
-                                          if (widget.onLabelUpdated != null) {
-                                            widget
-                                                .onLabelUpdated!(label.copyWith(name: newName));
+                                            if (widget.onLabelUpdated != null) {
+                                              widget.onLabelUpdated!(label
+                                                  .copyWith(name: newName));
+                                            }
+                                            Navigator.pop(context);
                                           }
-                                          Navigator.pop(context);
-                                        }
-                                      },
-                                    ),
-                                  ],
+                                        },
+                                      ),
+                                    ],
+                                  ),
                                 );
                               },
                             );
@@ -288,7 +254,9 @@ class _CustomDrawerState extends State<CustomDrawer> {
 
                         onTap: () {
                           widget.onLabelSelected(label);
-                          Navigator.pop(context);
+                          Responsive.isDesktop(context)
+                              ? null
+                              : Navigator.pop(context);
                         }, //! Select label handler placeholder
                       );
                     },
@@ -312,13 +280,13 @@ class _CustomDrawerState extends State<CustomDrawer> {
                         ),
                         width: 24,
                         height: 24),
-                    title:
-                        const LocaleText('add_label', style: TextStyle(fontSize: 14)),
+                    title: const LocaleText('add_label',
+                        style: TextStyle(fontSize: 14)),
                     onTap: () {
                       final TextEditingController labelController =
                           TextEditingController();
                       showDialog(
-                        useRootNavigator: false,
+                          useRootNavigator: false,
                           context: context,
                           builder: (context) {
                             return NoteDialog(
@@ -334,17 +302,17 @@ class _CustomDrawerState extends State<CustomDrawer> {
                                 ),
                                 const SizedBox(height: 40),
                                 DialogButtons(
-                                  showSecondary: true,
+                                  showTextButton: true,
                                   primaryButtonOnPressed: () async {
                                     final labeleName =
                                         labelController.text.trim();
                                     if (labeleName.isNotEmpty) {
                                       await widget
                                           .addLabel(Label(name: labeleName));
-                                      awaitCubit.refresh();
+                                      widget.labelsCubit.refresh();
                                       if (Navigator.canPop(context)) {
                                         Navigator.pop(context);
-                                      } 
+                                      }
                                       if (widget.onLabelAdded != null) {
                                         widget.onLabelAdded!(
                                             Label(name: labeleName));
@@ -363,18 +331,17 @@ class _CustomDrawerState extends State<CustomDrawer> {
                     },
                   ),
                   //! Settings button - opens settings dialog
-                
-                         ListTile(
-                            horizontalTitleGap: 6,
-                            leading: const Icon(
-                              Icons.settings_outlined,
-                            ),
-                            title: const LocaleText('settings',
-                                style: TextStyle(fontSize: 14)),
-                            onTap: () async{
-                              widget.onSettingTap();
-                            })
-                      
+
+                  ListTile(
+                      horizontalTitleGap: 6,
+                      leading: const Icon(
+                        Icons.settings_outlined,
+                      ),
+                      title: const LocaleText('settings',
+                          style: TextStyle(fontSize: 14)),
+                      onTap: () async {
+                        widget.onSettingTap();
+                      })
                 ],
               ),
             ),
@@ -384,7 +351,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
                 child: AwaitBuilder<String?>(
-                    cubit: userNameCubit,
+                    cubit: widget.userNameCubit,
                     getData: widget.userSavedName,
                     builder: (context, state) {
                       final name = state.data ?? 'guest';
@@ -432,8 +399,9 @@ class _CustomDrawerState extends State<CustomDrawer> {
                               icon: const Icon(Icons.unfold_more),
                               onPressed: () async {
                                 widget.onProfileTap();
-                                        Navigator.pop(context);
-
+                                // !Responsive.isMobile(context)
+                                //     ? null
+                                //     : Navigator.pop(context);
                               }),
                         ],
                       );

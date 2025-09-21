@@ -1,10 +1,17 @@
-
 import 'package:arfoon_note/frontend/features/home/home_example.dart';
+import 'package:arfoon_note/frontend/frontend.dart';
+import 'package:arfoon_note/frontend/widgets/sure_dialog_widget.dart';
 import 'package:arfoon_note/integration/main_app.dart';
+import 'package:arfoon_note/frontend/features/profile_view/profile_view.dart';
+import 'package:arfoon_note/main.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bidi_text/bidi_text.dart';
+import 'package:flutter_locales/flutter_locales.dart';
 
 class ExamplePage extends StatefulWidget {
-  const ExamplePage({super.key,});
+  const ExamplePage({
+    super.key,
+  });
 
   @override
   State<ExamplePage> createState() => _MyHomePageState();
@@ -15,24 +22,111 @@ class _MyHomePageState extends State<ExamplePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          backgroundColor: Colors.black,
-          title: const Text(
-            'Examples',
-            style: TextStyle(color: Colors.white),
-          )),
-      body:  const Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          ExampleButton(
-            text: 'Home Example',
-            route: HomeExample(),
-          ),
-          ExampleButton(
-            text: 'Main App',
-            route: MainApp(),
-          ),
-        ],
+        backgroundColor: Colors.black,
+        title: BidiText(
+          Locales.string(context, 'examples'),
+          style: const TextStyle(color: Colors.white),
+        ),
       ),
+      body: Padding(
+        padding: const EdgeInsets.all(1.0),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              const ListTileWidget(
+                route: HomeExample(), 
+                title: 'Home Example',
+                subTitle:
+                    'Push to HomeExample and Example returns HomeView with calls of getNote(file), getLabels, addNote, onSettingTap, onProfileTap.',
+              ),
+               ListTileWidget(
+                onTap: (){
+                  ProfileView(onSubmit: (value) { },
+                  submitText: '',
+                  title: '',
+                  currentName: ''
+                  );
+                },
+                title: 'Profile View',
+                subTitle:
+                    'This is a dialog and show as ProfileView().show(context) and has parameters of: title, submitText, onSubmit(s)',
+              ),
+              ListTileWidget(
+                dialog: SettingDialog(
+                  getTheme: api.themeRepository.loadTheme, 
+                  saveTheme: api.themeRepository.saveTheme,
+                ), 
+                title: 'Setting view',
+                subTitle:
+                    'This is a dialog and show as SettingsView().show(context) and has parameters of currentLanguage, onLanguageChanged(llang), currentTheme, onThemeChanged(t)',
+              ),
+              ListTileWidget(
+                route: AddEditNoteView(
+                  getLabels: api.noteServer.labels.list,
+                  onSave:api.noteServer.notes.insert,
+                  initialLabel:null,
+                  note: null,
+                ), 
+                title: 'Add Edit Label View',
+                subTitle:
+                    'This is a dialog and show as AddEditLabelView().show(context) and has parameters of: title, onSubmit(s), onDelete',
+              ),
+              ListTileWidget(
+                onTap:(){
+                   SureView(title: 'confirm_delete', subTitle: 'delete_warning', sureText: 'delete', onSure: ()async{
+                  print('label deleted');
+                }).show(context);
+                },
+                title: 'Sure View',
+                subTitle:
+                    'This is a dialog and show as SureView(title: , subtitle: , sureText: , onSure: async (){}).show(context)',
+              ),
+          
+              const ListTileWidget(title: 'Main App', subTitle: '', route: MainApp(),)
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class ListTileWidget extends StatelessWidget {
+  final Widget? route;
+  final Widget? dialog;
+  final String title;
+  final String subTitle;
+  final VoidCallback? onTap;
+
+  const ListTileWidget({
+    super.key,
+    this.route,
+    this.dialog,
+    required this.title,
+    required this.subTitle, this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      dense: true,
+     
+      onTap: onTap ?? () {
+        
+        if (route != null) {
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => route!));
+        } else if (dialog != null) {
+          showDialog(
+            context: context,
+            builder: (context) => dialog!,
+          );
+        }
+      },
+      title: BidiText(title,
+          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 24)),
+      subtitle: BidiText(subTitle),
     );
   }
 }

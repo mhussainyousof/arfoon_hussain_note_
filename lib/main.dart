@@ -10,7 +10,7 @@ import 'package:flutter_locales/flutter_locales.dart';
 import 'package:isar/isar.dart';
 
 late AppService api;
-void main() async {
+void main() async { 
   WidgetsFlutterBinding.ensureInitialized();
   await Isar.initializeIsarCore();
 

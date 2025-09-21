@@ -41,7 +41,7 @@ class _FrontendAppState extends State<FrontendApp> {
             
             debugShowCheckedModeBanner: false,
             title: 'Arfoon Note',
-            theme: AppTheme.lightTheme(),
+            theme: AppTheme.lightTheme(locale!),
             darkTheme: AppTheme.darkTheme(),
             themeMode: _getThemeMode(theme),
             home: widget.home,

@@ -9,8 +9,8 @@ class DialogButtons extends StatefulWidget {
   final String secondaryButtonText;
   final String primaryButtonText;
   final MainAxisAlignment? mainAxisAlignment;
-  final bool? showSecondary;
-  final double? width;
+  final bool? showTextButton;
+  final double? space_of_buttons;
 
   const DialogButtons({
     super.key,
@@ -20,8 +20,8 @@ class DialogButtons extends StatefulWidget {
     required this.secondaryButtonText,
     required this.primaryButtonText,
     this.mainAxisAlignment,
-    this.width,
-    this.showSecondary,
+    this.space_of_buttons,
+    this.showTextButton,
   });
 
   @override
@@ -35,41 +35,48 @@ class _DialogButtonsState extends State<DialogButtons> {
     return Row(
       mainAxisAlignment:
           widget.mainAxisAlignment ?? MainAxisAlignment.spaceBetween,
+          
       children: [
-        widget.showSecondary == true
-            ? Material(
-                color: Colors.white,
-                elevation: widget.secondaryButtonElevation ?? 1,
-                borderRadius: BorderRadius.circular(8),
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(8),
-                  onTap: widget.secondaryButtonOnPressed,
-                  child: Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                    child: LocaleText(
-                      widget.secondaryButtonText,
-                      style: const TextStyle(
-                        color: Color(0XFF646464),
-                        fontSize: 14,
+        widget.showTextButton == true
+            ? Column(
+              children: [
+                Material(
+                    color: Colors.white,
+                    elevation: widget.secondaryButtonElevation ?? 1,
+                    borderRadius: BorderRadius.circular(8),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(8),
+                      onTap: widget.secondaryButtonOnPressed,
+                      child: Padding(
+                        padding:
+                            const EdgeInsets.symmetric(horizontal: 10, vertical:6 ),
+                        child: LocaleText(
+                          widget.secondaryButtonText,
+                          style: const TextStyle(
+                            color: Color(0XFF646464),
+                            fontSize: 14,
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              )
+                  const SizedBox(height: 6,)
+              ],
+            )
             : const SizedBox.shrink(),
-        SizedBox(width: widget.width),
+        SizedBox(width: widget.space_of_buttons),
         ElevatedButton(
             style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)),
+                    borderRadius: BorderRadius.circular(6)),
                 backgroundColor: Colors.black),
             onPressed: isLoading
                 ? null
                 : () async {
                     if (widget.primaryButtonOnPressed != null) {
                       setState(() => isLoading = true);
-
+    
                       try {
                         await widget.primaryButtonOnPressed!();
                       } catch (e) {
@@ -82,7 +89,7 @@ class _DialogButtonsState extends State<DialogButtons> {
                               DialogButtons(
                                 secondaryButtonText: 'textButtonText',
                                 primaryButtonText: 'Ok',
-                                showSecondary: false,
+                                showTextButton: false,
                                 primaryButtonOnPressed: () async {
                                   Navigator.pop(context);
                                 },
