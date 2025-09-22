@@ -182,43 +182,43 @@ void dispose() {
                       if (isDesktop)
                       Column(children: [
                         const SizedBox(height: 20),
-                        Row(
-                           mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                           Column(
-                              children: [
-                                LocaleText(
-                                  'my_notes',
-                                  style: TextStyle(
-                                    overflow: TextOverflow.ellipsis,
-                                      fontSize: isRTL(context) ? 18 : 23 , fontWeight: FontWeight.w700),
-                                ),
-                                const SizedBox(height: 6,)
-                              ],
-                            ),
-                            ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  
-                                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(5)),
-                                    ),
-                                onPressed: ()=> createNote(),
-                                child: const Row(
-                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  
-                                  children: [
-                                    Icon(Icons.add,),
-                                    SizedBox(width: 5, ),
-                                    Padding(
-                                      padding: EdgeInsets.only(bottom: 5),
-                                      child: LocaleText('new'),
-                                    ),
-                                  ],
-                                ))
-                          ],
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                          child: Row(
+                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                             Column(
+                                children: [
+                                  LocaleText(
+                                    'my_notes',
+                                    style: TextStyle(
+                                      overflow: TextOverflow.ellipsis,
+                                        fontSize: isRTL(context) ? 18 : 20 , fontWeight: FontWeight.w700),
+                                  ),
+                                  const SizedBox(height: 6,)
+                                ],
+                              ),
+                              ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    
+                                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(5)),
+                                      ),
+                                  onPressed: ()=> createNote(),
+                                  child: const Row(
+                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            
+                                    children: [
+                                      Icon(Icons.add,size: 14,),
+                                      SizedBox(width: 5, ),
+                                      LocaleText('new', style: TextStyle(fontSize: 12),),
+                                    ],
+                                  ))
+                            ],
+                          ),
                         ),
-                        const SizedBox(height: 30,)
+                        const SizedBox(height: 25,)
                       ],),
                   
                       SearchNotesBar(
@@ -327,6 +327,7 @@ void dispose() {
                   initialLabel: selectedLabel,
                   note: selectedNote,
                   key: ValueKey(selectedNote?.id ?? 'new'),
+                  noteCubit: notesCubit,
                 ),
               ),
             ),

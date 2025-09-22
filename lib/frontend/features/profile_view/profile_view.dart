@@ -66,6 +66,10 @@ class _ProfileViewDialogState extends State<ProfileViewDialog> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return NoteDialog(
+      title: 'edit_label',
+      fontWeight: FontWeight.bold,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      details: 'label_name',
       children: [
         //!
         //App logo
@@ -172,4 +176,3 @@ class _ProfileViewDialogState extends State<ProfileViewDialog> {
     );
   }
 }
-

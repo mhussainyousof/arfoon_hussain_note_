@@ -1,6 +1,7 @@
 import 'package:arfoon_note/client/models/models.dart';
 import 'package:arfoon_note/frontend/frontend.dart';
 import 'package:arfoon_note/frontend/theme/responsive.dart';
+import 'package:arfoon_note/frontend/widgets/add_edit_label_dialog.dart';
 import 'package:arfoon_note/frontend/widgets/sure_dialog_widget.dart';
 import 'package:arfoon_note/integration/integration.dart';
 import 'package:arfoon_note/server/server.dart';
@@ -133,7 +134,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
               trailing: const Icon(Icons.chevron_right),
               onTap: () {
                 widget.onLabelSelected(Label(name: '', id: null));
-                Responsive.isDesktop(context) ? null : Navigator.pop(context);
+                !Responsive.isMobile(context) ? null : Navigator.pop(context);
               },
             ),
 
@@ -176,6 +177,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                     );
                   }
                   return ListView.builder(
+                    
                     itemCount: labels.length,
                     itemBuilder: (context, index) {
                       final label = labels[index];
@@ -193,62 +195,32 @@ class _CustomDrawerState extends State<CustomDrawer> {
                             height: 20,
                           ),
                           onPressed: () {
-                            final TextEditingController controller =
-                                TextEditingController(text: label.name);
-
-                            showDialog(
-                              context: context,
-                              useRootNavigator: false,
-                              builder: (context) {
-                                return SizedBox(
-                                  child: NoteDialog(
-                                    title: 'edit_label',
-                                    fontWeight: FontWeight.bold,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    details: 'label_name',
-                                    children: [
-                                      const SizedBox(height: 8),
-                                      CustomeTextField(
-                                        controller: controller,
-                                        hintText: 'enter_label_name',
-                                      ),
-                                      const SizedBox(height: 40), 
-                                      DialogButtons(
-                                        showTextButton: true,
-                                        secondaryButtonText: 'delete',
-                                        primaryButtonText: 'update',
-                                        secondaryButtonOnPressed: () {
-                                          SureView(title: 'delete', subTitle: 'delete_warning', sureText: 'delete', onSure: ()async{
-                                            await widget.deleteLabel(label.id!);
-                                            await widget.labelsCubit.refresh();
-                                            if(widget.onLabelDeleted != null) widget.onLabelDeleted!(label.id!);
-                                            Navigator.pop(context);
-                                          }).show(context);
-                                        },
-
-                                        // Update Label Button
-                                        primaryButtonOnPressed: () async {
-                                          final newName =
-                                              controller.text.trim();
-                                          if (newName.isNotEmpty) {
-                                            await widget.updateLabel(
-                                                label.copyWith(name: newName));
-                                          await  widget.labelsCubit.refresh();
-
-                                            if (widget.onLabelUpdated != null) {
-                                              widget.onLabelUpdated!(label
-                                                  .copyWith(name: newName));
-                                            }
-                                            Navigator.pop(context);
-                                          }
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                );
+                           AddEditLabelView(
+                            initialValue: label.name,
+                             title: 'label_name',
+                            details: 'label_name',
+                              onSubmit: (newLabel)async{
+                                if(newLabel.isNotEmpty){
+                              await   widget.updateLabel(label.copyWith(name: newLabel));
+                                 await widget.labelsCubit.refresh();
+                               
+                                  if(widget.onLabelUpdated != null){
+                                   widget.onLabelUpdated!(label.copyWith(name: newLabel));
+                                  }
+                                }
                               },
-                            );
+                               onDelete: ()async{
+                                SureView(
+                                  title: 'delete',
+                                  subTitle: 'delete_warning',
+                                  sureText: 'delete',
+                                  onSure: ()async{
+                                  await widget.deleteLabel(label.id!);
+                                  await widget.labelsCubit.refresh();
+                                  if(widget.onLabelDeleted != null) widget.onLabelDeleted!(label.id!);
+                                  Navigator.pop(context);
+                                }).show(context);
+                               }).show(context);
                           },
                         ),
 
@@ -283,51 +255,23 @@ class _CustomDrawerState extends State<CustomDrawer> {
                     title: const LocaleText('add_label',
                         style: TextStyle(fontSize: 14)),
                     onTap: () {
-                      final TextEditingController labelController =
-                          TextEditingController();
-                      showDialog(
-                          useRootNavigator: false,
-                          context: context,
-                          builder: (context) {
-                            return NoteDialog(
-                              title: 'new_label',
-                              fontWeight: FontWeight.bold,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              details: 'label_name',
-                              children: [
-                                const SizedBox(height: 8),
-                                CustomeTextField(
-                                  controller: labelController,
-                                  hintText: 'creative_label_name',
-                                ),
-                                const SizedBox(height: 40),
-                                DialogButtons(
-                                  showTextButton: true,
-                                  primaryButtonOnPressed: () async {
-                                    final labeleName =
-                                        labelController.text.trim();
-                                    if (labeleName.isNotEmpty) {
-                                      await widget
-                                          .addLabel(Label(name: labeleName));
-                                      widget.labelsCubit.refresh();
-                                      if (Navigator.canPop(context)) {
-                                        Navigator.pop(context);
-                                      }
-                                      if (widget.onLabelAdded != null) {
-                                        widget.onLabelAdded!(
-                                            Label(name: labeleName));
-                                      }
-                                    }
-                                  },
-                                  secondaryButtonText: 'cancel',
-                                  primaryButtonText: 'save_label',
-                                  secondaryButtonOnPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                )
-                              ],
-                            );
-                          });
+
+                      AddEditLabelView(
+                        initialValue: null,
+                        title: 'new_label',
+                        details: 'label_name',
+                        onSubmit: (labelName)async{
+                          if(labelName.isNotEmpty){
+                            final newLabel = await widget.addLabel(Label(name: labelName));
+                            await widget.labelsCubit.refresh();
+                            if(widget.onLabelAdded != null){
+                              widget.onLabelAdded!(newLabel);
+                            }
+                          }
+                        },
+                        onDelete: ()=> Navigator.pop(context),
+                      ).show(context);
+
                     },
                   ),
                   //! Settings button - opens settings dialog

@@ -28,7 +28,7 @@ class SureView {
                 showTextButton: true,
                 secondaryButtonElevation: 0,
                 mainAxisAlignment: MainAxisAlignment.end,
-                space_of_buttons: 15,
+                spaceOfButtons: 15,
                 primaryButtonOnPressed: () async {
                   await onSure();
                   Navigator.pop(context);

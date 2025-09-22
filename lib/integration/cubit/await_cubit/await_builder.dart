@@ -1,7 +1,7 @@
-  import 'package:arfoon_note/client/models/models.dart';
-  import 'package:arfoon_note/integration/integration.dart';
-  import 'package:flutter/material.dart';
-  import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arfoon_note/client/models/models.dart';
+import 'package:arfoon_note/integration/integration.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AwaitBuilder<T> extends StatefulWidget {
   const AwaitBuilder({
@@ -28,25 +28,20 @@ class _AwaitBuilderState<T> extends State<AwaitBuilder<T>> {
   void initState() {
     super.initState();
 
-    awaitCubit = widget.cubit ?? AwaitCubit<T>();
+    awaitCubit = widget.cubit!;
 
-    if (widget.cubit == null) {
-
+    final currentState = widget.cubit!.state;
+    if (currentState.data == null || currentState.status == AwaitStatus.error) {
       _loadData();
-    } else {
-      final currentState = widget.cubit!.state;
-      if (currentState.data == null || currentState.status == AwaitStatus.error) {
-        _loadData();
-      }
     }
   }
 
   void _loadData() {
-      awaitCubit.load(
-        widget.getData,
-        widget.initalFilter,
-        inital: true,
-      );
+    awaitCubit.load(
+      widget.getData,
+      widget.initalFilter,
+      inital: true,
+    );
   }
 
   @override

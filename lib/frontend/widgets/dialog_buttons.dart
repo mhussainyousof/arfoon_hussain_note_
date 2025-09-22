@@ -10,7 +10,7 @@ class DialogButtons extends StatefulWidget {
   final String primaryButtonText;
   final MainAxisAlignment? mainAxisAlignment;
   final bool? showTextButton;
-  final double? space_of_buttons;
+  final double? spaceOfButtons;
 
   const DialogButtons({
     super.key,
@@ -20,7 +20,7 @@ class DialogButtons extends StatefulWidget {
     required this.secondaryButtonText,
     required this.primaryButtonText,
     this.mainAxisAlignment,
-    this.space_of_buttons,
+    this.spaceOfButtons,
     this.showTextButton,
   });
 
@@ -64,7 +64,7 @@ class _DialogButtonsState extends State<DialogButtons> {
               ],
             )
             : const SizedBox.shrink(),
-        SizedBox(width: widget.space_of_buttons),
+        SizedBox(width: widget.spaceOfButtons),
         ElevatedButton(
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -76,7 +76,6 @@ class _DialogButtonsState extends State<DialogButtons> {
                 : () async {
                     if (widget.primaryButtonOnPressed != null) {
                       setState(() => isLoading = true);
-    
                       try {
                         await widget.primaryButtonOnPressed!();
                       } catch (e) {

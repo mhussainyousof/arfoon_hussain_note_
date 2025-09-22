@@ -75,7 +75,6 @@ class _MyHomePageState extends State<ExamplePage> {
               ListTileWidget(
                 onTap:(){
                    SureView(title: 'confirm_delete', subTitle: 'delete_warning', sureText: 'delete', onSure: ()async{
-                  print('label deleted');
                 }).show(context);
                 },
                 title: 'Sure View',

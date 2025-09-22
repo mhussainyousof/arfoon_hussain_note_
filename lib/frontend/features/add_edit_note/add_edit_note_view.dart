@@ -1,10 +1,10 @@
 import 'package:arfoon_note/frontend/features/home/widgets/home_appbar.dart';
 import 'package:arfoon_note/frontend/frontend.dart';
 import 'package:arfoon_note/frontend/theme/responsive.dart';
+import 'package:arfoon_note/frontend/widgets/sure_dialog_widget.dart';
 import 'package:arfoon_note/integration/integration.dart';
 import 'package:arfoon_note/main.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:intl/intl.dart';
 import '../../../client/client.dart';
@@ -15,26 +15,27 @@ class AddEditNoteView extends StatefulWidget {
   final Future<List<Label>> Function(Filter?) getLabels;
   final Future<Note> Function(Note) onSave;
   final Label? initialLabel;
-  
+  final AwaitCubit<List<Note>>? noteCubit;
+
   const AddEditNoteView({
-      super.key,
-      this.note,
-      required this.onSave,
-      required this.getLabels,
-      this.initialLabel,
-      });
+    super.key,
+    this.note,
+    required this.onSave,
+    required this.getLabels,
+    this.initialLabel,
+    this.noteCubit,
+  });
 
   @override
   State<AddEditNoteView> createState() => _AddEditNoteViewState();
 }
 
 class _AddEditNoteViewState extends State<AddEditNoteView> {
-  // Text controllers for form fields8
   late final TextEditingController _titleController;
   late final TextEditingController _descriptionController;
   late TextEditingController _labelController;
 
-  late final  AwaitCubit<List<Label?>> labelCubit;
+  late final AwaitCubit<List<Label?>> labelCubit;
 
   // State variables
   final List<int> _selectedLabelIds = [];
@@ -47,7 +48,7 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
   void initState() {
     super.initState();
     _note = widget.note;
-    labelCubit =  AwaitCubit<List<Label>>();
+    labelCubit = AwaitCubit<List<Label>>();
     _initializeControllers();
     _initializeSelections(); // Initialize selected labels and color
     _loadLabels(); // Load available labels
@@ -69,7 +70,7 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
   void _updateControllers() {
     _titleController.text = _note?.title ?? '';
     _descriptionController.text = _note?.details ?? '';
-    _labelController.text ='';
+    _labelController.text = '';
   }
 
   void _updateSelections() {
@@ -122,13 +123,13 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
     if (widget.initialLabel?.id != null) {
       _selectedLabelIds.add(widget.initialLabel!.id!);
     }
-   
 
+    setState(() {});
   }
 
   Note get currentNote {
     return Note(
-        id: _note?.id, 
+        id: _note?.id,
         createdAt: _note?.createdAt ?? DateTime.now(),
         updatedAt: _note != null ? DateTime.now() : null,
         title: _titleController.text,
@@ -172,7 +173,7 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
   Future<void> _handleNewLabelCreation() async {
     final text = _labelController.text.trim();
     if (text.isEmpty) return;
-                                                                      
+
     // Check if label already exists
     final allLabels = await api.noteServer.labels.list(null);
     final exists =
@@ -183,20 +184,16 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
       final newLabel = await api.noteServer.labels.insert(Label(name: text));
       if (newLabel.id != null && !_selectedLabelIds.contains(newLabel.id)) {
         _selectedLabelIds.add(newLabel.id!);
-
       }
-       labelCubit.refresh();
-
-
+      labelCubit.refresh();
     }
-
   }
 
   // Save the note using the provided onSave callback
   Future<void> _saveNote() async {
     final updatedNote = currentNote.copyWith(labelIds: _selectedLabelIds);
     final savedNote = await widget.onSave(updatedNote);
-
+     if (!mounted) return;
     if (!Responsive.isDesktop(context) && mounted) {
       Navigator.pop(context, savedNote);
     } else {
@@ -216,14 +213,14 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
   void dispose() {
     _titleController.dispose();
     _descriptionController.dispose();
-    // _labelController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final isDesktop = Responsive.isDesktop(context);
-    return SafeArea(
+    return Padding(
+      padding: const EdgeInsets.only(top: 22),
       child: Scaffold(
         resizeToAvoidBottomInset: true,
         appBar: HomeAppBar(
@@ -236,10 +233,11 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
           ),
           centerTitle: false,
           isLocalTitle: false,
-          
-          title: _note != null && isDesktop? 
-          '${Locales.string(context, 'my_notes')} > ${_note!.title}' : !isDesktop ? '' : Locales.string(context, 'my_notes'),
-          
+          title: _note != null && isDesktop
+              ? '${Locales.string(context, 'my_notes')} > ${_note!.title}'
+              : !isDesktop
+                  ? ''
+                  : Locales.string(context, 'my_notes'),
           titleSize: 14,
           titleFontWeight: FontWeight.bold,
           leading: isDesktop
@@ -251,7 +249,9 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
                   ),
                 ),
           trailing: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0, ),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 8.0,
+            ),
             child: Row(
               children: [
                 //!
@@ -274,7 +274,6 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: Colors.grey,
                             fontSize: 11,
-
                           ),
                     );
                   }),
@@ -282,64 +281,51 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
       
                 //!
                 // Create and Update note button for desktop
-                if(isDesktop)
-                TextButton(
-                    style: ButtonStyle(
-                        shape: WidgetStateProperty.all(RoundedRectangleBorder(
-                            borderRadius: BorderRadiusGeometry.circular(7))),
-                        foregroundColor: WidgetStateProperty.all(Colors.black),
-                        backgroundColor:
-                            WidgetStateProperty.all(Colors.grey[100])),
-                    onPressed: _onSave,
-                    child: Row(
-                      children: [
-                        const Icon(Icons.save_as_outlined),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        LocaleText(_note != null ? 'save_changes' : 'create_note'),
-                      ],
-                    )),
+                if (isDesktop)
+                  TextButton(
+                      style: ButtonStyle(
+                          shape: WidgetStateProperty.all(RoundedRectangleBorder(
+                              borderRadius: BorderRadiusGeometry.circular(7))),
+                          foregroundColor:
+                              WidgetStateProperty.all(Colors.black),
+                          backgroundColor:
+                              WidgetStateProperty.all(Colors.grey[100])),
+                      onPressed: _onSave,
+                      child: Row(
+                        children: [
+                          const Icon(Icons.save_as_outlined),
+                          const SizedBox(
+                            width: 5,
+                          ),
+                          LocaleText(
+                              _note != null ? 'save_changes' : 'create_note'),
+                        ],
+                      )),
       
                 //!
                 // Delete Note button
-                if (!_isEmptyNote)
+                if (!_isEmptyNote && _note != null)
                   IconButton(
                     onPressed: () async {
-                      showDialog(
-                          context: context,
-                          builder: (context) {
-                            return NoteDialog(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                title: 'delete',
-                                details: 'confirm_delete',
-                                children: [
-                                  const SizedBox(height: 20),
-                                  DialogButtons(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    space_of_buttons: 20,
-                                    secondaryButtonElevation: 1,
-                                    showTextButton: true,
-                                    secondaryButtonText: 'cancel',
-                                    primaryButtonText: 'delete',
-                                    secondaryButtonOnPressed: () =>
-                                        Navigator.pop(context),
-                                    primaryButtonOnPressed: () async {
-                                      await api.noteServer.notes
-                                          .deleteNote(widget.note!.id!);
-                                      Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                   HomePage()));
-                                    },
-                                  )
-                                ]);
-                          });
-                      context.read<AwaitCubit<List<Note>>>().refresh();
-                      await labelCubit.refresh();
+                      SureView(
+                          title: 'delete',
+                          subTitle: 'confirm_delete',
+                          sureText: 'delete',
+                          onSure: () async {
+                            await api.noteServer.notes
+                                .deleteNote(widget.note!.id!);
+                            if (!isDesktop) {
+                              Navigator.pop(
+                                context,
+                              );
+                            } else {
+                                _clearForm();
+                            }
+                            await widget.noteCubit!.refresh();
+                            await labelCubit.refresh();
+                          }).show(context);
                     },
-                    icon: Icon(widget.note != null ? Icons.delete : null),
+                    icon: const Icon( Icons.delete),
                   ),
               ],
             ),
@@ -350,7 +336,7 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
         body: Stack(
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 5,vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -369,7 +355,7 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
                       } else {
                         formattedDate = DateFormat('dd MMM').format(date);
                       }
-              
+      
                       return Text(
                         '${Locales.string(context, isUpdated ? 'updated_at' : 'created_at')} $formattedDate',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -377,7 +363,7 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
                             ),
                       );
                     }),
-              
+      
                   const SizedBox(height: 8),
                   //! Title input field
                   CustomeTextField(
@@ -387,7 +373,7 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
                     hasBorder: false,
                     fontWeight: FontWeight.bold,
                   ),
-              
+      
                   //! Expanded description text field
                   Expanded(
                     child: CustomeTextField(
@@ -406,15 +392,15 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
                       if (state.status == AwaitStatus.loading) {
                         return const SizedBox();
                       }
-              
+      
                       final labels = state.data ?? [];
-              
+      
                       // Filter to only selected labels
                       final selectedLabels = labels
                           .where(
                               (label) => _selectedLabelIds.contains(label?.id))
                           .toList();
-              
+      
                       // Display selected labels as chips
                       return Wrap(
                         spacing: 6,
@@ -430,7 +416,7 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
                       );
                     },
                   ),
-              
+      
                   const Divider(),
                   Row(
                     children: [
@@ -464,11 +450,11 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
                             if (value.text.isEmpty) {
                               return const Iterable<Label>.empty();
                             }
-              
+      
                             final labels =
                                 await api.noteServer.labels.list(null);
                             final query = value.text.toLowerCase();
-              
+      
                             return labels.where(
                               (label) =>
                                   label.name.toLowerCase().contains(query),
@@ -496,132 +482,154 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
                           },
                         ),
                       ),
-                  isDesktop ?  Padding(
-                    padding: const EdgeInsets.only(top: 7),
-                    child: SizedBox(
-                              width: 150,
-                              height: 35,
-                              child: Stack(
-                                children: [
-                                  if(!_isColorExpanded) ...[
-                                    Positioned(
-                            right: isRTL(context) ? 55 : 70,
-                            child: GestureDetector(
-                              onTap: () => _selectColor(0),
-                              child: _buildColorCircle(0, 0, isSelected: _selectedColorId == 0),
-                            ),
-                                    ),
-                                    Positioned(
-                            right: isRTL(context) ? 88 : 35,
-                            child: GestureDetector(
-                              onTap: () => _selectColor(1),
-                              child: _buildColorCircle(1, 0, isSelected: _selectedColorId == 1),
-                            ),
-                                    ),
-                                    Positioned(
-                            right: isRTL(context) ? 120 : 0,
-                            child: GestureDetector(
-                              onTap: () => _selectColor(2),
-                              child: _buildColorCircle(2, 0, isSelected: _selectedColorId == 2),
-                            ),
-                                    ),
+                      isDesktop
+                          ? Padding(
+                              padding: const EdgeInsets.only(top: 7),
+                              child: SizedBox(
+                                width: 150,
+                                height: 35,
+                                child: Stack(
+                                  children: [
+                                    if (!_isColorExpanded) ...[
+                                      Positioned(
+                                        right: isRTL(context) ? 55 : 70,
+                                        child: GestureDetector(
+                                          onTap: () => _selectColor(0),
+                                          child: _buildColorCircle(0, 0,
+                                              isSelected:
+                                                  _selectedColorId == 0),
+                                        ),
+                                      ),
+                                      Positioned(
+                                        right: isRTL(context) ? 88 : 35,
+                                        child: GestureDetector(
+                                          onTap: () => _selectColor(1),
+                                          child: _buildColorCircle(1, 0,
+                                              isSelected:
+                                                  _selectedColorId == 1),
+                                        ),
+                                      ),
+                                      Positioned(
+                                        right: isRTL(context) ? 120 : 0,
+                                        child: GestureDetector(
+                                          onTap: () => _selectColor(2),
+                                          child: _buildColorCircle(2, 0,
+                                              isSelected:
+                                                  _selectedColorId == 2),
+                                        ),
+                                      ),
+                                    ],
+                                    if (_selectedColorId != null)
+                                      Positioned(
+                                        right: isRTL(context) ? 25 : 105,
+                                        top: 2.5,
+                                        child: GestureDetector(
+                                          onTap: () => _selectColor(null),
+                                          child: Container(
+                                            width: 25,
+                                            height: 25,
+                                            decoration: BoxDecoration(
+                                              color: Colors.grey[300],
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: const Icon(Icons.close,
+                                                size: 18, color: Colors.grey),
+                                          ),
+                                        ),
+                                      ),
                                   ],
-                                  
-                                  if(_selectedColorId != null)
-                                  Positioned(
-                                    right: isRTL(context) ? 25 : 105,
-                                    top: 2.5,
-                                    child: GestureDetector(
-                            onTap: () => _selectColor(null),
-                            child: Container(
-                              width: 25,
-                              height: 25,
-                              decoration: BoxDecoration(
-                                color: Colors.grey[300],
-                                shape: BoxShape.circle,
+                                ),
                               ),
-                              child: const Icon(Icons.close, size: 18, color: Colors.grey),
-                            ),
-                                    ),
+                            )
+                          :
+      
+                          //!
+                          // Mobile version continues...
+                          GestureDetector(
+                              onTap: _toggleColorExpansion,
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 7),
+                                child: SizedBox(
+                                  width: _isColorExpanded ? 150 : 60,
+                                  height: 35,
+                                  child: Stack(
+                                    children: [
+                                      // When user sees first of note colors
+                                      if (_selectedColorId == null &&
+                                          !_isColorExpanded) ...[
+                                        Positioned(
+                                            right: 0,
+                                            child: _buildColorCircle(0, 0)),
+                                        Positioned(
+                                            right: 15,
+                                            child: _buildColorCircle(1, 0)),
+                                        Positioned(
+                                            right: 30,
+                                            child: _buildColorCircle(2, 0)),
+                                      ],
+      
+                                      // When user clicks on colors to pick one
+                                      if (_isColorExpanded) ...[
+                                        Positioned(
+                                          right: isRTL(context) ? 55 : 70,
+                                          child: GestureDetector(
+                                            onTap: () => _selectColor(2),
+                                            child: _buildColorCircle(2, 0,
+                                                isSelected:
+                                                    _selectedColorId == 2),
+                                          ),
+                                        ),
+                                        Positioned(
+                                          right: isRTL(context) ? 88 : 35,
+                                          child: GestureDetector(
+                                            onTap: () => _selectColor(1),
+                                            child: _buildColorCircle(1, 0,
+                                                isSelected:
+                                                    _selectedColorId == 1),
+                                          ),
+                                        ),
+                                        Positioned(
+                                          right: isRTL(context) ? 120 : 0,
+                                          child: GestureDetector(
+                                            onTap: () => _selectColor(0),
+                                            child: _buildColorCircle(0, 0,
+                                                isSelected:
+                                                    _selectedColorId == 0),
+                                          ),
+                                        ),
+                                        Positioned(
+                                          right: isRTL(context) ? 25 : 105,
+                                          top: 2.5,
+                                          child: GestureDetector(
+                                            onTap: () => _selectColor(null),
+                                            child: Container(
+                                              width: 25,
+                                              height: 25,
+                                              decoration: BoxDecoration(
+                                                color: Colors.grey[300],
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: const Icon(Icons.close,
+                                                  size: 18, color: Colors.grey),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+      
+                                      // When user picks one color
+                                      if (_selectedColorId != null &&
+                                          !_isColorExpanded)
+                                        Positioned(
+                                          right: isRTL(context) ? 30 : 0,
+                                          child: _buildColorCircle(
+                                              _selectedColorId!, 0,
+                                              isSelected: true),
+                                        ),
+                                    ],
                                   ),
-                                ],
+                                ),
                               ),
-                            ),
-                  ) : 
-        
-        //!
-          // Mobile version continues...
-          GestureDetector(
-          onTap: _toggleColorExpansion,
-          child:  Padding(
-            padding: const EdgeInsets.only(top: 7),
-            child: SizedBox(
-              width: _isColorExpanded ? 150 : 60,
-              height: 35,
-              child: Stack(
-                children: [
-                    // When user sees first of note colors
-                    if (_selectedColorId == null && !_isColorExpanded) ...[
-                      Positioned(right: 0, child: _buildColorCircle(0, 0)),
-                      Positioned(right: 15, child: _buildColorCircle(1, 0)),
-                      Positioned(right: 30, child: _buildColorCircle(2, 0)),
-                    ],
-                      
-                    // When user clicks on colors to pick one
-                    if (_isColorExpanded) ...[
-                      Positioned(
-            right: isRTL(context) ? 55 : 70,
-            child: GestureDetector(
-              onTap: () => _selectColor(2),
-              child: _buildColorCircle(2, 0, isSelected: _selectedColorId == 2),
-            ),
-                      ),
-                      Positioned(
-            right: isRTL(context) ? 88 : 35,
-            child: GestureDetector(
-              onTap: () => _selectColor(1),
-              child: _buildColorCircle(1, 0, isSelected: _selectedColorId == 1),
-            ),
-                      ),
-                      Positioned(
-            right: isRTL(context) ? 120 : 0,
-            child: GestureDetector(
-              onTap: () => _selectColor(0),
-              child: _buildColorCircle(0, 0, isSelected: _selectedColorId == 0),
-            ),
-                      ),
-                      Positioned(
-            right: isRTL(context) ? 25 : 105,
-            top: 2.5,
-            child: GestureDetector(
-              onTap: () => _selectColor(null),
-              child: Container(
-                width: 25,
-                height: 25,
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.close, size: 18, color: Colors.grey),
-              ),
-            ),
-                      ),
-                    ],
-            
-                    // When user picks one color
-                    if (_selectedColorId != null && !_isColorExpanded)
-                      Positioned(
-            right: isRTL(context) ? 30 : 0,
-            child: _buildColorCircle(_selectedColorId!, 0, isSelected: true),
-                      ),
-                ],
-              ),
-            ),
-          ),
-        )
-              
-              
-                      
+                            )
                     ],
                   ),
                 ],
@@ -638,7 +646,8 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
   }
 }
 
-Widget _buildColorCircle(int colorIndex, double rightSpace, {bool isSelected = false}) {
+Widget _buildColorCircle(int colorIndex, double rightSpace,
+    {bool isSelected = false}) {
   return Container(
     width: 30,
     height: 30,

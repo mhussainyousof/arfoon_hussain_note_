@@ -3,7 +3,6 @@ import 'package:arfoon_note/integration/cubit/await_cubit/await_builder.dart';
 import 'package:arfoon_note/integration/cubit/await_cubit/await_cubit.dart';
 import 'package:arfoon_note/main.dart';
 import 'package:arfoon_note/server/theme.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_locales/flutter_locales.dart';
