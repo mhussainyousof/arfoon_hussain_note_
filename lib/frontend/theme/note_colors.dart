@@ -14,15 +14,12 @@ class AppColors {
 }
 
 class AppTheme {
-static  bool _isPersion(Locale locale){
-     return locale.languageCode == 'fa' || locale.languageCode == 'ps';
-      
-    }
+
   static ThemeData lightTheme(Locale locale) {
    
     return ThemeData(
 
-      fontFamily: _isPersion(locale) ? 'Iranian Sans' : 'Geist',
+      fontFamily:'Geist',
       useMaterial3: true,
       brightness: Brightness.light,
         scaffoldBackgroundColor: Colors.white,

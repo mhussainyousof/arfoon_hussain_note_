@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bidi_text/flutter_bidi_text.dart';
 import 'package:flutter_locales/flutter_locales.dart';
 
+
 class SettingOption extends StatelessWidget {
   final String labelKey;
   final String valueText;
   final VoidCallback? onPressed;
-  final bool isLocaleText;
+  final bool isLocaleText; // to check if the valueText must be translated or not
   const SettingOption({
     super.key,
     required this.labelKey,
@@ -21,6 +22,9 @@ class SettingOption extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
+
+        //!
+         // setting language and theme option
         children: [
           BidiText(
             Locales.string(context, labelKey),

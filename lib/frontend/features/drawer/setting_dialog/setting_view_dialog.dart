@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_locales/flutter_locales.dart';
-import 'package:arfoon_note/frontend/features/drawer/setting_dialog/widgets/setting_languange.dart';
+import 'package:arfoon_note/frontend/features/drawer/setting_dialog/widgets/setting_option.dart';
 import 'package:arfoon_note/frontend/frontend.dart';
 import 'package:arfoon_note/server/theme.dart';
 
@@ -15,8 +15,6 @@ class SettingView {
     required this.currentTheme,
     required this.onThemeChanged,
   });
-
-
   void show(BuildContext context) {
     showDialog(
       useRootNavigator: false,
@@ -59,13 +57,15 @@ class _SettingDialogState extends State<SettingDialog> {
     _currentlanguage = widget.currentLangugage;
     _currentTheme = widget.currentTheme;
   }
-
+//!
+// mao of languages
   final _languages = {
     'en': 'English',
     'fa': 'فارسی',
     'ps': 'پښتو',
   };
-
+//!
+// List of themes
   final _themes = [
     ThemeState.system,
     ThemeState.light,
@@ -74,14 +74,18 @@ class _SettingDialogState extends State<SettingDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return NoteDialog(children: [
+    return NoteDialog(
+      children: [
       const Icon(
         Icons.settings,
         size: 60,
       ),
       const SizedBox(height: 20),
-      const LocaleText('welcome'),
+      const LocaleText('Setting'),
       const SizedBox(height: 30),
+
+      //!
+      // Language option
       SettingOption(
         isLocaleText: false,
         labelKey: 'change_language',
@@ -105,10 +109,16 @@ class _SettingDialogState extends State<SettingDialog> {
           );
         },
       ),
+
+
       const SizedBox(height: 20),
+
+      //!
+      // Theme option
       SettingOption(
         labelKey: 'change_theme',
         valueText: _currentTheme.name,
+        // isLocaleText: true,
         onPressed: () {
           showDialog(
             useRootNavigator: false,
@@ -117,7 +127,7 @@ class _SettingDialogState extends State<SettingDialog> {
               children: 
               _themes.map((theme){
                 return SimpleDialogOption(
-                  child: Text(theme.name),
+                  child: LocaleText(theme.name),
                   onPressed: () {
                     setState(()=> _currentTheme=theme);
                     widget.onThemeChanged(theme);

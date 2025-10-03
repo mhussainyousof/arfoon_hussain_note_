@@ -1,8 +1,8 @@
 import 'package:arfoon_note/client/models/models.dart';
 import 'package:arfoon_note/frontend/frontend.dart';
 import 'package:arfoon_note/frontend/theme/responsive.dart';
-import 'package:arfoon_note/frontend/widgets/add_edit_label_view_dialog.dart';
-import 'package:arfoon_note/frontend/widgets/sure_dialog_widget.dart';
+import 'package:arfoon_note/frontend/widgets/add_edit_label_dialog_view.dart';
+import 'package:arfoon_note/frontend/widgets/sure_dialog_view.dart';
 import 'package:arfoon_note/integration/integration.dart';
 import 'package:arfoon_note/server/server.dart';
 import 'package:flutter/material.dart';

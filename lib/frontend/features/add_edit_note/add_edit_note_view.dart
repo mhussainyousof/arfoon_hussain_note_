@@ -1,7 +1,6 @@
 import 'package:arfoon_note/frontend/features/home/widgets/home_appbar.dart';
 import 'package:arfoon_note/frontend/frontend.dart';
 import 'package:arfoon_note/frontend/theme/responsive.dart';
-import 'package:arfoon_note/frontend/widgets/sure_dialog_widget.dart';
 import 'package:arfoon_note/integration/integration.dart';
 import 'package:arfoon_note/main.dart';
 import 'package:flutter/material.dart';
@@ -31,13 +30,19 @@ class AddEditNoteView extends StatefulWidget {
 }
 
 class _AddEditNoteViewState extends State<AddEditNoteView> {
+  // ----------------------------
+  // Controllers
+  // ----------------------------
   late final TextEditingController _titleController;
   late final TextEditingController _descriptionController;
   late TextEditingController _labelController;
 
+  //! Cubit
   late final AwaitCubit<List<Label?>> labelCubit;
 
-  // State variables
+  // ----------------------------
+  // State Variables
+  // ----------------------------
   final List<int> _selectedLabelIds = [];
   bool _isLoading = false;
   bool _isColorExpanded = false;
@@ -47,63 +52,53 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
   @override
   void initState() {
     super.initState();
-    _note = widget.note;
     labelCubit = AwaitCubit<List<Label>>();
-    _initializeControllers();
-    _initializeSelections(); // Initialize selected labels and color
+    _titleController = TextEditingController();
+    _descriptionController = TextEditingController();
+    _labelController = TextEditingController();
+
+    setupNoteState();
     _loadLabels(); // Load available labels
   }
 
   @override
   void didUpdateWidget(AddEditNoteView oldWidget) {
     super.didUpdateWidget(oldWidget);
-
+    //!
     // If the note prop changed, update the internal state
     if (widget.note != oldWidget.note) {
       _note = widget.note;
-      _updateControllers();
+      setupNoteState(widget.note);
       _loadLabels();
-      _updateSelections();
     }
   }
 
-  void _updateControllers() {
+  //!
+  // setupNoteState
+  void setupNoteState([Note? note]) {
+    _note = note ?? widget.note;
+
     _titleController.text = _note?.title ?? '';
     _descriptionController.text = _note?.details ?? '';
     _labelController.text = '';
-  }
 
-  void _updateSelections() {
-    _selectedLabelIds.clear();
-    _selectedLabelIds.addAll(_note?.labelIds ?? []);
+    _selectedLabelIds
+      ..clear()
+      ..addAll(_note?.labelIds ?? []);
+
     if (_note == null && widget.initialLabel?.id != null) {
       _selectedLabelIds.add(widget.initialLabel!.id!);
     }
+
     _selectedColorId = _note?.colorId;
   }
 
-  // Initialize text controllers
-  void _initializeControllers() {
-    _titleController = TextEditingController(text: _note?.title ?? '');
-    _descriptionController = TextEditingController(text: _note?.details ?? '');
-    _labelController = TextEditingController();
-  }
-
-  // Initialize selected labels and color
-  void _initializeSelections() {
-    _selectedLabelIds.addAll(_note?.labelIds ?? []);
-    if (_note == null && widget.initialLabel?.id != null) {
-      _selectedLabelIds.add(widget.initialLabel!.id!);
-    }
-    _selectedColorId = _note?.colorId;
-  }
-
+  //!
   //Load labels using the cubit's load method
-
   void _loadLabels() => labelCubit.load(widget.getLabels, null);
-
+  //!
   // Toggle the expanded state of the color selector
-  void _toggleColorExpansion() =>
+  void _toggleColorPicker() =>
       setState(() => _isColorExpanded = !_isColorExpanded);
 
   void _selectColor(int? colorIndex) => setState(() {
@@ -111,14 +106,14 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
         _isColorExpanded = false;
       });
 
-  void _clearForm() {
+  void _resetForm() {
     _titleController.clear();
     _descriptionController.clear();
     _labelController.clear();
     _selectedLabelIds.clear();
     _selectedColorId = null;
     _note = null;
-
+    //!
     // If there's an initial label, add it back
     if (widget.initialLabel?.id != null) {
       _selectedLabelIds.add(widget.initialLabel!.id!);
@@ -138,6 +133,7 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
         colorId: _selectedColorId);
   }
 
+  //!
   // Check if the note is empty (no content, labels, or title)
   bool get _isEmptyNote {
     return _titleController.text.trim().isEmpty &&
@@ -146,8 +142,9 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
         _labelController.text.trim().isEmpty;
   }
 
+  //!
   // Save the note, handling new label creation
-  Future<void> _onSave() async {
+  Future<void> _handleSave() async {
     if (_isLoading) return;
 
     if (_isEmptyNote) {
@@ -169,16 +166,17 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
     }
   }
 
+  //!
   // Handle creation of a new label from the label input field
   Future<void> _handleNewLabelCreation() async {
     final text = _labelController.text.trim();
     if (text.isEmpty) return;
-
+    //!
     // Check if label already exists
     final allLabels = await api.noteServer.labels.list(null);
     final exists =
         allLabels.any((l) => l.name.toLowerCase() == text.toLowerCase());
-
+    //!
     // Create new label if it doesn't exist
     if (!exists) {
       final newLabel = await api.noteServer.labels.insert(Label(name: text));
@@ -189,15 +187,16 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
     }
   }
 
+  //!
   // Save the note using the provided onSave callback
   Future<void> _saveNote() async {
     final updatedNote = currentNote.copyWith(labelIds: _selectedLabelIds);
     final savedNote = await widget.onSave(updatedNote);
-     if (!mounted) return;
+    if (!mounted) return;
     if (!Responsive.isDesktop(context) && mounted) {
       Navigator.pop(context, savedNote);
     } else {
-      _clearForm();
+      _resetForm();
     }
   }
 
@@ -219,6 +218,7 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
   @override
   Widget build(BuildContext context) {
     final isDesktop = Responsive.isDesktop(context);
+
     return Padding(
       padding: const EdgeInsets.only(top: 22),
       child: Scaffold(
@@ -243,7 +243,7 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
           leading: isDesktop
               ? null
               : IconButton(
-                  onPressed: _onSave,
+                  onPressed: _handleSave,
                   icon: const Icon(
                     Icons.arrow_back_ios,
                   ),
@@ -257,28 +257,9 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
                 //!
                 // update time for desktop
                 if (isDesktop && _note != null)
-                  Builder(builder: (context) {
-                    final date = widget.note?.updatedAt ??
-                        widget.note?.createdAt ??
-                        DateTime.now();
-                    final isUpdated = widget.note?.updatedAt != null;
-                    final locale = Locales.currentLocale(context)?.languageCode;
-                    String formattedDate;
-                    if (locale == 'fa' || locale == 'ps') {
-                      formattedDate = DateFormat('d MMMM', 'fa').format(date);
-                    } else {
-                      formattedDate = DateFormat('dd MMM').format(date);
-                    }
-                    return Text(
-                      '${Locales.string(context, isUpdated ? 'updated_at' : 'created_at')} $formattedDate',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Colors.grey,
-                            fontSize: 11,
-                          ),
-                    );
-                  }),
+                  _buildNoteDate(context, widget.note?.createdAt, widget.note?.updatedAt),
                 const SizedBox(width: 20),
-      
+
                 //!
                 // Create and Update note button for desktop
                 if (isDesktop)
@@ -290,7 +271,7 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
                               WidgetStateProperty.all(Colors.black),
                           backgroundColor:
                               WidgetStateProperty.all(Colors.grey[100])),
-                      onPressed: _onSave,
+                      onPressed: _handleSave,
                       child: Row(
                         children: [
                           const Icon(Icons.save_as_outlined),
@@ -301,7 +282,7 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
                               _note != null ? 'save_changes' : 'create_note'),
                         ],
                       )),
-      
+
                 //!
                 // Delete Note button
                 if (!_isEmptyNote && _note != null)
@@ -319,20 +300,21 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
                                 context,
                               );
                             } else {
-                                _clearForm();
+                              _resetForm();
                             }
                             await widget.noteCubit!.refresh();
                             await labelCubit.refresh();
                           }).show(context);
                     },
-                    icon: const Icon( Icons.delete),
+                    icon: const Icon(Icons.delete),
                   ),
               ],
             ),
           ),
         ),
-      
-        //! Main body content
+
+        //!
+        //Main body content
         body: Stack(
           children: [
             Padding(
@@ -340,32 +322,15 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  //! Displays the last updated date of the note
+                  //!
+                  // Displays the last updated date of the note
                   if (!isDesktop && widget.note != null)
-                    Builder(builder: (context) {
-                      final date = widget.note?.updatedAt ??
-                          widget.note?.createdAt ??
-                          DateTime.now();
-                      final isUpdated = widget.note?.updatedAt != null;
-                      final locale =
-                          Locales.currentLocale(context)?.languageCode;
-                      String formattedDate;
-                      if (locale == 'fa' || locale == 'ps') {
-                        formattedDate = DateFormat('d MMMM', 'fa').format(date);
-                      } else {
-                        formattedDate = DateFormat('dd MMM').format(date);
-                      }
-      
-                      return Text(
-                        '${Locales.string(context, isUpdated ? 'updated_at' : 'created_at')} $formattedDate',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Colors.grey,
-                            ),
-                      );
-                    }),
-      
+                    
+                     _buildNoteDate(context, widget.note?.createdAt, widget.note?.updatedAt),
+                    
                   const SizedBox(height: 8),
-                  //! Title input field
+                  //!
+                  // Title input field
                   CustomeTextField(
                     controller: _titleController,
                     hintText: 'untitled',
@@ -373,8 +338,9 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
                     hasBorder: false,
                     fontWeight: FontWeight.bold,
                   ),
-      
-                  //! Expanded description text field
+
+                  //!
+                  // description text field
                   Expanded(
                     child: CustomeTextField(
                       controller: _descriptionController,
@@ -384,6 +350,7 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
                       maxLines: null,
                     ),
                   ),
+                  //!
                   //selected labels display using chips
                   AwaitBuilder<List<Label?>>(
                     cubit: labelCubit,
@@ -392,35 +359,37 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
                       if (state.status == AwaitStatus.loading) {
                         return const SizedBox();
                       }
-      
+
                       final labels = state.data ?? [];
-      
+                      //!
                       // Filter to only selected labels
                       final selectedLabels = labels
                           .where(
                               (label) => _selectedLabelIds.contains(label?.id))
                           .toList();
-      
+                      //!
                       // Display selected labels as chips
                       return Wrap(
                         spacing: 6,
                         runSpacing: 6,
                         children: selectedLabels.map((label) {
-                          if (label == null) return const SizedBox();
                           return NoteChip(
-                              text: label.name,
-                              onDeleted: () => setState(() {
-                                    _selectedLabelIds.remove(label.id);
-                                  }));
+                            text: label!.name,
+                            onDeleted: () => setState(() {
+                              _selectedLabelIds.remove(label.id);
+                            }),
+                          );
                         }).toList(),
                       );
                     },
                   ),
-      
+
                   const Divider(),
                   Row(
                     children: [
                       Expanded(
+                        //!
+                        // Label input with autocomplete
                         child: Autocomplete<Label>(
                           optionsViewOpenDirection: OptionsViewOpenDirection.up,
                           optionsViewBuilder: (context, onSelected, options) {
@@ -450,11 +419,11 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
                             if (value.text.isEmpty) {
                               return const Iterable<Label>.empty();
                             }
-      
+
                             final labels =
                                 await api.noteServer.labels.list(null);
                             final query = value.text.toLowerCase();
-      
+
                             return labels.where(
                               (label) =>
                                   label.name.toLowerCase().contains(query),
@@ -542,11 +511,11 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
                               ),
                             )
                           :
-      
+
                           //!
                           // Mobile version continues...
                           GestureDetector(
-                              onTap: _toggleColorExpansion,
+                              onTap: _toggleColorPicker,
                               child: Padding(
                                 padding: const EdgeInsets.only(top: 7),
                                 child: SizedBox(
@@ -567,7 +536,7 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
                                             right: 30,
                                             child: _buildColorCircle(2, 0)),
                                       ],
-      
+
                                       // When user clicks on colors to pick one
                                       if (_isColorExpanded) ...[
                                         Positioned(
@@ -615,7 +584,7 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
                                           ),
                                         ),
                                       ],
-      
+
                                       // When user picks one color
                                       if (_selectedColorId != null &&
                                           !_isColorExpanded)
@@ -659,5 +628,25 @@ Widget _buildColorCircle(int colorIndex, double rightSpace,
           ? [BoxShadow(blurRadius: 3, color: AppColors.noteColors[colorIndex])]
           : null,
     ),
+  );
+}
+
+Widget _buildNoteDate(BuildContext context, DateTime? createdAt, DateTime? updatedAt){
+  final date = updatedAt ?? createdAt ?? DateTime.now();
+  final isUpdated = updatedAt != null;
+  final locale = Locales.currentLocale(context)?.languageCode;
+  String formattedDate;
+  if(locale == 'fa' || locale == 'ps'){
+    formattedDate = DateFormat('d MMMM', 'fa').format(date);
+  }else{
+    formattedDate = DateFormat('dd MMM').format(date);
+  }
+
+  return Text(
+    '${Locales.string(context, isUpdated ? 'updated_at' : 'created_at')} $formattedDate',
+     style: Theme.of(context).textTheme.bodySmall?.copyWith(
+          color: Colors.grey,
+          fontSize: 11,
+        ),
   );
 }

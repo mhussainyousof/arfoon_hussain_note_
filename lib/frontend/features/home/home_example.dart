@@ -1,5 +1,5 @@
 import 'package:arfoon_note/frontend/frontend.dart';
-import 'package:arfoon_note/frontend/widgets/profile_view_dialog.dart';
+import 'package:arfoon_note/frontend/widgets/profile_dialog_view.dart';
 import 'package:flutter/material.dart';
 
 class HomeExample extends StatelessWidget {
