@@ -1,8 +1,8 @@
 import 'package:arfoon_note/frontend/frontend.dart';
 import 'package:arfoon_note/integration/pages/home_page.dart';
-import 'package:arfoon_note/frontend/features/profile_view/profile_view.dart';
+import 'package:arfoon_note/frontend/widgets/profile_view_dialog.dart';
 import 'package:arfoon_note/main.dart';
-import 'package:arfoon_note/server/user_profile.dart';
+import 'package:arfoon_note/server/user_info.dart';
 import 'package:flutter/material.dart';
 
 class MainApp extends StatefulWidget {
