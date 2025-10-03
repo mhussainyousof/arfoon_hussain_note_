@@ -4,6 +4,7 @@ import 'package:arfoon_note/frontend/widgets/sure_dialog_widget.dart';
 import 'package:arfoon_note/integration/main_app.dart';
 import 'package:arfoon_note/frontend/widgets/profile_view_dialog.dart';
 import 'package:arfoon_note/main.dart';
+import 'package:arfoon_note/server/server.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bidi_text/bidi_text.dart';
 import 'package:flutter_locales/flutter_locales.dart';
@@ -46,17 +47,16 @@ class _MyHomePageState extends State<ExamplePage> {
                   submitText: '',
                   title: '',
                   currentName: ''
-                  );
+                  ).show(context);
                 },
                 title: 'Profile View',
                 subTitle:
                     'This is a dialog and show as ProfileView().show(context) and has parameters of: title, submitText, onSubmit(s)',
               ),
               ListTileWidget(
-                dialog: SettingDialog(
-                  getTheme: api.themeRepository.loadTheme, 
-                  saveTheme: api.themeRepository.saveTheme,
-                ), 
+                onTap: (){
+                  SettingView(currentLanguage: Locales.lang, onLanguageChanged: (lang){}, currentTheme: ThemeState.dark, onThemeChanged: (t){}).show(context);
+                },
                 title: 'Setting view',
                 subTitle:
                     'This is a dialog and show as SettingsView().show(context) and has parameters of currentLanguage, onLanguageChanged(llang), currentTheme, onThemeChanged(t)',
