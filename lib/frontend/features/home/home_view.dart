@@ -1,6 +1,5 @@
 import 'package:arfoon_note/frontend/features/home/widgets/home_desktop_header.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_locales/flutter_locales.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:arfoon_note/frontend/features/home/home.dart';
 import 'package:arfoon_note/frontend/frontend.dart';
@@ -92,7 +91,7 @@ class _HomeViewState extends State<HomeView> {
     final userNameCubit = homePage?.userNameCubit;
 
     final drawerWidget = DrawerPage(
-      userNameCubit: userNameCubit!,
+      userNameCubit: userNameCubit ?? AwaitCubit<String>(),
       labelsCubit: labelsCubit,
       onLabelSelected: applyFilter,
       onLabelAdded: (newLabel) async {
@@ -109,6 +108,7 @@ class _HomeViewState extends State<HomeView> {
       onProfileTap: widget.onProfileTap,
       onSettingTap: widget.onSettingTap,
     );
+
     return Material(
       child: Row(
         children: [
@@ -119,9 +119,15 @@ class _HomeViewState extends State<HomeView> {
 
           Expanded(
             child: Scaffold(
+
+              //! 
+              // Drawer in Mobile Mode
                 drawer: !isMobile ? null : drawerWidget,
+
+                //!
+                // Mobile AppBar
                 appBar: isMobile
-                    ? HomeAppBar(
+                    ? CustomAppBar(
                         leading: !isMobile
                             ? null
                             : Builder(
@@ -132,7 +138,7 @@ class _HomeViewState extends State<HomeView> {
                                 ),
                               ),
                         title: 'arfoon_note',
-                        textNaighbor: SvgPicture.asset(
+                        leadingTitleWidget: SvgPicture.asset(
                           'assets/images/note_logo.svg',
                           colorFilter: ColorFilter.mode(
                             isDark ? Colors.white : Colors.black,
@@ -143,6 +149,10 @@ class _HomeViewState extends State<HomeView> {
                         ),
                       )
                     : null,
+
+
+                //!-------------------------------------
+
                 body: Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: Column(
@@ -165,6 +175,9 @@ class _HomeViewState extends State<HomeView> {
                       const SizedBox(
                         height: 15,
                       ),
+                      
+
+                      //!
                       // list of labels:
                       if (isMobile)
                         AwaitBuilder(
@@ -179,6 +192,8 @@ class _HomeViewState extends State<HomeView> {
                               );
                             }),
 
+                      //!
+                      // List on Notes
                       NotesList(
                           getNotes: widget.getNotes,
                           getLabels: widget.getLabels,
@@ -190,6 +205,10 @@ class _HomeViewState extends State<HomeView> {
                     ],
                   ),
                 ),
+
+
+                //!
+                // Add note button in Mobile Mode
                 floatingActionButton: isDesktop
                     ? null
                     : AddNoteButton(
@@ -214,6 +233,10 @@ class _HomeViewState extends State<HomeView> {
                           }
                         })),
           ),
+
+
+          //!
+          // Add Edit NoteView in HomeScreen in Desktop Mode
           if (isDesktop)
             Flexible(
               flex: 2,

@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_locales/flutter_locales.dart';
 
 
-class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final Widget? textNaighbor;
+class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
+  final Widget? leadingTitleWidget;
   final Widget? trailing;
   final Widget? leading;
   final VoidCallback? onMenuPressed;
@@ -15,13 +15,13 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   final FontWeight? titleFontWeight;
   final bool? isLocalTitle;
 
-  const HomeAppBar({
+  const CustomAppBar({
     super.key,
     this.titleFontWeight,
     this.centerTitle = true,
     this.titleSize,
     this.leading,
-    this.textNaighbor,
+    this.leadingTitleWidget,
     this.trailing,
     this.onMenuPressed,
     required this.title, this.bottom,  this.isLocalTitle = true,
@@ -41,8 +41,8 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (textNaighbor != null) ...[
-              textNaighbor!,
+            if (leadingTitleWidget != null) ...[
+              leadingTitleWidget!,
               const SizedBox(width: 4),
             ],
             Flexible(

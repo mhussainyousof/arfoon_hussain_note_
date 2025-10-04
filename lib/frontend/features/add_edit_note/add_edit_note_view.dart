@@ -1,4 +1,4 @@
-import 'package:arfoon_note/frontend/features/home/widgets/home_appbar.dart';
+import 'package:arfoon_note/frontend/widgets/custom_appbar.dart';
 import 'package:arfoon_note/frontend/frontend.dart';
 import 'package:arfoon_note/frontend/theme/responsive.dart';
 import 'package:arfoon_note/integration/integration.dart';
@@ -59,6 +59,8 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
 
     setupNoteState();
     _loadLabels(); // Load available labels
+
+
   }
 
   @override
@@ -70,7 +72,15 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
       _note = widget.note;
       setupNoteState(widget.note);
       _loadLabels();
+      
     }
+    if (widget.initialLabel != null) {
+  _selectedLabelIds
+  ..clear()
+  ..add(widget.initialLabel!.id!);
+}
+
+    
   }
 
   //!
@@ -223,7 +233,7 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
       padding: const EdgeInsets.only(top: 22),
       child: Scaffold(
         resizeToAvoidBottomInset: true,
-        appBar: HomeAppBar(
+        appBar: CustomAppBar(
           bottom: PreferredSize(
             preferredSize: const Size.fromHeight(1.0),
             child: Container(
@@ -523,6 +533,8 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
                                   height: 35,
                                   child: Stack(
                                     children: [
+
+                                      //!
                                       // When user sees first of note colors
                                       if (_selectedColorId == null &&
                                           !_isColorExpanded) ...[

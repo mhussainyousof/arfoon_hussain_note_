@@ -6,3 +6,4 @@ export 'note_dialog.dart';
 export 'profile_dialog_view.dart';
 export 'search_bar.dart';
 export 'sure_dialog_view.dart';
+export 'custom_appbar.dart';
