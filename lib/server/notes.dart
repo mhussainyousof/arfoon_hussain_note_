@@ -13,19 +13,22 @@ class Notes {
   }
 
   Future<List<Note>> list([Filter? filter]) async {
-     List<Note> notes;
 
-    if ((filter?.search ?? '').isNotEmpty) {
-      var s = filter!.search!;
+     final search = filter?.search?.trim() ?? '';
+     final label = filter?.label;
+
+     List<Note> notes;
+    if (search.isNotEmpty) {
+
       notes =  await isar.notes.filter().group((q)=> q
-      .titleContains(s, caseSensitive: false)
+      .titleContains(search, caseSensitive: false)
       .or()
-      .detailsContains(s, caseSensitive: false)
-      ).findAll();
+      .detailsContains(search, caseSensitive: false)
+      ).optional(label != null, (q) => q.labelIdsElementEqualTo (label!.id!)).findAll();
     }
 
-     else if(filter?.label != null){
-      notes =  await isar.notes.filter().labelIdsElementEqualTo (filter!.label!.id!).findAll();
+     else if(label != null){
+      notes =  await isar.notes.filter().labelIdsElementEqualTo (label.id!).findAll();
     }
     
     else if (filter?.pagination != null) {

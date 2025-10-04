@@ -1,8 +1,6 @@
 import 'package:arfoon_note/client/models/models.dart';
 import 'package:arfoon_note/frontend/frontend.dart';
 import 'package:arfoon_note/frontend/theme/responsive.dart';
-import 'package:arfoon_note/frontend/widgets/add_edit_label_dialog_view.dart';
-import 'package:arfoon_note/frontend/widgets/sure_dialog_view.dart';
 import 'package:arfoon_note/integration/integration.dart';
 import 'package:arfoon_note/server/server.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +12,7 @@ class CustomDrawer extends StatefulWidget {
   final Future<Label?> Function(Label) updateLabel;
   final Future<void> Function(int) deleteLabel;
   final Future<Label> Function(Label) addLabel;
-  final void Function(Label label) onLabelSelected;
+  final void Function(Label? label) onLabelSelected;
   final void Function(Label label)? onLabelAdded;
   final void Function(Label label)? onLabelUpdated;
   final void Function(int id)? onLabelDeleted;
@@ -133,7 +131,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
               ),
               trailing: const Icon(Icons.chevron_right),
               onTap: () {
-                widget.onLabelSelected(Label(name: '', id: null));
+                widget.onLabelSelected(null);
                 !Responsive.isMobile(context) ? null : Navigator.pop(context);
               },
             ),
@@ -177,7 +175,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                     );
                   }
                   return ListView.builder(
-                    
+
                     itemCount: labels.length,
                     itemBuilder: (context, index) {
                       final label = labels[index];

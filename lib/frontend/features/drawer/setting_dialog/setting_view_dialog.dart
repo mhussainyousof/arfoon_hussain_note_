@@ -81,7 +81,7 @@ class _SettingDialogState extends State<SettingDialog> {
         size: 60,
       ),
       const SizedBox(height: 20),
-      const LocaleText('Setting'),
+      const LocaleText('setting'),
       const SizedBox(height: 30),
 
       //!

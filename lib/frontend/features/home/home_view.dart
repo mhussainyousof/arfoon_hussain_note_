@@ -1,10 +1,11 @@
+import 'package:arfoon_note/frontend/features/home/widgets/home_desktop_header.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_locales/flutter_locales.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:arfoon_note/frontend/features/home/home.dart';
 import 'package:arfoon_note/frontend/frontend.dart';
 import 'package:arfoon_note/frontend/theme/responsive.dart';
 import 'package:arfoon_note/integration/integration.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_locales/flutter_locales.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import '../../../client/models/models.dart';
 
 class HomeView extends StatefulWidget {
@@ -28,30 +29,27 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
   final searchController = TextEditingController();
-  late final  AwaitCubit<List<Note>> notesCubit;
-  late final  AwaitCubit<List<Label>> labelsCubit;
+  late final AwaitCubit<List<Note>> notesCubit;
+  late final AwaitCubit<List<Label>> labelsCubit;
   int selectedChipIndex = 0;
   Label? selectedLabel;
   Note? selectedNote;
   bool isEditing = false;
-
 
   @override
   void initState() {
     super.initState();
     notesCubit = AwaitCubit<List<Note>>();
     labelsCubit = AwaitCubit<List<Label>>();
-
   }
 
- @override
-void dispose() {
-  searchController.dispose();
- notesCubit.close(); 
+  @override
+  void dispose() {
+    searchController.dispose();
+    notesCubit.close();
     labelsCubit.close();
-  super.dispose();
-}
-
+    super.dispose();
+  }
 
   void applyFilter(Label? label) {
     setState(() {
@@ -60,7 +58,6 @@ void dispose() {
       selectedChipIndex =
           label == null ? 0 : labels.indexWhere((l) => l.id == label.id) + 1;
     });
-
     notesCubit.filter(Filter(label: (label?.id != null) ? label : null));
   }
 
@@ -81,17 +78,12 @@ void dispose() {
   Future<Note> desktopSaveNote(Note note) async {
     final savedNote = await widget.addNote(note);
     await notesCubit.refresh();
-    await labelsCubit.refresh();      
+    await labelsCubit.refresh();
     return savedNote;
   }
 
-
-
-
-
   @override
   Widget build(BuildContext context) {
-
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isDesktop = Responsive.isDesktop(context);
     final isMobile = Responsive.isMobile(context);
@@ -100,19 +92,18 @@ void dispose() {
     final userNameCubit = homePage?.userNameCubit;
 
     final drawerWidget = DrawerPage(
-      userNameCubit: userNameCubit! , 
+      userNameCubit: userNameCubit!,
       labelsCubit: labelsCubit,
-      onLabelSelected: applyFilter, 
+      onLabelSelected: applyFilter,
       onLabelAdded: (newLabel) async {
-        
-      await labelsCubit.refresh();
-      } ,
+        await labelsCubit.refresh();
+      },
       onLabelDelete: (id) async {
-      await  labelsCubit.refresh();
-       await notesCubit.refresh(filter: notesCubit.state.filter);
+        await labelsCubit.refresh();
+        await notesCubit.refresh(filter: notesCubit.state.filter);
       },
       onLabelUpdate: (updatedLabel) async {
-     await   labelsCubit.refresh();
+        await labelsCubit.refresh();
         notesCubit.refresh(filter: notesCubit.state.filter);
       },
       onProfileTap: widget.onProfileTap,
@@ -121,34 +112,11 @@ void dispose() {
     return Material(
       child: Row(
         children: [
+          //!
+          // Drawer in Desktop and Tablet Sizes
           if (!isMobile)
-                SizedBox(
-                  width: 250,
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(children: [
-                          SvgPicture.asset(
-                            'assets/images/note_logo.svg',
-                            colorFilter: ColorFilter.mode(
-                              isDark ? Colors.white : Colors.black,
-                              BlendMode.srcIn,
-                            ),
-                            width: 20,
-                            height: 20,
-                          ),
-                          const SizedBox(width: 6,),
-                          const LocaleText('arfoon_note',
-                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-                          ),
-                        ],),
-                      ),
-                      Expanded(child: drawerWidget),
-                    ],
-                  )),
-              
-            
+            DesktopAndTabletDrawer(isDark: isDark, drawerWidget: drawerWidget),
+
           Expanded(
             child: Scaffold(
                 drawer: !isMobile ? null : drawerWidget,
@@ -179,56 +147,24 @@ void dispose() {
                   padding: const EdgeInsets.all(10.0),
                   child: Column(
                     children: [
-                      if (isDesktop)
-                      Column(children: [
-                        const SizedBox(height: 20),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 2.0),
-                          child: Row(
-                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                             Column(
-                                children: [
-                                  LocaleText(
-                                    'my_notes',
-                                    style: TextStyle(
-                                      overflow: TextOverflow.ellipsis,
-                                        fontSize: isRTL(context) ? 18 : 20 , fontWeight: FontWeight.w700),
-                                  ),
-                                  const SizedBox(height: 6,)
-                                ],
-                              ),
-                              ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    
-                                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(5)),
-                                      ),
-                                  onPressed: ()=> createNote(),
-                                  child: const Row(
-                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            
-                                    children: [
-                                      Icon(Icons.add,size: 14,),
-                                      SizedBox(width: 5, ),
-                                      LocaleText('new', style: TextStyle(fontSize: 12),),
-                                    ],
-                                  ))
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 25,)
-                      ],),
-                  
+
+                      //!
+                      // Header for Desktop
+                      if (isDesktop) DesktopHeader(createNote: createNote),
+
                       SearchNotesBar(
                         controller: searchController,
                         hintText: 'search_notes',
                         onChanged: (s) {
-                          notesCubit.filter(Filter(search: s));
+                          notesCubit.filter(Filter(
+                            search: s,
+                            label: selectedLabel,
+                          ));
                         },
                       ),
-                      const SizedBox(height: 15,),
+                      const SizedBox(
+                        height: 15,
+                      ),
                       // list of labels:
                       if (isMobile)
                         AwaitBuilder(
@@ -242,61 +178,25 @@ void dispose() {
                                 onSelectLabel: applyFilter,
                               );
                             }),
-                  
-                      Expanded(
-                        child: AwaitBuilder<List<Note>>(
-                          cubit: notesCubit,
-                          getData: widget.getNotes,
-                          builder: (context, state) {
-                            if (state.status == AwaitStatus.loading) {
-                              return const Center(
-                                  child: CircularProgressIndicator());
-                            }
-                  
-                            if (state.status == AwaitStatus.error) {
-                              return Center(child: Text('Error: ${state.error}'));
-                            }
-                  
-                            if (state.data == null || state.data!.isEmpty) {
-                              return const Center(
-                                child: LocaleText('no_note'),
-                              );
-                            }
-                            final currentLabels = labelsCubit.state.data ?? [];
-                            return ListView.builder(
-                              padding:  EdgeInsets.only( top: isMobile ? 15 : 0),
-                              itemCount: state.data!.length,
-                              itemBuilder: (context, index) {
-                                final note = state.data![index];
-                                return Padding(
-                                  padding: const EdgeInsets.only(bottom: 12),
-                                  child: NoteCard(
-                                    note: note,
-                                    getLabels: widget.getLabels,
-                                    allLabels: currentLabels,
-                                    labelsCubit: labelsCubit,
-                                    notesCubit: notesCubit,
-                                    onTap: isDesktop
-                                        ? () => selectNote(note)
-                                        : null, 
-                                  ),
-                                );
-                              },
-                            );
-                          },
-                        ),
-                      ),
+
+                      NotesList(
+                          getNotes: widget.getNotes,
+                          getLabels: widget.getLabels,
+                          notesCubit: notesCubit,
+                          labelsCubit: labelsCubit,
+                          selectNote: selectNote,
+                          isMobile: isMobile,
+                          isDesktop: isDesktop),
                     ],
                   ),
                 ),
-              floatingActionButton: isDesktop
-                  ? null
-                  : AddNoteButton(
-                      child: const Icon(
-                        Icons.add,
-                      ),
-                      onPressed: () async {
-                        
+                floatingActionButton: isDesktop
+                    ? null
+                    : AddNoteButton(
+                        child: const Icon(
+                          Icons.add,
+                        ),
+                        onPressed: () async {
                           final result = await Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -311,7 +211,6 @@ void dispose() {
                           if (result != null) {
                             await notesCubit.refresh();
                             await labelsCubit.refresh();
-                          
                           }
                         })),
           ),
@@ -320,8 +219,7 @@ void dispose() {
               flex: 2,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4),
-                child: 
-                AddEditNoteView(
+                child: AddEditNoteView(
                   onSave: desktopSaveNote,
                   getLabels: widget.getLabels,
                   initialLabel: selectedLabel,

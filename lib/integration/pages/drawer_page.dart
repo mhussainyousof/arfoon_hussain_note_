@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 
 class DrawerPage extends StatelessWidget {
   final AwaitCubit<List<Label>> labelsCubit;
-  final void Function(Label) onLabelSelected;
+  final void Function(Label?) onLabelSelected;
   final void Function(Label)? onLabelAdded;
   final void Function(Label)? onLabelUpdate;
   final void Function(int id)? onLabelDelete;

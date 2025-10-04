@@ -257,7 +257,7 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
                 //!
                 // update time for desktop
                 if (isDesktop && _note != null)
-                  _buildNoteDate(context, widget.note?.createdAt, widget.note?.updatedAt),
+                  _buildNoteDate(context, _note?.createdAt, _note?.updatedAt),
                 const SizedBox(width: 20),
 
                 //!
