@@ -1,4 +1,3 @@
-import 'package:arfoon_note/frontend/widgets/custom_appbar.dart';
 import 'package:arfoon_note/frontend/frontend.dart';
 import 'package:arfoon_note/frontend/theme/responsive.dart';
 import 'package:arfoon_note/integration/integration.dart';
@@ -15,6 +14,7 @@ class AddEditNoteView extends StatefulWidget {
   final Future<Note> Function(Note) onSave;
   final Label? initialLabel;
   final AwaitCubit<List<Note>>? noteCubit;
+  final AwaitCubit<List<Label>>? labelCubit;
 
   const AddEditNoteView({
     super.key,
@@ -22,7 +22,7 @@ class AddEditNoteView extends StatefulWidget {
     required this.onSave,
     required this.getLabels,
     this.initialLabel,
-    this.noteCubit,
+    this.noteCubit, this.labelCubit,
   });
 
   @override
@@ -63,25 +63,27 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
 
   }
 
-  @override
-  void didUpdateWidget(AddEditNoteView oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    //!
-    // If the note prop changed, update the internal state
-    if (widget.note != oldWidget.note) {
-      _note = widget.note;
-      setupNoteState(widget.note);
-      _loadLabels();
-      
-    }
+ @override
+void didUpdateWidget(AddEditNoteView oldWidget) {
+  super.didUpdateWidget(oldWidget);
+
+  if (widget.note != oldWidget.note) {
+    _note = widget.note;
+    setupNoteState(widget.note);
+    _loadLabels();
+  }
+
+  if (widget.initialLabel != oldWidget.initialLabel) {
     if (widget.initialLabel != null) {
-  _selectedLabelIds
-  ..clear()
-  ..add(widget.initialLabel!.id!);
+      _selectedLabelIds
+        ..clear()
+        ..add(widget.initialLabel!.id!);
+    } else if (oldWidget.initialLabel != null) {
+      _selectedLabelIds.clear();
+    }
+  }
 }
 
-    
-  }
 
   //!
   // setupNoteState
@@ -105,7 +107,7 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
 
   //!
   //Load labels using the cubit's load method
-  void _loadLabels() => labelCubit.load(widget.getLabels, null);
+  void _loadLabels() => widget.labelCubit?.load(widget.getLabels, null);
   //!
   // Toggle the expanded state of the color selector
   void _toggleColorPicker() =>
@@ -193,7 +195,7 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
       if (newLabel.id != null && !_selectedLabelIds.contains(newLabel.id)) {
         _selectedLabelIds.add(newLabel.id!);
       }
-      labelCubit.refresh();
+      widget.labelCubit?.refresh();
     }
   }
 
@@ -229,254 +231,334 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
   Widget build(BuildContext context) {
     final isDesktop = Responsive.isDesktop(context);
 
-    return Padding(
-      padding: const EdgeInsets.only(top: 22),
-      child: Scaffold(
-        resizeToAvoidBottomInset: true,
-        appBar: CustomAppBar(
-          bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(1.0),
-            child: Container(
-              color: Colors.grey[300],
-              height: 1.0,
-            ),
-          ),
-          centerTitle: false,
-          isLocalTitle: false,
-          title: _note != null && isDesktop
-              ? '${Locales.string(context, 'my_notes')} > ${_note!.title}'
-              : !isDesktop
-                  ? ''
-                  : Locales.string(context, 'my_notes'),
-          titleSize: 14,
-          titleFontWeight: FontWeight.bold,
-          leading: isDesktop
-              ? null
-              : IconButton(
-                  onPressed: _handleSave,
-                  icon: const Icon(
-                    Icons.arrow_back_ios,
-                  ),
-                ),
-          trailing: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 8.0,
-            ),
-            child: Row(
-              children: [
-                //!
-                // update time for desktop
-                if (isDesktop && _note != null)
-                  _buildNoteDate(context, _note?.createdAt, _note?.updatedAt),
-                const SizedBox(width: 20),
-
-                //!
-                // Create and Update note button for desktop
-                if (isDesktop)
-                  TextButton(
-                      style: ButtonStyle(
-                          shape: WidgetStateProperty.all(RoundedRectangleBorder(
-                              borderRadius: BorderRadiusGeometry.circular(7))),
-                          foregroundColor:
-                              WidgetStateProperty.all(Colors.black),
-                          backgroundColor:
-                              WidgetStateProperty.all(Colors.grey[100])),
-                      onPressed: _handleSave,
-                      child: Row(
-                        children: [
-                          const Icon(Icons.save_as_outlined),
-                          const SizedBox(
-                            width: 5,
-                          ),
-                          LocaleText(
-                              _note != null ? 'save_changes' : 'create_note'),
-                        ],
-                      )),
-
-                //!
-                // Delete Note button
-                if (!_isEmptyNote && _note != null)
-                  IconButton(
-                    onPressed: () async {
-                      SureView(
-                          title: 'delete',
-                          subTitle: 'confirm_delete',
-                          sureText: 'delete',
-                          onSure: () async {
-                            await api.noteServer.notes
-                                .deleteNote(widget.note!.id!);
-                            if (!isDesktop) {
-                              Navigator.pop(
-                                context,
-                              );
-                            } else {
-                              _resetForm();
-                            }
-                            await widget.noteCubit!.refresh();
-                            await labelCubit.refresh();
-                          }).show(context);
-                    },
-                    icon: const Icon(Icons.delete),
-                  ),
-              ],
-            ),
+    return Scaffold(
+      resizeToAvoidBottomInset: true,
+      appBar: CustomAppBar(
+        appBarHeightPlus: isDesktop ? 25 : 0,
+        appBarPadding: isDesktop ? const EdgeInsets.only(top: 35) : null,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1.0),
+          child: Container(
+            color: Colors.grey[300],
+            height: 1.0,
           ),
         ),
-
-        //!
-        //Main body content
-        body: Stack(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  //!
-                  // Displays the last updated date of the note
-                  if (!isDesktop && widget.note != null)
-                    
-                     _buildNoteDate(context, widget.note?.createdAt, widget.note?.updatedAt),
-                    
-                  const SizedBox(height: 8),
-                  //!
-                  // Title input field
-                  CustomeTextField(
-                    controller: _titleController,
-                    hintText: 'untitled',
-                    hintSize: 36,
-                    hasBorder: false,
-                    fontWeight: FontWeight.bold,
-                  ),
-
-                  //!
-                  // description text field
-                  Expanded(
-                    child: CustomeTextField(
-                      controller: _descriptionController,
-                      hintText: 'description',
-                      hasBorder: false,
-                      isMultiline: true,
-                      maxLines: null,
-                    ),
-                  ),
-                  //!
-                  //selected labels display using chips
-                  AwaitBuilder<List<Label?>>(
-                    cubit: labelCubit,
-                    getData: widget.getLabels,
-                    builder: (context, state) {
-                      if (state.status == AwaitStatus.loading) {
-                        return const SizedBox();
-                      }
-
-                      final labels = state.data ?? [];
-                      //!
-                      // Filter to only selected labels
-                      final selectedLabels = labels
-                          .where(
-                              (label) => _selectedLabelIds.contains(label?.id))
-                          .toList();
-                      //!
-                      // Display selected labels as chips
-                      return Wrap(
-                        spacing: 6,
-                        runSpacing: 6,
-                        children: selectedLabels.map((label) {
-                          return NoteChip(
-                            text: label!.name,
-                            onDeleted: () => setState(() {
-                              _selectedLabelIds.remove(label.id);
-                            }),
-                          );
-                        }).toList(),
-                      );
-                    },
-                  ),
-
-                  const Divider(),
-                  Row(
-                    children: [
-                      Expanded(
-                        //!
-                        // Label input with autocomplete
-                        child: Autocomplete<Label>(
-                          optionsViewOpenDirection: OptionsViewOpenDirection.up,
-                          optionsViewBuilder: (context, onSelected, options) {
-                            return ConstrainedBox(
-                              constraints: const BoxConstraints(
-                                maxHeight: 150,
-                              ),
-                              child: Material(
-                                borderRadius: BorderRadius.circular(12),
-                                elevation: 4,
-                                child: ListView.builder(
-                                    itemCount: options.length,
-                                    itemBuilder: (context, index) {
-                                      final Label option =
-                                          options.elementAt(index);
-                                      return ListTile(
-                                        title: Text(option.name),
-                                        onTap: () {
-                                          onSelected(option);
-                                        },
-                                      );
-                                    }),
-                              ),
-                            );
-                          },
-                          optionsBuilder: (TextEditingValue value) async {
-                            if (value.text.isEmpty) {
-                              return const Iterable<Label>.empty();
-                            }
-
-                            final labels =
-                                await api.noteServer.labels.list(null);
-                            final query = value.text.toLowerCase();
-
-                            return labels.where(
-                              (label) =>
-                                  label.name.toLowerCase().contains(query),
-                            );
-                          },
-                          displayStringForOption: (Label option) => option.name,
-                          onSelected: (Label selected) {
-                            setState(() {
-                              if (!_selectedLabelIds.contains(selected.id)) {
-                                _selectedLabelIds.add(selected.id!);
-                              }
-                              _labelController.clear();
-                            });
-                          },
-                          fieldViewBuilder: (context, fieldContrller, focusNode,
-                              onFieldSubmitted) {
-                            _labelController = fieldContrller;
-                            return CustomeTextField(
-                              borderWidth: 0,
-                              borderColor: Colors.transparent,
-                              controller: fieldContrller,
-                              focusNode: focusNode,
-                              hintText: 'type_to_add_label',
-                            );
-                          },
+        centerTitle: false,
+        isLocalTitle: false,
+        title: _note != null && isDesktop
+            ? '${Locales.string(context, 'my_notes')} > ${_note!.title}'
+            : !isDesktop
+                ? ''
+                : Locales.string(context, 'my_notes'),
+        titleSize: 14,
+        titleFontWeight: FontWeight.bold,
+        leading: isDesktop
+            ? null
+            : IconButton(
+                onPressed: _handleSave,
+                icon: const Icon(
+                  Icons.arrow_back_ios,
+                ),
+              ),
+        trailing: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 8.0,
+          ),
+          child: Row(
+            children: [
+              //!
+              // update time for desktop
+              if (isDesktop && _note != null)
+                _buildNoteDate(context, _note?.createdAt, _note?.updatedAt),
+              const SizedBox(width: 20),
+    
+              //!
+              // Create and Update note button for desktop
+              if (isDesktop)
+                TextButton(
+                    style: ButtonStyle(
+                        shape: WidgetStateProperty.all(RoundedRectangleBorder(
+                            borderRadius: BorderRadiusGeometry.circular(7))),
+                        foregroundColor:
+                            WidgetStateProperty.all(Colors.black),
+                        backgroundColor:
+                            WidgetStateProperty.all(Colors.grey[100])),
+                    onPressed: _handleSave,
+                    child: Row(
+                      children: [
+                        const Icon(Icons.save_as_outlined),
+                        const SizedBox(
+                          width: 5,
                         ),
+                        LocaleText(
+                            _note != null ? 'save_changes' : 'create_note'),
+                      ],
+                    )),
+    
+              //!
+              // Delete Note button
+              if (!_isEmptyNote && _note != null)
+                IconButton(
+                  onPressed: () async {
+                    SureView(
+                        title: 'delete',
+                        subTitle: 'confirm_delete',
+                        sureText: 'delete',
+                        onSure: () async {
+                          await api.noteServer.notes
+                              .deleteNote(widget.note!.id!);
+                          if (!isDesktop) {
+                            Navigator.pop(
+                              context,
+                            );
+                          } else {
+                            _resetForm();
+                          }
+                          await widget.noteCubit!.refresh();
+                          await widget.labelCubit?.refresh();
+                        }).show(context);
+                  },
+                  icon: const Icon(Icons.delete),
+                ),
+            ],
+          ),
+        ),
+      ),
+    
+      //!
+      //Main body content
+      body: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                //!
+                // Displays the last updated date of the note
+                if (!isDesktop && widget.note != null)
+                   _buildNoteDate(context, widget.note?.createdAt, widget.note?.updatedAt),
+                  
+                const SizedBox(height: 8),
+                //!
+                // Title input field
+                CustomeTextField(
+                  controller: _titleController,
+                  hintText: 'untitled',
+                  hintSize: 36,
+                  hasBorder: false,
+                  fontWeight: FontWeight.bold,
+                ),
+    
+                //!
+                // description text field
+                Expanded(
+                  child: CustomeTextField(
+                    controller: _descriptionController,
+                    hintText: 'description',
+                    hasBorder: false,
+                    isMultiline: true,
+                    maxLines: null,
+                  ),
+                ),
+                //!
+                //selected labels display using chips
+                AwaitBuilder<List<Label?>>(
+                  cubit: widget.labelCubit ?? labelCubit,
+                  getData: widget.getLabels,
+                  builder: (context, state) {
+                    if (state.status == AwaitStatus.loading) {
+                      return const SizedBox();
+                    }
+    
+                    final labels = state.data ?? [];
+                    //!
+                    // Filter to only selected labels
+                    final selectedLabels = labels
+                        .where(
+                            (label) => _selectedLabelIds.contains(label?.id))
+                        .toList();
+                    //!
+                    // Display selected labels as chips
+                    return Wrap(
+                      spacing: 6,
+                      runSpacing: 6,
+                      children: selectedLabels.map((label) {
+                        return NoteChip(
+                          text: label!.name,
+                          onDeleted: () => setState(() {
+                            _selectedLabelIds.remove(label.id);
+                          }),
+                        );
+                      }).toList(),
+                    );
+                  },
+                ),
+    
+                const Divider(),
+                Row(
+                  children: [
+                    Expanded(
+                      //!
+                      // Label input with autocomplete
+                      child: Autocomplete<Label>(
+                        optionsViewOpenDirection: OptionsViewOpenDirection.up,
+                        optionsViewBuilder: (context, onSelected, options) {
+                          return ConstrainedBox(
+                            constraints: const BoxConstraints(
+                              maxHeight: 150,
+                            ),
+                            child: Material(
+                              borderRadius: BorderRadius.circular(12),
+                              elevation: 4,
+                              child: ListView.builder(
+                                  itemCount: options.length,
+                                  itemBuilder: (context, index) {
+                                    final Label option =
+                                        options.elementAt(index);
+                                    return ListTile(
+                                      title: Text(option.name),
+                                      onTap: () {
+                                        onSelected(option);
+                                      },
+                                    );
+                                  }),
+                            ),
+                          );
+                        },
+                        optionsBuilder: (TextEditingValue value) async {
+                          if (value.text.isEmpty) {
+                            return const Iterable<Label>.empty();
+                          }
+    
+                          final labels =
+                              await api.noteServer.labels.list(null);
+                          final query = value.text.toLowerCase();
+    
+                          return labels.where(
+                            (label) =>
+                                label.name.toLowerCase().contains(query),
+                          );
+                        },
+                        displayStringForOption: (Label option) => option.name,
+                        onSelected: (Label selected) {
+                          setState(() {
+                            if (!_selectedLabelIds.contains(selected.id)) {
+                              _selectedLabelIds.add(selected.id!);
+                            }
+                            _labelController.clear();
+                          });
+                        },
+                        fieldViewBuilder: (context, fieldContrller, focusNode,
+                            onFieldSubmitted) {
+                          _labelController = fieldContrller;
+                          return CustomeTextField(
+                            borderWidth: 0,
+                            borderColor: Colors.transparent,
+                            controller: fieldContrller,
+                            focusNode: focusNode,
+                            hintText: 'type_to_add_label',
+                          );
+                        },
                       ),
-                      isDesktop
-                          ? Padding(
+                    ),
+                    isDesktop
+                        ? Padding(
+                            padding: const EdgeInsets.only(top: 7),
+                            child: SizedBox(
+                              width: 150,
+                              height: 35,
+                              child: Stack(
+                                children: [
+                                  if (!_isColorExpanded) ...[
+                                    Positioned(
+                                      right: isRTL(context) ? 55 : 70,
+                                      child: GestureDetector(
+                                        onTap: () => _selectColor(0),
+                                        child: _buildColorCircle(0, 0,
+                                            isSelected:
+                                                _selectedColorId == 0),
+                                      ),
+                                    ),
+                                    Positioned(
+                                      right: isRTL(context) ? 88 : 35,
+                                      child: GestureDetector(
+                                        onTap: () => _selectColor(1),
+                                        child: _buildColorCircle(1, 0,
+                                            isSelected:
+                                                _selectedColorId == 1),
+                                      ),
+                                    ),
+                                    Positioned(
+                                      right: isRTL(context) ? 120 : 0,
+                                      child: GestureDetector(
+                                        onTap: () => _selectColor(2),
+                                        child: _buildColorCircle(2, 0,
+                                            isSelected:
+                                                _selectedColorId == 2),
+                                      ),
+                                    ),
+                                  ],
+                                  if (_selectedColorId != null)
+                                    Positioned(
+                                      right: isRTL(context) ? 25 : 105,
+                                      top: 2.5,
+                                      child: GestureDetector(
+                                        onTap: () => _selectColor(null),
+                                        child: Container(
+                                          width: 25,
+                                          height: 25,
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey[300],
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: const Icon(Icons.close,
+                                              size: 18, color: Colors.grey),
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
+                          )
+                        :
+    
+                        //!
+                        // Mobile version continues...
+                        GestureDetector(
+                            onTap: _toggleColorPicker,
+                            child: Padding(
                               padding: const EdgeInsets.only(top: 7),
                               child: SizedBox(
-                                width: 150,
+                                width: _isColorExpanded ? 150 : 60,
                                 height: 35,
                                 child: Stack(
                                   children: [
-                                    if (!_isColorExpanded) ...[
+    
+                                    //!
+                                    // When user sees first of note colors
+                                    if (_selectedColorId == null &&
+                                        !_isColorExpanded) ...[
+                                      Positioned(
+                                          right: 0,
+                                          child: _buildColorCircle(0, 0)),
+                                      Positioned(
+                                          right: 15,
+                                          child: _buildColorCircle(1, 0)),
+                                      Positioned(
+                                          right: 30,
+                                          child: _buildColorCircle(2, 0)),
+                                    ],
+    
+                                    // When user clicks on colors to pick one
+                                    if (_isColorExpanded) ...[
                                       Positioned(
                                         right: isRTL(context) ? 55 : 70,
                                         child: GestureDetector(
-                                          onTap: () => _selectColor(0),
-                                          child: _buildColorCircle(0, 0,
+                                          onTap: () => _selectColor(2),
+                                          child: _buildColorCircle(2, 0,
                                               isSelected:
-                                                  _selectedColorId == 0),
+                                                  _selectedColorId == 2),
                                         ),
                                       ),
                                       Positioned(
@@ -491,14 +573,12 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
                                       Positioned(
                                         right: isRTL(context) ? 120 : 0,
                                         child: GestureDetector(
-                                          onTap: () => _selectColor(2),
-                                          child: _buildColorCircle(2, 0,
+                                          onTap: () => _selectColor(0),
+                                          child: _buildColorCircle(0, 0,
                                               isSelected:
-                                                  _selectedColorId == 2),
+                                                  _selectedColorId == 0),
                                         ),
                                       ),
-                                    ],
-                                    if (_selectedColorId != null)
                                       Positioned(
                                         right: isRTL(context) ? 25 : 105,
                                         top: 2.5,
@@ -516,112 +596,32 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
                                           ),
                                         ),
                                       ),
+                                    ],
+    
+                                    // When user picks one color
+                                    if (_selectedColorId != null &&
+                                        !_isColorExpanded)
+                                      Positioned(
+                                        right: isRTL(context) ? 30 : 0,
+                                        child: _buildColorCircle(
+                                            _selectedColorId!, 0,
+                                            isSelected: true),
+                                      ),
                                   ],
                                 ),
                               ),
-                            )
-                          :
-
-                          //!
-                          // Mobile version continues...
-                          GestureDetector(
-                              onTap: _toggleColorPicker,
-                              child: Padding(
-                                padding: const EdgeInsets.only(top: 7),
-                                child: SizedBox(
-                                  width: _isColorExpanded ? 150 : 60,
-                                  height: 35,
-                                  child: Stack(
-                                    children: [
-
-                                      //!
-                                      // When user sees first of note colors
-                                      if (_selectedColorId == null &&
-                                          !_isColorExpanded) ...[
-                                        Positioned(
-                                            right: 0,
-                                            child: _buildColorCircle(0, 0)),
-                                        Positioned(
-                                            right: 15,
-                                            child: _buildColorCircle(1, 0)),
-                                        Positioned(
-                                            right: 30,
-                                            child: _buildColorCircle(2, 0)),
-                                      ],
-
-                                      // When user clicks on colors to pick one
-                                      if (_isColorExpanded) ...[
-                                        Positioned(
-                                          right: isRTL(context) ? 55 : 70,
-                                          child: GestureDetector(
-                                            onTap: () => _selectColor(2),
-                                            child: _buildColorCircle(2, 0,
-                                                isSelected:
-                                                    _selectedColorId == 2),
-                                          ),
-                                        ),
-                                        Positioned(
-                                          right: isRTL(context) ? 88 : 35,
-                                          child: GestureDetector(
-                                            onTap: () => _selectColor(1),
-                                            child: _buildColorCircle(1, 0,
-                                                isSelected:
-                                                    _selectedColorId == 1),
-                                          ),
-                                        ),
-                                        Positioned(
-                                          right: isRTL(context) ? 120 : 0,
-                                          child: GestureDetector(
-                                            onTap: () => _selectColor(0),
-                                            child: _buildColorCircle(0, 0,
-                                                isSelected:
-                                                    _selectedColorId == 0),
-                                          ),
-                                        ),
-                                        Positioned(
-                                          right: isRTL(context) ? 25 : 105,
-                                          top: 2.5,
-                                          child: GestureDetector(
-                                            onTap: () => _selectColor(null),
-                                            child: Container(
-                                              width: 25,
-                                              height: 25,
-                                              decoration: BoxDecoration(
-                                                color: Colors.grey[300],
-                                                shape: BoxShape.circle,
-                                              ),
-                                              child: const Icon(Icons.close,
-                                                  size: 18, color: Colors.grey),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-
-                                      // When user picks one color
-                                      if (_selectedColorId != null &&
-                                          !_isColorExpanded)
-                                        Positioned(
-                                          right: isRTL(context) ? 30 : 0,
-                                          child: _buildColorCircle(
-                                              _selectedColorId!, 0,
-                                              isSelected: true),
-                                        ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            )
-                    ],
-                  ),
-                ],
-              ),
+                            ),
+                          )
+                  ],
+                ),
+              ],
             ),
-            if (_isLoading)
-              const Center(
-                child: CircularProgressIndicator(),
-              ),
-          ],
-        ),
+          ),
+          if (_isLoading)
+            const Center(
+              child: CircularProgressIndicator(),
+            ),
+        ],
       ),
     );
   }

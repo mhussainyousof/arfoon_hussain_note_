@@ -223,6 +223,9 @@ class _HomeViewState extends State<HomeView> {
                                 onSave: widget.addNote,
                                 getLabels: widget.getLabels,
                                 initialLabel: selectedLabel,
+                                labelCubit: labelsCubit,
+                                noteCubit: notesCubit,
+                               
                               ),
                             ),
                           );
@@ -249,6 +252,7 @@ class _HomeViewState extends State<HomeView> {
                   note: selectedNote,
                   key: ValueKey(selectedNote?.id ?? 'new'),
                   noteCubit: notesCubit,
+                  labelCubit: labelsCubit,
                 ),
               ),
             ),

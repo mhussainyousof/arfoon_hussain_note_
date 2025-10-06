@@ -1,7 +1,5 @@
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
 import 'package:arfoon_note/frontend/widgets/widget.dart';
 
 class AddEditLabelView {
@@ -26,7 +24,11 @@ class AddEditLabelView {
         context: context,
         builder: (context) {
           final controller = TextEditingController(text: initialValue ?? '');
-          return NoteDialog(title: title, details: details, children: [
+          return NoteDialog(
+            title: title,
+            details: details,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
             const SizedBox(height: 8),
             CustomeTextField(
               controller: controller,
