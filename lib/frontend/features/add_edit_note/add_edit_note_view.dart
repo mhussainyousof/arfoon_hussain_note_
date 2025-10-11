@@ -56,29 +56,36 @@ class _AddEditNoteViewState extends State<AddEditNoteView> {
     _titleController = TextEditingController();
     _descriptionController = TextEditingController();
     _labelController = TextEditingController();
-
     setupNoteState();
     _loadLabels(); // Load available labels
-
-
   }
 
+
+
+//!
+// in desktop mode, to sync note and label updates from parent
  @override
 void didUpdateWidget(AddEditNoteView oldWidget) {
   super.didUpdateWidget(oldWidget);
 
+  //!
+  // If the note prop changes, update the state
   if (widget.note != oldWidget.note) {
     _note = widget.note;
     setupNoteState(widget.note);
     _loadLabels();
   }
-
+ //!
+ // If the initialLabel prop changes, update the selected labels
   if (widget.initialLabel != oldWidget.initialLabel) {
     if (widget.initialLabel != null) {
       _selectedLabelIds
         ..clear()
         ..add(widget.initialLabel!.id!);
-    } else if (oldWidget.initialLabel != null) {
+    } 
+    //!
+    // If initialLabel is removed, clear selected labels
+    else if (oldWidget.initialLabel != null) {
       _selectedLabelIds.clear();
     }
   }
@@ -89,7 +96,6 @@ void didUpdateWidget(AddEditNoteView oldWidget) {
   // setupNoteState
   void setupNoteState([Note? note]) {
     _note = note ?? widget.note;
-
     _titleController.text = _note?.title ?? '';
     _descriptionController.text = _note?.details ?? '';
     _labelController.text = '';
@@ -101,7 +107,6 @@ void didUpdateWidget(AddEditNoteView oldWidget) {
     if (_note == null && widget.initialLabel?.id != null) {
       _selectedLabelIds.add(widget.initialLabel!.id!);
     }
-
     _selectedColorId = _note?.colorId;
   }
 
@@ -113,10 +118,14 @@ void didUpdateWidget(AddEditNoteView oldWidget) {
   void _toggleColorPicker() =>
       setState(() => _isColorExpanded = !_isColorExpanded);
 
+
+
   void _selectColor(int? colorIndex) => setState(() {
         _selectedColorId = colorIndex;
         _isColorExpanded = false;
       });
+
+
 
   void _resetForm() {
     _titleController.clear();

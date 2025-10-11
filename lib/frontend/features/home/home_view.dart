@@ -91,6 +91,7 @@ class _HomeViewState extends State<HomeView> {
     final userNameCubit = homePage?.userNameCubit;
 
     final drawerWidget = DrawerPage(
+      selectedLabel: selectedLabel,
       userNameCubit: userNameCubit ?? AwaitCubit<String>(),
       labelsCubit: labelsCubit,
       onLabelSelected: applyFilter,
