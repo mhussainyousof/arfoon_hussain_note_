@@ -74,7 +74,7 @@ class _HomeViewState extends State<HomeView> {
     });
   }
 
-  Future<Note> desktopSaveNote(Note note) async {
+  Future<Note> saveNoteDesktop(Note note) async {
     final savedNote = await widget.addNote(note);
     await notesCubit.refresh();
     await labelsCubit.refresh();
@@ -86,9 +86,9 @@ class _HomeViewState extends State<HomeView> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isDesktop = Responsive.isDesktop(context);
     final isMobile = Responsive.isMobile(context);
-
     final homePage = context.findAncestorWidgetOfExactType<HomePage>();
     final userNameCubit = homePage?.userNameCubit;
+
 
     final drawerWidget = DrawerPage(
       selectedLabel: selectedLabel,
@@ -247,7 +247,7 @@ class _HomeViewState extends State<HomeView> {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 child: AddEditNoteView(
-                  onSave: desktopSaveNote,
+                  onSave: saveNoteDesktop,
                   getLabels: widget.getLabels,
                   initialLabel: selectedLabel,
                   note: selectedNote,

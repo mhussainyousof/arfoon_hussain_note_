@@ -115,7 +115,7 @@ class _ProfileViewDialogState extends State<ProfileViewDialog> {
         //!
         // Dialog action buttons
         DialogButtons(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          mainAxisAlignment: _nameController.text.trim().isEmpty ? MainAxisAlignment.center : MainAxisAlignment.spaceAround,
           primaryButtonOnPressed: () async {
             final name = _nameController.text.trim();
             if (name.isNotEmpty) {

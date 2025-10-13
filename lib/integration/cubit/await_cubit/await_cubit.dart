@@ -4,9 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arfoon_note/client/models/filter.dart';
 
 class AwaitCubit<T> extends Cubit<AwaitState<T>> {
-  AwaitCubit() : super(AwaitState(data: null));
-  Future<T> Function(Filter?)? initalGetData;
-  Filter? initalFilter;
+  AwaitCubit() : super(AwaitState(status: AwaitStatus.loading));
+  Future<T> Function(Filter?)? initialGetData;
+  Filter? initialFilter;
 
   void safeEmit(AwaitState<T> newState) {
     if (!isClosed) {
@@ -19,8 +19,8 @@ class AwaitCubit<T> extends Cubit<AwaitState<T>> {
     if (isClosed) return;
 
     if (inital) {
-      initalGetData = getData;
-      initalFilter = filter;
+      initialGetData = getData;
+      initialFilter = filter;
     }
 
     try {
@@ -33,14 +33,14 @@ class AwaitCubit<T> extends Cubit<AwaitState<T>> {
   }
 
   filter(Filter filter) {
-    if (!isClosed && initalGetData != null) {
-      load(initalGetData!, filter);
+    if (!isClosed && initialGetData != null) {
+      load(initialGetData!, filter);
     }
   }
 
   refresh({Filter? filter}) {
-    if (!isClosed && initalGetData != null) {
-      load(initalGetData!, filter ?? state.filter ?? initalFilter);
+    if (!isClosed && initialGetData != null) {
+      load(initialGetData!, filter ?? state.filter ?? initialFilter);
     }
   }
 }

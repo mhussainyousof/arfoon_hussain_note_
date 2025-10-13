@@ -24,6 +24,8 @@ class AddEditLabelView {
         context: context,
         builder: (context) {
           final controller = TextEditingController(text: initialValue ?? '');
+          //!
+          // Main Dialog
           return NoteDialog(
             title: title,
             details: details,

@@ -44,8 +44,8 @@ class _MyHomePageState extends State<ExamplePage> {
                ListTileWidget(
                 onTap: (){
                   ProfileView(onSubmit: (value) { },
-                  submitText: '',
-                  title: '',
+                  submitText: 'continue',
+                  title: 'welcome_to_arfoon_note',
                   currentName: ''
                   ).show(context);
                 },

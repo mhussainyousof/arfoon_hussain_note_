@@ -28,7 +28,7 @@ class _AwaitBuilderState<T> extends State<AwaitBuilder<T>> {
   void initState() {
     super.initState();
 
-    awaitCubit = widget.cubit!;
+    awaitCubit = widget.cubit ?? AwaitCubit<T>();
 
     final currentState = widget.cubit!.state;
     if (currentState.data == null || currentState.status == AwaitStatus.error) {

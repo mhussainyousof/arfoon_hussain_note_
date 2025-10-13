@@ -2,7 +2,7 @@ import 'package:arfoon_note/frontend/theme/note_colors.dart';
 import 'package:arfoon_note/integration/cubit/await_cubit/await_builder.dart';
 import 'package:arfoon_note/integration/cubit/await_cubit/await_cubit.dart';
 import 'package:arfoon_note/main.dart';
-import 'package:arfoon_note/server/theme.dart';
+import 'package:arfoon_note/server/theme_repo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_locales/flutter_locales.dart';
@@ -34,10 +34,8 @@ class _FrontendAppState extends State<FrontendApp> {
             builder: (locale) {
               return MaterialApp(            
             localizationsDelegates:Locales.delegates,
-       
             supportedLocales: Locales.supportedLocales,
             locale: locale,
-            
             debugShowCheckedModeBanner: false,
             title: 'Arfoon Note',
             theme: AppTheme.lightTheme(locale!),

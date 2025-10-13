@@ -66,10 +66,10 @@ class _CustomDrawerState extends State<CustomDrawer> {
   @override
   void initState() {
     super.initState();
-    _loadUserName();
+    _loadGreeting();
   }
 
-  Future<void> _loadUserName() async {
+  Future<void> _loadGreeting() async {
     setState(() {
       userGreeting = _getGreeting();
     });

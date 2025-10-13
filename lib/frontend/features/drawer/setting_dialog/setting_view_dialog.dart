@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_locales/flutter_locales.dart';
 import 'package:arfoon_note/frontend/features/drawer/setting_dialog/widgets/setting_option.dart';
 import 'package:arfoon_note/frontend/frontend.dart';
-import 'package:arfoon_note/server/theme.dart';
+import 'package:arfoon_note/server/theme_repo.dart';
 
 class SettingView {
   final String currentLanguage;

@@ -1,7 +1,7 @@
 import 'package:arfoon_note/client/models/models.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class UserInfo {
+class UserRepo {
 static const String _userNameKey = 'user_name';
 static const String _firstTimeKey = 'first_time';
 

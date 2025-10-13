@@ -22,6 +22,9 @@ class NoteChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    //!
+    // chip to show labels
     return Chip(
       labelPadding: const EdgeInsets.symmetric(horizontal: 7,),
       label: Text(text),

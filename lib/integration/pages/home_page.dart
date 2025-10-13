@@ -2,7 +2,7 @@ import 'package:arfoon_note/frontend/frontend.dart';
 import 'package:arfoon_note/integration/integration.dart';
 import 'package:arfoon_note/frontend/widgets/profile_dialog_view.dart';
 import 'package:arfoon_note/main.dart';
-import 'package:arfoon_note/server/theme.dart';
+import 'package:arfoon_note/server/theme_repo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_locales/flutter_locales.dart';
@@ -25,11 +25,13 @@ class HomePage extends StatelessWidget {
   void _onProfileTap(BuildContext context) async {
     final currentName = await api.localStorageService.getUserName(null);
     ProfileView(
+      
         title: currentName?.isEmpty ?? true
             ? 'welcome_to_arfoon_note'
             : 'edit_profile',
         submitText: currentName?.isEmpty ?? true ? 'continue' : 'save',
         currentName: currentName,
+
         onSubmit: (newName) async {
           await api.localStorageService.saveUserName(newName!);
           await userNameCubit.refresh();
